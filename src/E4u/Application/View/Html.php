@@ -1,0 +1,486 @@
+<?php
+namespace E4u\Application\View;
+
+use E4u\Application\View,
+    E4u\Application\Helper,
+    E4u\Common\File\Image,
+    Zend\View\Helper\Doctype;
+
+class Html extends View
+{
+    protected $_viewSuffix = '.html';
+    protected $_externalTarget = '_blank';
+    protected $_externalClass = 'external';
+    protected $_mailToClass = 'mailTo';
+
+    protected $_title = null;
+    protected $_description = null;
+    protected $_keywords = null;
+    protected $_metaProperties = [];
+
+    /** @var Helper\ViewHelper[] */
+    protected $_helpers = [
+        'gg'          => Helper\GaduGadu::class,
+        'bc'          => Helper\Breadcrumbs::class,
+        'flash'       => Helper\Flash::class,
+        'pagination'  => Helper\Pagination::class,
+        'breadcrumbs' => Helper\Breadcrumbs::class,
+        'icon'        => Helper\Flaticon::class,
+        'back'        => Helper\BackUrl::class,
+    ];
+
+    public function __construct()
+    {
+        $this->_('doctype')->setDoctype(Doctype::HTML5);
+        $this->registerHelpers();
+    }
+
+    protected function registerHelpers()
+    {
+        foreach ($this->_helpers as $key => $helper) {
+            $x = new $helper();
+            $x->setView($this);
+            $this->plugins()->setService($key, $x);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $type
+     * @param string $glue
+     * @return string
+     */
+    public function getFlash($type = null, $glue = '<br />')
+    {
+        return parent::getFlash($type, $glue);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->_description ?: $this->get('description');
+    }
+
+    /**
+     * @return string
+     */
+    public function getKeywords()
+    {
+        return $this->_keywords ?: $this->get('keywords');
+    }
+
+    /**
+     * @param  string $description
+     * @return Html Current instance
+     */
+    public function setDescription($description)
+    {
+        $this->_description = $description;
+        return $this;
+    }
+
+    /**
+     * @param  string $keywords
+     * @return Html Current instance
+     */
+    public function setKeywords($keywords)
+    {
+        $this->_keywords = $keywords;
+        return $this;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getMetaProperties()
+    {
+        return array_filter($this->_metaProperties ?: $this->get('metaProperties') ?: [], 'strlen');
+    }
+
+    /**
+     * @return string
+     */
+    public function showMetaProperties()
+    {
+        $html = '';
+        foreach ($this->getMetaProperties() as $key => $value) {
+            $html .= $this->tag('meta', [ 'property' => $key, 'content' => $value, ]) . "\n";
+        }
+
+        return $html;
+    }
+
+    /**
+     * @param  string $title
+     * @return Html Current instance
+     */
+    public function setTitle($title)
+    {
+        $this->_title = $title;
+        return $this;
+    }
+
+    public function showTitle($tag = 'h1', $title = null)
+    {
+        if (!is_null($title)) {
+            $this->setTitle($title);
+        }
+
+        $title = $this->getTitle();
+        if (!empty($title)) {
+            if (is_object($title)) {
+                $title = $title->__toString();
+            }
+
+            return $this->tag($tag, $title);
+        }
+
+        return null;
+    }
+
+    public function getTitle()
+    {
+        $title = $this->t($this->_title ?: $this->get('title'));
+        if (empty($title)) {
+            $title = ucfirst($this->getRequest()->getCurrentRoute()->getParam('controller'));
+        }
+
+        return $title;
+    }
+
+    /**
+     * @todo   Cache separated files into one big file?
+     * @param  array  $files
+     * @param  string $path
+     * @return string
+     */
+    public function stylesheets($files, $path = 'stylesheets')
+    {
+        $html = ''; $ext = 'css';
+        foreach ($files as $name) {
+
+            if ((0 !== strpos($name, 'http://')) && (0 !== strpos($name, '//'))) {
+
+                $filename = "$path/$name.$ext";
+                $key = '?v=' . filemtime('public/'.$filename);
+
+            }
+            else {
+
+                $filename = "$name.$ext";
+                $key = null;
+
+            }
+
+            $html .= $this->tag('link', [
+                'href' => $this->urlTo($filename) . $key,
+                'media' => 'screen, print',
+                'rel' => 'stylesheet',
+                'type' => 'text/css',
+            ])."\n";
+        }
+
+        return $html;
+    }
+
+    /**
+     * @todo   Cache separated files into one big file?
+     * @param  array  $files
+     * @param  array  $options
+     * @return string
+     */
+    public function scripts($files, $options = [])
+    {
+        $html = ''; $ext = 'js';
+        if (is_string($options)) {
+            $options = [ 'path' => $options ];
+        }
+
+        $options = array_merge([
+            'path' => 'javascripts',
+            'suffix' => $ext,
+            'type' => 'text/javascript',
+            'exec' => null,
+        ], $options);
+
+        foreach ($files as $name) {
+
+            if ((0 !== strpos($name, 'http://')) && (0 !== strpos($name, '//'))) {
+
+                $filename = "{$options['path']}/$name.{$options['suffix']}";
+                $key = '?v=' . filemtime('public/'.$filename);
+
+            }
+            else {
+
+                $filename = "$name.{$options['suffix']}";
+                $key = null;
+
+            }
+
+            $html .= $this->tag('script', [
+                'type' => $options['type'],
+                'src' => $this->urlTo($filename) . $key,
+                $options['exec'] => $options['exec'],
+            ], '') . "\n";
+        }
+
+        return $html;
+    }
+
+    /**
+     * Generate expected filename for controller-specific stylesheet
+     * @return string
+     */
+    public function controllerCSS()
+    {
+        $file = get_class($this->getController());
+        $file = str_replace(APPLICATION.'\\', '', $file);
+        $file = str_replace('Controller\\', '', $file);
+        $file = str_replace('Controller', '', $file);
+        $file = str_replace('\\', '/', $file);
+        $file = strtolower($file);
+        return $file;
+    }
+
+    /**
+     * Generate ID for controller-specific HTML element
+     * @return string
+     */
+    public function controllerID()
+    {
+        $class = get_class($this->getController());
+        $class = str_replace(APPLICATION.'\\', '', $class);
+        $class = str_replace('Controller\\', '', $class);
+        $class = str_replace('\\', '-', $class);
+        return 'controller-'.$class;
+    }
+
+    /**
+     * Generate ID for action-specific HTML element
+     * @return string
+     */
+    public function actionID()
+    {
+        return 'action-'.$this->getAction();
+    }
+
+    /**
+     * Creates HTML anchor: <a href="mailto:$email" ...>$caption</a>
+     *
+     * @param  string $email
+     * @param  string $caption  (defaults to $email)
+     * @param  array  $attributes
+     * @return string
+     */
+    public function mailTo($email, $caption = null, $attributes = [])
+    {
+        if (is_array($caption)) {
+            $caption = null;
+            $attributes = $caption;
+        }
+
+        if (is_null($caption)) {
+            $caption = $email;
+        }
+
+        $attributes['href'] = 'mailto:'.$email;
+        $attributes['class'] = trim(@$attributes['class'] . ' ' . $this->_mailToClass);
+        return $this->tag('a', $attributes, $caption);
+    }
+
+    /**
+     * Creates HTML anchor: <a href="tel:$phone" ...>$caption</a>
+     *
+     * @param  string $phone
+     * @param  string $caption  (defaults to $phone)
+     * @param  array  $attributes
+     * @return string
+     */
+    public function telTo($phone, $caption = null, $attributes = [])
+    {
+        if (is_array($caption)) {
+            $caption = null;
+            $attributes = $caption;
+        }
+
+        if (is_null($caption)) {
+            $caption = $phone;
+        }
+
+        $attributes['href'] = 'tel:'.preg_replace('/[\s\-\.]/', '', $phone);
+        return $this->tag('a', $attributes, $caption);
+    }
+
+    /**
+     * @param  string $link
+     * @param  array $attributes
+     * @param  string|array $target Target URL or URL specification
+     * @return string
+     */
+    public function linkBackOr($link, $target, $attributes = [])
+    {
+        if ($back = $this->getRequest()->getQuery('back')) {
+            $target = $back;
+        }
+
+        return $this->linkTo($link, $target, $attributes);
+    }
+
+    /**
+     * Creates HTML anchor: <a href="$target" ...>$link</a>
+     *
+     * @see \E4u\Application\Helper\Url
+     * @param  string $caption Linked text
+     * @param  string|array $target Target URL or URL specification
+     * @param  array  $attributes HTML attributes of the <a ...>  tag
+     * @return string HTML string
+     */
+    public function linkTo($caption, $target, $attributes = [])
+    {
+        if (is_null($target)) {
+            return $caption;
+        }
+
+        if (empty($caption)) {
+            return '';
+        }
+
+        if (empty($attributes['class'])) {
+            $attributes['class'] = '';
+        }
+
+        if (strpos($caption, '<img ') === 0) {
+            $attributes['class'] = trim($attributes['class'].' image');
+        }
+
+        if (Helper\Url::isExternalUrl($target)) {
+            $attributes['target'] = $this->_externalTarget;
+            $attributes['class'] = trim($attributes['class'] . ' ' . $this->_externalClass);
+        }
+
+        if (!empty($attributes['confirm'])) {
+            $attributes['onClick'] = sprintf("return confirm(%s)", json_encode($attributes['confirm']));
+            unset($attributes['confirm']);
+        }
+
+        $back = '';
+        if (!empty($attributes['back']) && $attributes['back']) {
+            $back = is_bool($attributes['back'])
+                ? $this->backUrl()
+                : $attributes['back'];
+            unset($attributes['back']);
+        }
+
+        $attributes['href'] = $this->urlTo($target) . (!empty($back) ? '?back=' . $back : '');
+        return $this->tag('a', $attributes, $caption);
+    }
+
+    /**
+     * Creates HTML button: <button>$link</button> within
+     * <form action="$target" ...>...</form>
+     *
+     * @see \E4u\Application\Helper\Url
+     * @param  string $link Linked text
+     * @param  string|array $target Target URL or URL specification
+     * @param  array  $attributes HTML attributes of the <button ...>  tag
+     * @return string HTML string
+     */
+    public function buttonTo($link, $target, $attributes = [])
+    {
+        $formAttributes = [ 'action' => $this->urlTo($target), 'method' => 'post', 'class' => 'buttonTo' ];
+        if (!empty($attributes['id'])) {
+            $formAttributes['id'] = $attributes['id'];
+            unset($attributes['id']);
+        }
+
+        if (!empty($attributes['class'])) {
+            $formAttributes['class'] .= ' '.$attributes['class'];
+            unset($attributes['class']);
+        }
+
+        if (!empty($attributes['target'])) {
+            $formAttributes['target'] = $attributes['target'];
+            unset($attributes['target']);
+        }
+
+        if (!empty($attributes['confirm'])) {
+            $formAttributes['onSubmit'] = sprintf("return confirm(%s)", json_encode($attributes['confirm']));
+            unset($attributes['confirm']);
+        }
+
+        $button = $this->tag('button', $attributes, $link);
+        return $this->tag('form', $formAttributes, $button);
+    }
+
+    public function tag($tag, $attributes = null, $content = null)
+    {
+        return \E4u\Common\Html::tag($tag, $attributes, $content);
+    }
+
+    /**
+     * @param  string|Image $file
+     * @param  int    $maxWidth
+     * @param  int    $maxHeight
+     * @param  string $alt
+     * @param  array  $attributes
+     * @return string
+     */
+    public function thumbnail($file, $maxWidth, $maxHeight, $alt, $attributes = [])
+    {
+        if (is_null($file)) {
+            return null;
+        }
+        elseif (is_string($file)) {
+            $file = new Image($file);
+        }
+
+        if ($file instanceof Image) {
+            return $this->image($file->getThumbnail($maxWidth, $maxHeight), $alt, $attributes);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  string|Image $file
+     * @param  string $alt
+     * @param  array  $attributes
+     * @return string
+     */
+    public function image($file, $alt, $attributes = [])
+    {
+        if (is_null($file)) {
+            return null;
+        }
+
+        if (is_array($alt)) {
+            $attributes = $alt;
+        }
+        elseif (is_string($alt)) {
+            $attributes['alt'] = $alt;
+        }
+
+        if ($file instanceof Image) {
+            if (!isset($attributes['width'])) {
+                $attributes['width'] = $file->getWidth();
+            }
+
+            if (!isset($attributes['height'])) {
+                $attributes['height'] = $file->getHeight();
+            }
+        }
+
+        $attributes['src'] = $this->urlTo($file);
+        if (isset($attributes['href'])) {
+            $url = $attributes['href'];
+            unset($attributes['href']);
+            return $this->linkTo($this->tag('img', $attributes), $url, [ 'title' => $attributes['alt'] ]);
+        }
+
+        return $this->tag('img', $attributes);
+    }
+}
