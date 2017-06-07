@@ -1,8 +1,8 @@
 <?php
 namespace E4u\Application\Helper;
 
-use Zend\View\Helper\AbstractHelper,
-    Zend\View\Helper\HelperInterface,
+use E4u\Application\View;
+use Zend\View\Helper\HelperInterface,
     Zend\View\Renderer\RendererInterface as Renderer;
 
 abstract class ViewHelper implements HelperInterface
@@ -10,15 +10,15 @@ abstract class ViewHelper implements HelperInterface
     /**
      * View object instance
      *
-     * @var Renderer
+     * @var View
      */
     protected $view = null;
 
     /**
      * Set the View object
      *
-     * @param  Renderer $view
-     * @return AbstractHelper
+     * @param  Renderer|View $view
+     * @return $this
      */
     public function setView(Renderer $view)
     {
@@ -29,7 +29,7 @@ abstract class ViewHelper implements HelperInterface
     /**
      * Get the view object
      *
-     * @return null|Renderer
+     * @return null|View
      */
     public function getView()
     {

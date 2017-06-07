@@ -2,6 +2,7 @@
 namespace E4u\Application;
 
 use E4u\Request\Http;
+use Zend\Stdlib\Message;
 use Zend\Stdlib\RequestInterface,
     Zend\Stdlib\ResponseInterface,
     Zend\Config\Config,
@@ -100,7 +101,7 @@ abstract class Controller implements DispatchableInterface
     /**
      * @param  string $content
      * @param  array  $data
-     * @return \E4u\Response\Xhr
+     * @return \E4u\Response\Xhr|Message
      */
     public function sendXhrResponse($content, $data = null)
     {
