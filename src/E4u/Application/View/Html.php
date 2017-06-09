@@ -17,6 +17,7 @@ class Html extends View
     protected $_description = null;
     protected $_keywords = null;
     protected $_metaProperties = [];
+    protected $_canonicalUrl;
 
     /** @var Helper\ViewHelper[] */
     protected $_helpers = [
@@ -38,6 +39,7 @@ class Html extends View
     protected function registerHelpers()
     {
         foreach ($this->_helpers as $key => $helper) {
+            /** @var Helper\ViewHelper $x */
             $x = new $helper();
             $x->setView($this);
             $this->plugins()->setService($key, $x);
@@ -114,8 +116,36 @@ class Html extends View
     }
 
     /**
+     * @return mixed
+     */
+    public function getCanonicalUrl()
+    {
+        return $this->_canonicalUrl ?: $this->get('canonicalUrl');
+    }
+
+    /**
+     * @param  mixed $url
+     * @return $this
+     */
+    public function setCanonicalUrl($url)
+    {
+        $this->_canonicalUrl = $url;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function showCanonicalUrl()
+    {
+        return $url = $this->getCanonicalUrl()
+            ? $this->tag('link', [ 'rel' => 'canonical', 'href' => $this->urlTo($this->getCanonicalUrl(), true) ])
+            : '';
+    }
+
+    /**
      * @param  string $title
-     * @return Html Current instance
+     * @return $this Current instance
      */
     public function setTitle($title)
     {
@@ -123,6 +153,11 @@ class Html extends View
         return $this;
     }
 
+    /**
+     * @param  string $tag
+     * @param  string $title
+     * @return null|string
+     */
     public function showTitle($tag = 'h1', $title = null)
     {
         if (!is_null($title)) {
@@ -132,7 +167,7 @@ class Html extends View
         $title = $this->getTitle();
         if (!empty($title)) {
             if (is_object($title)) {
-                $title = $title->__toString();
+                $title = (string)$title;
             }
 
             return $this->tag($tag, $title);
@@ -141,6 +176,9 @@ class Html extends View
         return null;
     }
 
+    /**
+     * @return string
+     */
     public function getTitle()
     {
         $title = $this->t($this->_title ?: $this->get('title'));
@@ -162,7 +200,7 @@ class Html extends View
         $html = ''; $ext = 'css';
         foreach ($files as $name) {
 
-            if ((0 !== strpos($name, 'http://')) && (0 !== strpos($name, '//'))) {
+            if (!Helper\Url::isExternalUrl($name)) {
 
                 $filename = "$path/$name.$ext";
                 $key = '?v=' . filemtime('public/'.$filename);
@@ -176,11 +214,11 @@ class Html extends View
             }
 
             $html .= $this->tag('link', [
-                'href' => $this->urlTo($filename) . $key,
-                'media' => 'screen, print',
-                'rel' => 'stylesheet',
-                'type' => 'text/css',
-            ])."\n";
+                    'href' => $this->urlTo($filename) . $key,
+                    'media' => 'screen, print',
+                    'rel' => 'stylesheet',
+                    'type' => 'text/css',
+                ])."\n";
         }
 
         return $html;
@@ -237,12 +275,11 @@ class Html extends View
      */
     public function controllerCSS()
     {
-        $file = get_class($this->getController());
-        $file = str_replace(APPLICATION.'\\', '', $file);
-        $file = str_replace('Controller\\', '', $file);
-        $file = str_replace('Controller', '', $file);
-        $file = str_replace('\\', '/', $file);
-        $file = strtolower($file);
+        $module = $this->getActiveModule();
+        $file = empty($module)
+            ? $this->getActiveController()
+            : $module . '/' . $this->getActiveController();
+
         return $file;
     }
 
@@ -252,11 +289,11 @@ class Html extends View
      */
     public function controllerID()
     {
-        $class = get_class($this->getController());
-        $class = str_replace(APPLICATION.'\\', '', $class);
-        $class = str_replace('Controller\\', '', $class);
-        $class = str_replace('\\', '-', $class);
-        return 'controller-'.$class;
+        $module = $this->getActiveModule();
+        $class = empty($module)
+            ? $this->getActiveController()
+            : $module . ucfirst($this->getActiveController());
+        return 'controller-' . $class;
     }
 
     /**
@@ -416,6 +453,12 @@ class Html extends View
         return $this->tag('form', $formAttributes, $button);
     }
 
+    /**
+     * @param  string $tag
+     * @param  string[] $attributes
+     * @param  string $content
+     * @return string
+     */
     public function tag($tag, $attributes = null, $content = null)
     {
         return \E4u\Common\Html::tag($tag, $attributes, $content);
