@@ -14,6 +14,7 @@ class Regex extends ZendRegex
      *
      * @see    Route::match()
      * @param  Request $request
+     * @param  int $pathOffset
      * @return RouteMatch
      */
     public function match(Request $request, $pathOffset = null)

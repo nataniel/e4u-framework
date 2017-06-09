@@ -14,6 +14,8 @@ class Route extends Segment
      *
      * @see    Route::match()
      * @param  Request $request
+     * @param  int $pathOffset
+     * @param  array $options
      * @return RouteMatch
      */
     public function match(Request $request, $pathOffset = null, array $options = [])
@@ -23,7 +25,6 @@ class Route extends Segment
         }
 
         $path = $request->getCurrentPath();
-        $path = '/'.trim($path, '/');
         $path = urldecode(urldecode($path));
 
         $result = preg_match('(^' . $this->regex . '$)u', $path, $matches);
