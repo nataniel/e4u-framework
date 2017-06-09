@@ -1,6 +1,7 @@
 <?php
 namespace E4u\Application;
 
+use E4u\Common\StringTools;
 use E4u\Request\Http;
 use Zend\Stdlib\Message;
 use Zend\Stdlib\RequestInterface,
@@ -281,6 +282,7 @@ abstract class Controller implements DispatchableInterface
      */
     protected function init($action)
     {
+        return null;
     }
 
     /**
@@ -482,7 +484,7 @@ abstract class Controller implements DispatchableInterface
     /**
      * Get the request object
      *
-     * @return Http
+     * @return Http|Request
      */
     public function getRequest()
     {
@@ -513,28 +515,11 @@ abstract class Controller implements DispatchableInterface
     {
         if (null === $this->_response) {
             $this->_response = $this->isXhr()
-                            ? new \E4u\Response\Xhr()
-                            : new \E4u\Response\Http();
+                ? new \E4u\Response\Xhr()
+                : new \E4u\Response\Http();
         }
 
         return $this->_response;
-    }
-
-    /**
-     * Method overloading: return plugins
-     *
-     * @param mixed $method
-     * @param mixed $params
-     * @return mixed
-     */
-    public function __call($method, $params)
-    {
-        $options = null;
-        if (0 < count($params)) {
-            $options = array_shift($params);
-        }
-
-        return $this->plugin($method, $options);
     }
 
     /**
@@ -545,7 +530,7 @@ abstract class Controller implements DispatchableInterface
      */
     public static function getMethodFromAction($action)
     {
-        $method  = \E4u\Common\StringTools::camelCase($action);
+        $method  = StringTools::camelCase($action);
         $method  = lcfirst($method);
         $method .= 'Action';
         return $method;
@@ -564,11 +549,22 @@ abstract class Controller implements DispatchableInterface
 
     /**
      * @param mixed $message
-     * @param array ...$parameters
+     * @param array $parameters
      * @return string
      */
-    public function t($message, ...$parameters)
+    public function t($message, $parameters = null)
     {
-        return vsprintf($this->translate($message), $parameters);
+        $txt = $this->translate($message);
+        if (!empty($parameters)) {
+
+            if (!is_array($parameters)) {
+                $parameters = func_get_args();
+                array_shift($parameters);
+            }
+
+            return vsprintf($txt, $parameters);
+        }
+
+        return $txt;
     }
 }

@@ -166,10 +166,6 @@ class Html extends View
 
         $title = $this->getTitle();
         if (!empty($title)) {
-            if (is_object($title)) {
-                $title = (string)$title;
-            }
-
             return $this->tag($tag, $title);
         }
 
@@ -181,12 +177,21 @@ class Html extends View
      */
     public function getTitle()
     {
-        $title = $this->t($this->_title ?: $this->get('title'));
-        if (empty($title)) {
-            $title = ucfirst($this->getRequest()->getCurrentRoute()->getParam('controller'));
+        $title = $this->_title ?: $this->get('title');
+        if (is_array($title)) {
+            $params = $title;
+            $title = array_shift($params);
+        }
+        else {
+            $title = (string)$title;
+            $params = [];
         }
 
-        return $title;
+        if (empty($title)) {
+            $title = ucfirst($this->getActiveController());
+        }
+
+        return $this->t($title, $params);
     }
 
     /**

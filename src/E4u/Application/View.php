@@ -429,11 +429,22 @@ abstract class View implements Renderer, Resolver, ContainerInterface
 
     /**
      * @param mixed $message
-     * @param array ...$parameters
+     * @param array $parameters
      * @return string
      */
-    public function t($message, ...$parameters)
+    public function t($message, $parameters = null)
     {
-        return vsprintf($this->translate($message), $parameters);
+        $txt = $this->translate($message);
+        if (!empty($parameters)) {
+
+            if (!is_array($parameters)) {
+                $parameters = func_get_args();
+                array_shift($parameters);
+            }
+
+            return vsprintf($txt, $parameters);
+        }
+
+        return $txt;
     }
 }
