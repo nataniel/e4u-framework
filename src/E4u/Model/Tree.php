@@ -73,6 +73,14 @@ trait Tree
     }
 
     /**
+     * @return bool
+     */
+    public function isRoot()
+    {
+        return is_null($this->getParent());
+    }
+
+    /**
      * @param  int $limit
      * @param  int $offset
      * @return self[]
