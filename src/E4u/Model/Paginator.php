@@ -2,10 +2,11 @@
 namespace E4u\Model;
 
 use Countable, IteratorAggregate, ArrayIterator;
+use E4u\Common\Collection\Paginable;
 use E4u\Common\Variable;
 use E4u\Exception\LogicException;
 
-class Paginator implements Countable, IteratorAggregate
+class Paginator implements Countable, IteratorAggregate, Paginable
 {
     /**
      * @var Collection

@@ -1,8 +1,8 @@
 <?php
 namespace E4u\Application\Helper;
 
-use E4u\Model\Paginator,
-    E4u\Application\View;
+use E4u\Common\Collection\Paginable;
+use E4u\Application\View;
 
 /**
  * Usage:
@@ -31,8 +31,12 @@ class Pagination extends ViewHelper
           </a>
         </li>
         </ul>
+     *
+     * @param  Paginable $collection
+     * @param  array $options
+     * @return string
      */
-    public function show(Paginator $collection, $options = [])
+    public function show(Paginable $collection, $options = [])
     {
         if (isset($options['prev'])) {
             $prevCaption =  $options['prev'];
@@ -124,6 +128,11 @@ class Pagination extends ViewHelper
         return $this->getView()->tag('li', [ 'class' => trim('page-item ' . $class) ], $this->linkToPage($page, $caption));
     }
 
+    /**
+     * @param  int $page
+     * @param  string $caption
+     * @return string
+     */
     protected function linkToPage($page, $caption = null)
     {
         $href = '?' . $this->getView()->getRequest()->mergeQuery([ 'page' => $page ]);
@@ -136,8 +145,11 @@ class Pagination extends ViewHelper
 
     /**
      * @deprecated
+     * @param  Paginable $collection
+     * @param  View\Html $view
+     * @return string
      */
-    public static function listPages(Paginator $collection, View $view)
+    public static function listPages(Paginable $collection, View\Html $view)
     {
         $html = '';
         if ($prev = $collection->prevPage()) {
@@ -174,8 +186,13 @@ class Pagination extends ViewHelper
 
     /**
      * @deprecated
+     * @param  Paginable $collection
+     * @param  View\Html $view
+     * @param  int $page
+     * @param  string $caption
+     * @return string
      */
-    public static function linkTo(Paginator $collection, View $view, $page, $caption = null)
+    public static function linkTo(Paginable $collection, View\Html $view, $page, $caption = null)
     {
         $caption = $caption ?: (string)$page;
         if ($collection->currentPage() != $page) {
