@@ -125,7 +125,9 @@ class Pagination extends ViewHelper
             $class = 'disabled';
         }
 
-        return $this->getView()->tag('li', [ 'class' => trim('page-item ' . $class) ], $this->linkToPage($page, $caption));
+        return $this->getView()->tag('li', [
+            'class' => trim('page-item ' . $class)
+        ], $this->linkToPage($page, $caption));
     }
 
     /**
@@ -139,6 +141,7 @@ class Pagination extends ViewHelper
         return $this->getView()->tag('a', [
             'href' => $href,
             'class' => 'page-link',
+            'data-page' => $page,
             'title' => $page ? 'strona '.$page : null
         ], $caption ?: $page).' ';
     }
