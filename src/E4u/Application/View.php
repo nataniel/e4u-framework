@@ -454,6 +454,11 @@ abstract class View implements Renderer, Resolver, ContainerInterface
      */
     public function t($message, $parameters = null)
     {
+        if (is_array($message)) {
+            $parameters = $message;
+            $message = array_shift($parameters);
+        }
+
         $txt = $this->translate($message);
         if (!empty($parameters)) {
 
