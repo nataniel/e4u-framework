@@ -131,7 +131,7 @@ abstract class Controller implements DispatchableInterface
 
     /**
      * @param array|string $target
-     * @param string $message
+     * @param array|string $message
      * @param string $type
      * @return Response
      * @throws Controller\Redirect
@@ -139,7 +139,7 @@ abstract class Controller implements DispatchableInterface
     protected function redirectTo($target, $message = null, $type = View::FLASH_MESSAGE)
     {
         if (!empty($message)) {
-            $this->getView()->addFlash($this->t($message), $type);
+            $this->getView()->addFlash($message, $type);
         }
 
         $exception = new Controller\Redirect();

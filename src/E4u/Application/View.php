@@ -1,6 +1,8 @@
 <?php
 namespace E4u\Application;
 
+use E4u\Common\Variable;
+use E4u\Exception\LogicException;
 use E4u\Loader;
 use Interop\Container\ContainerInterface;
 use Zend\View\Renderer\RendererInterface as Renderer,
@@ -69,24 +71,36 @@ abstract class View implements Renderer, Resolver, ContainerInterface
         return $this;
     }
 
+    /**
+     * @param  string|array $message
+     * @return $this
+     */
     public function addSuccessFlash($message)
     {
         return $this->addFlash($message, self::FLASH_SUCCESS);
     }
 
+    /**
+     * @param  string|array $message
+     * @return $this
+     */
     public function addMessageFlash($message)
     {
         return $this->addFlash($message, self::FLASH_MESSAGE);
     }
 
+    /**
+     * @param  string|array $message
+     * @return $this
+     */
     public function addErrorFlash($message)
     {
         return $this->addFlash($message, self::FLASH_ERROR);
     }
 
     /**
-     * @param string $message
-     * @param string $type
+     * @param  string|array $message
+     * @param  string $type
      * @return View
      */
     public function addFlash($message, $type = self::FLASH_MESSAGE)
@@ -95,13 +109,13 @@ abstract class View implements Renderer, Resolver, ContainerInterface
             $_SESSION['flash'][$type] = [];
         }
 
-        $_SESSION['flash'][$type][] = $message;
+        $_SESSION['flash'][$type][] = $this->t($message);
         return $this;
     }
 
     /**
-     * @param string $type
-     * @param string $glue
+     * @param  string $type
+     * @param  string $glue
      * @return string
      */
     public function getFlash($type = null, $glue = "\n")
@@ -159,8 +173,9 @@ abstract class View implements Renderer, Resolver, ContainerInterface
      * Defined by RendererInterface.
      *
      * @todo  Add variables from $vars instead of replacing
-     * @param string $name
-     * @param string $partial
+     * @param  string $name
+     * @param  array $vars
+     * @param  string $partial
      * @return string
      */
     public function render($name, $vars = null, $partial = null)
@@ -187,6 +202,11 @@ abstract class View implements Renderer, Resolver, ContainerInterface
         return $content;
     }
 
+    /**
+     * @param  string $name
+     * @param  string $content
+     * @return $this
+     */
     public function setPartial($name, $content)
     {
         $this->__partials[$name] = $content;
@@ -218,14 +238,14 @@ abstract class View implements Renderer, Resolver, ContainerInterface
         try {
             $filename = $this->_viewPath.DIRECTORY_SEPARATOR.$name.$this->_viewSuffix;
             if (!is_file($filename)) {
-                throw new \E4u\Exception\LogicException("File $filename does not exist.");
+                throw new LogicException("File $filename does not exist.");
             }
 
             ob_start();
             include $filename;
             return ob_get_clean();
         }
-        catch (\E4u\Exception\LogicException $e) {
+        catch (LogicException $e) {
             return '<pre><h3>'.$e->getMessage()."</h3>\n".$e->getTraceAsString().'</pre>';
         }
     }
@@ -288,7 +308,7 @@ abstract class View implements Renderer, Resolver, ContainerInterface
      *
      * @param  array|ArrayAccess $variables
      * @return View
-     * @throws \E4u\Exception\LogicException
+     * @throws LogicException
      */
     public function registerVars($variables)
     {
@@ -297,9 +317,9 @@ abstract class View implements Renderer, Resolver, ContainerInterface
         }
 
         if (!is_array($variables) && !$variables instanceof ArrayAccess) {
-            throw new \E4u\Exception\LogicException(sprintf(
+            throw new LogicException(sprintf(
                 'Expected array or ArrayAccess object; received "%s"',
-                \E4u\Common\Variable::getType($variables))
+                Variable::getType($variables))
             );
         }
 
