@@ -1,0 +1,13 @@
+<phpunit
+    bootstrap="./bootstrap.php"
+    colors="false">
+    <testsuites>
+        <testsuite name="E4u Application Test Suite">
+            <directory>./</directory>
+        </testsuite>
+    </testsuites>
+    <logging>
+        <log type="testdox-html" target="../logs/tests.html"/>
+        <log type="testdox-text" target="../logs/tests.txt"/>
+    </logging>
+</phpunit>

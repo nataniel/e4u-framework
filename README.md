@@ -18,3 +18,8 @@ require_once 'vendor/autoload.php';
 $app = E4u\Loader::get(APPLICATION);
 $app->run()->send();
 ```
+
+## Tests
+```
+phpunit --configuration tests/phpunit.xml
+```
