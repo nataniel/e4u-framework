@@ -10,10 +10,6 @@ class Generate extends Base
         return [ APPLICATION.'\Class' => sprintf("Generate test case for %s\\Class", APPLICATION) ];
     }
 
-    /**
-     * Generates test file for application classes using phpUnit Skeleton Generator
-     * https://github.com/sebastianbergmann/phpunit-skeleton-generator
-     */
     public function execute()
     {
         $srcClass = $this->getArgument(0);
@@ -61,8 +57,6 @@ class Generate extends Base
         }
 
 
-        #$command = "vendor\\bin\\phpunit-skelgen generate-test --bootstrap=\"tests\bootstrap.php\" $className \"\" $testClass $testFile";
-        #system($command);
         file_put_contents($testFile, $this->testFileContents($srcClass, $testClass));
         echo $testFile. " created.\n";
 
