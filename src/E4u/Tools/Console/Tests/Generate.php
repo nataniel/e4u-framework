@@ -24,31 +24,17 @@ class Generate extends Base
         }
 
         $rootNamespace = strtok($srcClass, '\\');
-        $testName = strtok('');
+        $testClass = $rootNamespace . 'Test' . substr($srcClass, strlen($rootNamespace)) . 'Test';
 
-        switch ($rootNamespace) {
-            case APPLICATION:
-                $directory = 'application';
-                break;
-            case 'E4u':
-                $directory = 'framework';
-                break;
-            default:
-                echo sprintf('You can only generate tests for application (%s\\) or framework (%s\\) classes.',
-                             APPLICATION, 'E4u');
-                return false;
-        }
-
-        $testClass = $rootNamespace . 'Test\\' . $testName . 'Test';
         if (class_exists($testClass)) {
             echo sprintf("ERROR: Class %s already exists.\n", $testClass);
             return false;
         }
 
-        $testFile = 'tests' . DIRECTORY_SEPARATOR . $directory . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $testName) . 'Test.php';
+        $testFile = 'tests' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $testClass) . '.php';
         if (file_exists($testFile) && !$this->getOption('force')) {
             echo sprintf("WARNING: File %s already exists.\n".
-                         "         Use --force to overwrite it.\n", $testFile);
+                "         Use --force to overwrite it.\n", $testFile);
             return false;
         }
 
