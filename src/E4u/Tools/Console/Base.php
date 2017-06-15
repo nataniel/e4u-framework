@@ -1,11 +1,14 @@
 <?php
 namespace E4u\Tools\Console;
 
+use E4u\Application\Helper\Url;
 use E4u\Request\Request;
 use E4u\Tools\Console;
 
 abstract class Base implements Command
 {
+    use Url;
+
     const HELP = '';
 
     protected $arguments;
