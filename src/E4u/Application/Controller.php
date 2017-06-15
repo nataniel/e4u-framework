@@ -100,7 +100,7 @@ abstract class Controller implements DispatchableInterface
     }
 
     /**
-     * @param  string $content
+     * @param  mixed $content
      * @param  array  $data
      * @return \E4u\Response\Xhr|Message
      */
