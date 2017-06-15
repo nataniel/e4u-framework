@@ -4,6 +4,7 @@ namespace E4u\Tools\Console;
 use E4u\Application\Helper\Url;
 use E4u\Request\Request;
 use E4u\Tools\Console;
+use Zend\Console\Getopt;
 
 abstract class Base implements Command
 {
@@ -11,22 +12,49 @@ abstract class Base implements Command
 
     const HELP = '';
 
+    /**
+     * @var array
+     */
     protected $arguments;
+
+    /**
+     * @var Getopt
+     */
     protected $options;
+
+    /**
+     * @var Console
+     */
     protected $console;
+
+    /**
+     * @var Request
+     */
     protected $request;
 
+    /**
+     * @return string
+     */
     protected function getScript()
     {
         return $_SERVER['argv'][0];
     }
 
+    /**
+     * @param  string $key
+     * @param  mixed $default
+     * @return mixed|null
+     */
     protected function getOption($key, $default = null)
     {
         $value = $this->options->getOption($key);
         return !empty($value) ? $value : $default;
     }
 
+    /**
+     * @param  string $key
+     * @return string|null
+     */
     protected function getArgument($key)
     {
         if (isset($this->arguments[$key])) {
@@ -36,6 +64,11 @@ abstract class Base implements Command
         return null;
     }
 
+    /**
+     * @param  array $arguments
+     * @param  Getopt $options
+     * @return $this
+     */
     public function configure($arguments, $options)
     {
         $this->arguments = $arguments;
@@ -60,7 +93,7 @@ abstract class Base implements Command
         $this->console = $console;
         return $this;
     }
-    
+
     public function showHelp()
     {
         echo "Usage:\n";
