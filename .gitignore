@@ -1,5 +1,5 @@
 logs
-tmp
 vendor
+composer.lock
 .environment
 .idea
