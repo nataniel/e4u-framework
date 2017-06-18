@@ -206,4 +206,12 @@ class Console
 
         return null;
     }
+
+    /**
+     * @return Config
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
 }

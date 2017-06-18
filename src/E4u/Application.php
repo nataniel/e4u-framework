@@ -232,7 +232,7 @@ class Application
     }
 
     /**
-     * Get the router object. If no object available,
+     * Get the request object. If no object available,
      * then create and configure one.
      *
      * @return Request
@@ -241,29 +241,22 @@ class Application
     {
         if (!$this->request instanceof Request) {
             $this->request = \E4u\Request\Factory::create();
+            if ($routes = $this->getConfig()->get('routes')) {
+                $this->request->getRouter()->addRoutes($routes->toArray());
+            }
         }
 
         return $this->request;
     }
 
     /**
-     * Get the router object. If no object available,
-     * then create and configure one.
+     * Get the router object from request.
      *
      * @return RouteStackInterface
      */
     public function getRouter()
     {
-        if (!$this->router instanceof RouteStackInterface)
-        {
-            $this->router = $this->getRequest()->getRouter();
-
-            if ($routes = $this->getConfig()->get('routes')) {
-                $this->router->addRoutes($routes->toArray());
-            }
-        }
-
-        return $this->router;
+        return $this->getRequest()->getRouter();
     }
 
     /**

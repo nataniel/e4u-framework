@@ -115,6 +115,11 @@ abstract class Base implements Command
     {
         if (!$this->request instanceof Request) {
             $this->request = \E4u\Request\Factory::create();
+
+            $config = $this->getConsole()->getConfig();
+            if ($routes = $config->get('routes')) {
+                $this->request->getRouter()->addRoutes($routes->toArray());
+            }
         }
 
         return $this->request;
