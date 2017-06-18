@@ -1,51 +1,52 @@
 <?php
 namespace E4uTest\Model;
 
+use E4u\Model\Base;
 use PHPUnit\Framework\TestCase;
 
 class BaseTest extends TestCase
 {
     /**
-     * @covers \E4u\Model\Base::propertyGetMethod
+     * @covers Base::propertyGetMethod
      */
     public function testPropertyGetMethod()
     {
         $this->assertEquals(
           'getProductName',
-          \E4u\Model\Base::propertyGetMethod('product_name')
+          Base::propertyGetMethod('product_name')
         );
     }
 
     /**
-     * @covers \E4u\Model\Base::propertyDelFromMethod
+     * @covers Base::propertyDelFromMethod
      */
     public function testPropertyDelFromMethod()
     {
         $this->assertEquals(
           'delFromProductsImages',
-          \E4u\Model\Base::propertyDelFromMethod('products_images')
+          Base::propertyDelFromMethod('products_images')
         );
     }
 
     /**
-     * @covers \E4u\Model\Base::propertyAddToMethod
+     * @covers Base::propertyAddToMethod
      */
     public function testPropertyAddToMethod()
     {
         $this->assertEquals(
           'addToProductsImages',
-          \E4u\Model\Base::propertyAddToMethod('products_images')
+          Base::propertyAddToMethod('products_images')
         );
     }
 
     /**
-     * @covers \E4u\Model\Base::propertySetMethod
+     * @covers Base::propertySetMethod
      */
     public function testPropertySetMethod()
     {
         $this->assertEquals(
           'setProductName',
-          \E4u\Model\Base::propertySetMethod('product_name')
+          Base::propertySetMethod('product_name')
         );
     }
 }

@@ -44,9 +44,10 @@
 
 namespace E4u;
 
+use Doctrine\Common\Proxy\Autoloader;
 use Zend\Config\Config,
     Zend\Loader\StandardAutoloader,
-    Doctrine\ORM\Proxy,
+    Doctrine\Common\Proxy,
     Doctrine\ORM\EntityManager;
 
 #mb_internal_encoding('utf-8');
@@ -335,9 +336,6 @@ class Loader
      */
     public static function configureApplication($namespace = 'My', $environment = null)
     {
-        // register autoloader
-        self::register($namespace);
-
         // load main configuration
         $config = self::load('application');
         $appConfig = new Config($config, true);
@@ -367,25 +365,5 @@ class Loader
 
         Registry::set('application/config', $appConfig);
         return $appConfig;
-    }
-
-    /**
-     * @param  string $namespace
-     * @param  string $path to src/ directory
-     * @return StandardAutoloader
-     */
-    public static function register($namespace = 'My', $path = 'application/src')
-    {
-        if (is_file('vendor/autoload.php')) {
-            require_once 'vendor/autoload.php';
-        }
-
-        set_include_path(get_include_path() . PATH_SEPARATOR . 'library');
-
-        $autoloader = new StandardAutoloader([ StandardAutoloader::ACT_AS_FALLBACK => true ]);
-        $autoloader->registerNamespace($namespace, $path)->register();
-
-        Registry::set('application/autoloader', $autoloader);
-        return $autoloader;
     }
 }

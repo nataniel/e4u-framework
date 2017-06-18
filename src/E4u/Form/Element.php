@@ -3,14 +3,15 @@ namespace E4u\Form;
 
 use E4u\Common\StringTools;
 use E4u\Common\Variable;
+use E4u\Exception\LogicException;
 use E4u\Model\Entity;
-use Zend\Validator\ValidatorChain,
-    Zend\Validator\ValidatorInterface;
+use E4u\Model\Validatable;
+use Zend\Validator;
 
 abstract class Element
 {
     /**
-     * @var ValidatorChain
+     * @var Validator\ValidatorChain
      */
     protected $validatorChain;
 
@@ -101,7 +102,7 @@ abstract class Element
             return call_user_func_array([$this, $method], $argv);
         }
 
-        throw new \E4u\Exception\LogicException(
+        throw new LogicException(
             sprintf('Call to undefined method %s::%s()',
             get_class($this), $method));
     }
@@ -123,7 +124,7 @@ abstract class Element
 
     /**
      * @param  boolean $flag
-     * @return Element
+     * @return $this
      */
     public function setDisabled($flag = true)
     {
@@ -139,7 +140,7 @@ abstract class Element
 
     /**
      * @param  boolean $flag
-     * @return Element
+     * @return $this
      */
     public function setAutofocus($flag = true)
     {
@@ -155,7 +156,7 @@ abstract class Element
 
     /**
      * @param  boolean $flag
-     * @return Element
+     * @return $this
      */
     public function setAutocomplete($flag = true)
     {
@@ -172,7 +173,7 @@ abstract class Element
     /**
      * @param  mixed    $model to attach
      * @param  string   $model_field model field name
-     * @return Element  Current instance
+     * @return $this  Current instance
      */
     public function setModel($model, $model_field = null)
     {
@@ -192,7 +193,7 @@ abstract class Element
 
     /**
      * @param  string   $model_field model field name
-     * @return Element  Current instance
+     * @return $this  Current instance
      */
     public function setModelField($model_field)
     {
@@ -286,12 +287,13 @@ abstract class Element
     }
 
     /**
-     * @return mixed
+     * @param  mixed $value
+     * @return $this
      */
     public function setDefault($value)
     {
         if (!is_null($this->model)) {
-            throw new \E4u\Exception\LogicException(
+            throw new LogicException(
                 'Cannot assign default value to the model-related form element.');
         }
 
@@ -312,7 +314,7 @@ abstract class Element
 
     /**
      * @param  mixed $value
-     * @return Element
+     * @return $this
      */
     public function setValue($value)
     {
@@ -361,7 +363,7 @@ abstract class Element
             return false;
         }
 
-        if (!is_null($this->model) && $this->model instanceof \E4u\Model\Validatable) {
+        if (!is_null($this->model) && $this->model instanceof Validatable) {
             if (!$this->model->valid()) {
                 if ($error = $this->model->getErrors($this->getModelField())) {
                     $this->errors[] = $error;
@@ -382,7 +384,7 @@ abstract class Element
 
     /**
      * @param  string $message
-     * @return Element
+     * @return $this
      */
     public function setRequired($message = null)
     {
@@ -394,7 +396,7 @@ abstract class Element
 
         $this->required = true;
         $this->attributes['required'] = 'required';
-        $this->addValidator(new \Zend\Validator\NotEmpty(), $message);
+        $this->addValidator(new Validator\NotEmpty(), $message);
         return $this;
     }
 
@@ -410,12 +412,12 @@ abstract class Element
             $message = 'Nieprawidłowy format pola: ' . $this->getLabel() . '.';
         }
 
-        $this->addValidator(new \Zend\Validator\Regex('/^' . $pattern . '$/'), $message);
+        $this->addValidator(new Validator\Regex('/^' . $pattern . '$/'), $message);
         return $this;
     }
 
     /**
-     * @param  ValidatorInterface|string $validator
+     * @param  Validator\ValidatorInterface|string $validator
      * @param  string $message
      * @param  bool   $breakChainOnFailure
      * @return $this
@@ -435,12 +437,12 @@ abstract class Element
     }
 
     /**
-     * @return ValidatorChain
+     * @return Validator\ValidatorChain
      */
     protected function getValidatorChain()
     {
         if (null === $this->validatorChain) {
-            $this->validatorChain = new ValidatorChain();
+            $this->validatorChain = new Validator\ValidatorChain();
         }
 
         return $this->validatorChain;

@@ -2,6 +2,7 @@
 namespace E4u\Common\File;
 
 use E4u\Common\File;
+use E4u\Exception\LogicException;
 
 class Image extends File
 {
@@ -177,7 +178,7 @@ class Image extends File
                     @$img = imagecreatefromgif($this->getFullPath());
                     break;
                 default:
-                    throw new \E4u\Exception\LogicException(sprintf('Only JPG, PNG and GIF files are allowed for getThumbnail(), %s given.', $this->getFilename()));
+                    throw new LogicException(sprintf('Only JPG, PNG and GIF files are allowed for getThumbnail(), %s given.', $this->getFilename()));
             }
 
             $red = 255; $green = 255; $blue = 255;

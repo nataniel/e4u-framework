@@ -1,6 +1,7 @@
 <?php
 namespace E4u\Authentication\Identity;
 
+use Doctrine\ORM\EntityRepository;
 use E4u\Authentication\Exception;
 use E4u\Authentication\Identity;
 use E4u\Common\Variable;
@@ -227,7 +228,7 @@ abstract class User extends Entity implements Identity
     }
 
     /**
-     * @return Repository
+     * @return Repository|EntityRepository
      */
     public static function getRepository()
     {

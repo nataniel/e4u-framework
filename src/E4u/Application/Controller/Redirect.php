@@ -1,6 +1,8 @@
 <?php
 namespace E4u\Application\Controller;
 
+use E4u\Response\Response;
+
 /**
  * <code>
  *  $exception = new Controller\Redirect();
@@ -9,7 +11,7 @@ namespace E4u\Application\Controller;
  */
 class Redirect extends \Exception
 {
-    protected $code = \E4u\Response\Response::STATUS_REDIRECT;
+    protected $code = Response::STATUS_REDIRECT;
 
     private $url;
 

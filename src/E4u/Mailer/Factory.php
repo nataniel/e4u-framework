@@ -1,6 +1,7 @@
 <?php
 namespace E4u\Mailer;
 
+use E4u\Exception\LogicException;
 use Zend\Mail\Transport;
 
 class Factory
@@ -33,7 +34,7 @@ class Factory
                 }
         }
 
-        throw new \E4u\Exception\LogicException(sprintf(
+        throw new LogicException(sprintf(
             "Invalid or undefined mailer type: %s.", $type));
     }
 }

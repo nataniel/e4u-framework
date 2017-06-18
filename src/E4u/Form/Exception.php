@@ -1,3 +1,4 @@
 <?php
 namespace E4u\Form;
-class Exception extends \E4u\Exception\LogicException { }
+use E4u\Exception\LogicException;
+class Exception extends LogicException {}

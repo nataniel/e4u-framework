@@ -30,7 +30,7 @@ class ArrayLoader extends AbstractFileLoader
         $messages = include $fromIncludePath;
 
         if (!is_array($messages)) {
-            throw new \Zend\I18n\Exception\InvalidArgumentException(sprintf(
+            throw new Exception\InvalidArgumentException(sprintf(
                 'Expected an array, but received %s',
                 gettype($messages)
             ));

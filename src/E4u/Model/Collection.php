@@ -5,6 +5,8 @@ use Doctrine\ORM\QueryBuilder,
     Doctrine\ORM\Query,
     Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator,
     Countable, IteratorAggregate, ArrayIterator, ArrayAccess;
+use E4u\Common\Variable;
+use E4u\Exception\LogicException;
 
 class Collection implements Countable, IteratorAggregate, ArrayAccess
 {
@@ -85,9 +87,9 @@ class Collection implements Countable, IteratorAggregate, ArrayAccess
             $this->query = $query;
         }
         else {
-            throw new \E4u\Exception\LogicException(
+            throw new LogicException(
                 sprintf('$query must be instance of QueryBuilder or Query, %s given',
-                \E4u\Common\Variable::getType($query)));
+                Variable::getType($query)));
         }
 
         return $this;
@@ -202,11 +204,11 @@ class Collection implements Countable, IteratorAggregate, ArrayAccess
 
     public function offsetSet($name, $value)
     {
-        throw new \E4u\Exception\LogicException("Collection is read only.");
+        throw new LogicException("Collection is read only.");
     }
 
     public function offsetUnset($name)
     {
-        throw new \E4u\Exception\LogicException("Collection is read only.");
+        throw new LogicException("Collection is read only.");
     }
 }

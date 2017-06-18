@@ -19,7 +19,7 @@ class Variable
      */
     public static function propertySetMethod($property)
     {
-        $method  = \E4u\Common\StringTools::camelCase($property);
+        $method  = StringTools::camelCase($property);
         $method = 'set'.$method;
         return $method;
     }
@@ -31,7 +31,7 @@ class Variable
      */
     public static function propertyGetMethod($property)
     {
-        $method  = \E4u\Common\StringTools::camelCase($property);
+        $method  = StringTools::camelCase($property);
         $method = 'get'.$method;
         return $method;
     }

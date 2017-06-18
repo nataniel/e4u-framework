@@ -1,15 +1,16 @@
 <?php
 namespace E4uTest\Model;
 
+use E4u\Model\Fixture;
 use PHPUnit\Framework\TestCase;
 
 class FixtureTest extends TestCase
 {
     /**
-     * @covers \E4u\Model\Fixture::generateID
+     * @covers Fixture::generateID
      */
     public function testId()
     {
-        $this->assertEquals('1745746795', \E4u\Model\Fixture::generateID('nataniel', 'Main\Model\User'));
+        $this->assertEquals('1745746795', Fixture::generateID('nataniel', 'Main\Model\User'));
     }
 }

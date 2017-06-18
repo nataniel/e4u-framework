@@ -2,7 +2,9 @@
 namespace E4u\Application;
 
 use E4u\Common\StringTools;
+use E4u\Exception\LogicException;
 use E4u\Request\Http;
+use E4u\Application\Exception;
 use Zend\Stdlib\Message;
 use Zend\Stdlib\RequestInterface,
     Zend\Stdlib\ResponseInterface,
@@ -10,10 +12,9 @@ use Zend\Stdlib\RequestInterface,
     E4u\Request\Request,
     E4u\Response\Response,
     E4u\Authentication\Resolver,
-    Zend\Stdlib\DispatchableInterface,
     ArrayAccess;
 
-abstract class Controller implements DispatchableInterface
+abstract class Controller
 {
     use Helper\Url;
 
@@ -219,11 +220,11 @@ abstract class Controller implements DispatchableInterface
     /**
      * Dispatch a request
      *
-     * @param  RequestInterface  $_request
-     * @param  ResponseInterface $_response
+     * @param  Request  $_request
+     * @param  Response $_response
      * @return Response
      */
-    public function dispatch(RequestInterface $_request, ResponseInterface $_response = null)
+    public function dispatch(Request $_request, Response $_response = null)
     {
         $this->_request = $_request;
         if (null !== $_response) {
@@ -235,7 +236,7 @@ abstract class Controller implements DispatchableInterface
         $response = $this->getResponse();
 
         if (!method_exists($this, $method)) {
-            throw new \E4u\Application\Exception\NoMethodForAction("No method for '$action' action.");
+            throw new Exception\NoMethodForAction("No method for '$action' action.");
         }
 
         try {
@@ -489,7 +490,7 @@ abstract class Controller implements DispatchableInterface
     public function getRequest()
     {
         if (!$this->_request instanceof Request) {
-            throw new \E4u\Exception\LogicException('No valid Request set.');
+            throw new LogicException('No valid Request set.');
         }
 
         return $this->_request;

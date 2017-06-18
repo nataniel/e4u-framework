@@ -1,6 +1,8 @@
 <?php
 namespace E4u\Tools\Console;
 
+use E4u\Exception\RuntimeException;
+
 class Start extends Base
 {
     public function help()
@@ -11,7 +13,7 @@ class Start extends Base
     public function execute()
     {
         if (PHP_SAPI != 'cli') {
-            throw new \E4u\Exception\RuntimeException(sprintf('The console must be started using cli mode, %s used.', PHP_SAPI));
+            throw new RuntimeException(sprintf('The console must be started using cli mode, %s used.', PHP_SAPI));
         }
 
         $old_error_handler = set_error_handler([ get_class($this), 'errorHandler' ]);

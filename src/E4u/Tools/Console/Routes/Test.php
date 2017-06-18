@@ -2,6 +2,7 @@
 namespace E4u\Tools\Console\Routes;
 
 use E4u\Tools\Console\Base;
+use Zend\Mvc\Router\RouteMatch;
 
 class Test extends Base
 {
@@ -31,7 +32,7 @@ class Test extends Base
         $router  = $app->getRouter();
         $routeMatch = $router->match($request);
         
-        if (!$routeMatch instanceof \Zend\Mvc\Router\RouteMatch) {
+        if (!$routeMatch instanceof RouteMatch) {
             echo sprintf("NO MATCH!\n");
             return false;
         }

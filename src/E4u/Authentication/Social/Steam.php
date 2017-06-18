@@ -1,6 +1,8 @@
 <?php
 namespace E4u\Authentication\Social;
 
+use E4u\Application\Helper\Url;
+use E4u\Exception\ConfigException;
 use E4u\Request\Request;
 use Zend\Config\Config;
 
@@ -11,7 +13,7 @@ use Zend\Config\Config;
  */
 class Steam implements Helper
 {
-    use \E4u\Application\Helper\Url;
+    use Url;
 
     /**
      * @var Config
@@ -43,7 +45,7 @@ class Steam implements Helper
     protected function setConfig(Config $config)
     {
         if (!$config->get('api_key')) {
-            throw new \E4u\Exception\ConfigException('Steam config must have "api_key" key set.');
+            throw new ConfigException('Steam config must have "api_key" key set.');
         }
 
         $this->config = $config;

@@ -1,6 +1,7 @@
 <?php
 namespace E4u\Application\View;
 
+use E4u\Exception\LogicException;
 use Zend\View\Helper\AbstractHelper;
 use Zend\View\HelperPluginManager;
 
@@ -20,7 +21,7 @@ trait Plugins
     {
         if (is_string($helpers)) {
             if (!class_exists($helpers)) {
-                throw new \E4u\Exception\LogicException(sprintf(
+                throw new LogicException(sprintf(
                     'Invalid helper helpers class provided (%s)',
                     $helpers
                 ));
@@ -29,7 +30,7 @@ trait Plugins
         }
         
         if (!$helpers instanceof HelperPluginManager) {
-            throw new \E4u\Exception\LogicException(sprintf(
+            throw new LogicException(sprintf(
                 'Helper helpers must extend Zend\View\HelperPluginManager; got type "%s" instead',
                 (is_object($helpers) ? get_class($helpers) : gettype($helpers))
             ));
@@ -84,7 +85,7 @@ trait Plugins
     public function _($name)
     {
         if (!$this->plugins()->has($name)) {
-            throw new \E4u\Exception\LogicException(
+            throw new LogicException(
                     sprintf('Request of undefined plugin %s::%s',
                     get_class($this), $name));
         }

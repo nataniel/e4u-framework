@@ -1,7 +1,9 @@
 <?php
 namespace E4u\Validator;
 
-class StrongPassword extends \Zend\Validator\AbstractValidator
+use Zend\Validator\AbstractValidator;
+
+class StrongPassword extends AbstractValidator
 {
     /**
      * Defined by Zend_Validate_Interface

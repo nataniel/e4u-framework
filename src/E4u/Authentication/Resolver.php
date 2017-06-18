@@ -4,6 +4,7 @@ namespace E4u\Authentication;
 use E4u\Authentication\Identity,
     E4u\Request\Request,
     Zend\Config\Config;
+use E4u\Exception\LogicException;
 
 class Resolver
 {
@@ -61,7 +62,7 @@ class Resolver
     {
         $class = $this->getConfig()->get('model');
         if (!is_null($class) && !class_exists($class)) {
-            throw new \E4u\Exception\LogicException(
+            throw new LogicException(
                 "Identity class defined by authentication config $class does not exist.");
         }
 

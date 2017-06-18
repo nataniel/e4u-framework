@@ -1,14 +1,14 @@
 <?php
 namespace E4u;
 
+use E4u\Application\Controller;
 use E4u\Exception\LogicException;
 use E4u\Request\Request,
     E4u\Response\Response,
     E4u\Application\Exception,
     Zend\Config\Config,
     Zend\Mvc\Router\RouteStackInterface,
-    Zend\Mvc\Router\RouteMatch,
-    Zend\Stdlib\DispatchableInterface;
+    Zend\Mvc\Router\RouteMatch;
 
 class Application
 {
@@ -180,9 +180,9 @@ class Application
         }
 
         $controller = $this->getController();
-        if (!$controller instanceof DispatchableInterface) {
+        if (!$controller instanceof Controller) {
             throw new LogicException(
-                sprintf('Controller must be an instance of DispatchableInterface, %s given.',
+                sprintf('Controller must be an instance of E4u\Application\Controller, %s given.',
                 Common\Variable::getType($controller)));
         }
 

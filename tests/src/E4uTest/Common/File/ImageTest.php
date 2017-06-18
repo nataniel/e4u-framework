@@ -1,6 +1,7 @@
 <?php
 namespace E4uTest\Common\File;
 
+use E4u\Common\File\Image;
 use PHPUnit\Framework\TestCase;
 
 class ImageTest extends TestCase
@@ -16,7 +17,7 @@ class ImageTest extends TestCase
      */
     protected function setUp()
     {
-        $this->file = new \E4u\Common\File\Image('files/test.jpg', 'tests');
+        $this->file = new Image('files/test.jpg', 'tests');
     }
 
     /**
@@ -28,7 +29,7 @@ class ImageTest extends TestCase
     }
 
     /**
-     * @covers \E4u\Common\File\Image::getWidth
+     * @covers Image::getWidth
      */
     public function testGetWidth()
     {
@@ -36,7 +37,7 @@ class ImageTest extends TestCase
     }
 
     /**
-     * @covers \E4u\Common\File\Image::getHeight
+     * @covers Image::getHeight
      */
     public function testGetHeight()
     {
@@ -44,7 +45,7 @@ class ImageTest extends TestCase
     }
 
     /**
-     * @covers \E4u\Common\File\Image::getHTMLSize
+     * @covers Image::getHTMLSize
      */
     public function testGetHTMLSize()
     {
@@ -52,7 +53,7 @@ class ImageTest extends TestCase
     }
 
     /**
-     * @covers \E4u\Common\File\Image::getMime
+     * @covers Image::getMime
      */
     public function testGetMime()
     {
@@ -60,7 +61,7 @@ class ImageTest extends TestCase
     }
 
     /**
-     * @covers \E4u\Common\File\Image::resizeTo
+     * @covers Image::resizeTo
      */
     public function testResizeTo()
     {
@@ -70,14 +71,14 @@ class ImageTest extends TestCase
     }
 
     /**
-     * @covers \E4u\Common\File\Image::getThumbnail
+     * @covers Image::getThumbnail
      */
     public function testGetThumbnail()
     {
         $thumbnail = $this->file->getThumbnail(200, 200, 'cccccc', true);
         
         $this->assertFileExists('tests/files/test-162x200-cccccc.jpg');
-        $this->assertInstanceOf('E4u\Common\File\Image', $thumbnail);
+        $this->assertInstanceOf(Image::class, $thumbnail);
         $this->assertEquals(162, $thumbnail->getWidth());
         $this->assertEquals(200, $thumbnail->getHeight());
         

@@ -3,10 +3,13 @@ namespace E4u\Model;
 
 use Doctrine\ORM\EntityManager,
     Doctrine\ORM\Mapping\ClassMetadata,
+    Doctrine\DBAL\Types\Type,
     Doctrine\Common\Collections\ArrayCollection,
     Doctrine\Common\Util\Debug,
     Zend\Stdlib\ArrayUtils;
 use Doctrine\ORM\PersistentCollection;
+use E4u\Common\Variable;
+use E4u\Exception\LogicException;
 
 /**
  * @MappedSuperclass
@@ -233,24 +236,24 @@ class Entity extends Base
 
         $meta = $this->getClassMetadata();
         switch ($meta->getTypeOfField($field)) {
-            case \Doctrine\DBAL\Types\Type::DATETIME:
-            case \Doctrine\DBAL\Types\Type::DATE:
+            case Type::DATETIME:
+            case Type::DATE:
                 return $value instanceof \DateTime
                     ? "'".$value->format('Y-m-d H:i:s')."'"
                     : "'{$value}'";
 
-            case \Doctrine\DBAL\Types\Type::BOOLEAN:
+            case Type::BOOLEAN:
                 return $value ? 'TRUE' : 'FALSE';
 
-            case \Doctrine\DBAL\Types\Type::INTEGER:
-            case \Doctrine\DBAL\Types\Type::DECIMAL:
-            case \Doctrine\DBAL\Types\Type::FLOAT:
-            case \Doctrine\DBAL\Types\Type::BIGINT:
-            case \Doctrine\DBAL\Types\Type::SMALLINT:
+            case Type::INTEGER:
+            case Type::DECIMAL:
+            case Type::FLOAT:
+            case Type::BIGINT:
+            case Type::SMALLINT:
                 return $value;
 
-            case \Doctrine\DBAL\Types\Type::STRING:
-            case \Doctrine\DBAL\Types\Type::TEXT:
+            case Type::STRING:
+            case Type::TEXT:
                 return "'".mb_strimwidth($value, 0, 50, '...')."'";
 
             default:
@@ -341,9 +344,9 @@ class Entity extends Base
 
             // *-ToMany
             if (!is_array($value)) {
-                throw new \E4u\Exception\LogicException(
+                throw new LogicException(
                     sprintf('Value of %s::$%s is collection value association, thus it must be set to array, %s given.',
-                    get_class($this), $property, \E4u\Common\Variable::getType($value)));
+                    get_class($this), $property, Variable::getType($value)));
             }
 
             // TODO: remove reference from associated objects?
@@ -369,7 +372,7 @@ class Entity extends Base
     {
         $meta = $this->getClassMetadata();
         if (!$meta->isCollectionValuedAssociation($property)) {
-            throw new \E4u\Exception\LogicException(
+            throw new LogicException(
                 sprintf('Undefined property %s::$%s.',
                 get_class($this), $property));
         }
@@ -414,7 +417,7 @@ class Entity extends Base
     {
         $meta = $this->getClassMetadata();
         if (!$meta->isCollectionValuedAssociation($property)) {
-            throw new \E4u\Exception\LogicException(
+            throw new LogicException(
                 sprintf('You can run _delFrom() only for collection value associations, %s::%s is not.',
                 get_class($this), $property));
         }
@@ -568,9 +571,9 @@ class Entity extends Base
             return true;
         }
 
-        throw new \E4u\Exception\LogicException(
+        throw new LogicException(
             sprintf("%s expected, %s given.",
-            $targetEntity, \E4u\Common\Variable::getType($value)));
+            $targetEntity, Variable::getType($value)));
     }
 
     /**
@@ -589,9 +592,9 @@ class Entity extends Base
                 $this->$property = new ArrayCollection();
             }
             else {
-                throw new \E4u\Exception\LogicException(
+                throw new LogicException(
                     sprintf('%s::$%s must be null, array or ArrayCollection, %s given.',
-                    get_class($this), $property, \E4u\Common\Variable::getType($this->$property)));
+                    get_class($this), $property, Variable::getType($this->$property)));
             }
         }
 

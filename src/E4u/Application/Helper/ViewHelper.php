@@ -2,6 +2,7 @@
 namespace E4u\Application\Helper;
 
 use E4u\Application\View;
+use E4u\Exception\LogicException;
 use Zend\View\Helper\HelperInterface,
     Zend\View\Renderer\RendererInterface as Renderer;
 
@@ -39,7 +40,7 @@ abstract class ViewHelper implements HelperInterface
     public function __invoke()
     {
         if (!method_exists($this, 'show')) {
-            throw new \E4u\Exception\LogicException(sprintf(
+            throw new LogicException(sprintf(
                 'Invokable plugin %s should define show() method.',
                 get_class($this)));
         }

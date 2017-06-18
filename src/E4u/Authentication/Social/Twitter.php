@@ -2,6 +2,9 @@
 namespace E4u\Authentication\Social;
 
 use Abraham\TwitterOAuth\TwitterOAuth;
+use E4u\Application\Helper\Url;
+use E4u\Authentication\Exception\AuthenticationException;
+use E4u\Exception\ConfigException;
 use E4u\Request\Request;
 use Zend\Config\Config;
 
@@ -12,7 +15,7 @@ use Zend\Config\Config;
  */
 class Twitter implements Helper
 {
-    use \E4u\Application\Helper\Url;
+    use Url;
 
     /**
      * @var Config
@@ -49,7 +52,7 @@ class Twitter implements Helper
     protected function setConfig(Config $config)
     {
         if (!$config->get('consumer_key') || !$config->get('consumer_secret')) {
-            throw new \E4u\Exception\ConfigException('Twitter config must have "consumer_key" and "consumer_secret" keys set.');
+            throw new ConfigException('Twitter config must have "consumer_key" and "consumer_secret" keys set.');
         }
 
         $this->config = $config;
@@ -86,7 +89,7 @@ class Twitter implements Helper
         $oauth_token = $this->getRequest()->getQuery('oauth_token');
         if ($token['oauth_token'] != $oauth_token) {
             // cos poszło nie tak
-            throw new \E4u\Authentication\Exception('Nieprawidłowy token w sesji.');
+            throw new AuthenticationException('Nieprawidłowy token w sesji.');
         }
 
         $this->setRequestToken($token);

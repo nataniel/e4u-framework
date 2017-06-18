@@ -1,6 +1,8 @@
 <?php
 namespace E4u\Tools;
 
+use E4u\Common\Variable;
+use E4u\Exception\LogicException;
 use Zend\Console\Getopt,
     Zend\Config\Config,
     E4u\Tools\Console\Command;
@@ -91,9 +93,9 @@ class Console
         }
 
         if (!$command instanceof Command) {
-            throw new \E4u\Exception\LogicException(
+            throw new LogicException(
                 sprintf("Command is expected to be E4u\Tools\Console\Command, %s given.",
-                \E4u\Common\Variable::getType($command)));
+                Variable::getType($command)));
         }
 
         $command->setConsole($this);

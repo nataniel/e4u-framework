@@ -1,6 +1,8 @@
 <?php
 namespace E4u\Form\Builder;
 
+use E4u\Common\Variable;
+use E4u\Exception\LogicException;
 use E4u\Form\Base,
     E4u\Form\Element,
     E4u\Common\Html,
@@ -437,10 +439,10 @@ class Bootstrap3 implements BuilderInterface
             $date = '';
         }
         else {
-            throw new \E4u\Exception\LogicException(sprintf(
+            throw new LogicException(sprintf(
                 'Form field passed to Bootstrap#date must be string
                  or \DateTime object, %s given.',
-                \E4u\Common\Variable::getType($value)));
+                Variable::getType($value)));
         }
 
         $attributes = $this->getTextAttributes($field, $date, $options);

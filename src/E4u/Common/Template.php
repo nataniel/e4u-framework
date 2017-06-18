@@ -1,6 +1,8 @@
 <?php
 namespace E4u\Common;
 
+use E4u\Exception\LogicException;
+
 class Template
 {
     public static function wolacz($vars, $options = null)
@@ -14,7 +16,7 @@ class Template
         }
 
         if ($locale === 'pl') {
-            return \E4u\Common\StringTools::wolacz($name);
+            return StringTools::wolacz($name);
         }
 
         return $name;
@@ -57,9 +59,9 @@ class Template
     public static function merge($txt, $vars = null)
     {
         if (!is_null($vars) && !is_array($vars) && !$vars instanceof \ArrayAccess) {
-            throw new \E4u\Exception\LogicException(sprintf(
+            throw new LogicException(sprintf(
                 '$vars can be null, array or ArrayAccess, %s given.',
-                \E4u\Common\Variable::getType($vars)));
+                Variable::getType($vars)));
         }
         
         return preg_replace_callback('/\[\[((?<name>.*)(\((?<options>.*)\))?)\]\]/U', function ($matches) use ($vars) {

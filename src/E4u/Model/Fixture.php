@@ -1,6 +1,9 @@
 <?php
 namespace E4u\Model;
 
+use E4u\Exception\LogicException;
+use Zend\Config\Config;
+
 class Fixture
 {
     public static function generateID($name, $class)
@@ -22,7 +25,7 @@ class Fixture
     public static function load($filename)
     {
         $fixtures = include $filename;
-        $fixtures = new \Zend\Config\Config($fixtures, true);
+        $fixtures = new Config($fixtures, true);
         
         $count = 0;
         foreach ($fixtures as $key => $fixture) {
@@ -30,7 +33,7 @@ class Fixture
             $name = strtok('');
             
             if (!class_exists($class)) {
-                throw new \E4u\Exception\LogicException(
+                throw new LogicException(
                     sprintf('Class %s defined in %s does not exist.',
                     $class, $filename));
             }

@@ -1,6 +1,9 @@
 <?php
 namespace E4u\Authentication\Social;
 
+use E4u\Application\Helper\Url;
+use E4u\Authentication\Exception\AuthenticationException;
+use E4u\Exception\ConfigException;
 use E4u\Request\Request;
 use Zend\Config\Config;
 
@@ -11,7 +14,7 @@ use Zend\Config\Config;
  */
 class Facebook implements Helper
 {
-    use \E4u\Application\Helper\Url;
+    use Url;
 
     /**
      * @var Config
@@ -46,7 +49,7 @@ class Facebook implements Helper
     protected function setConfig(Config $config)
     {
         if (!$config->get('app_id') || !$config->get('app_secret')) {
-            throw new \E4u\Exception\ConfigException('Facebook config must have "app_id" and "app_secret" keys set.');
+            throw new ConfigException('Facebook config must have "app_id" and "app_secret" keys set.');
         }
 
         $this->config = $config;
@@ -106,7 +109,7 @@ class Facebook implements Helper
 
         } catch (\Facebook\Exceptions\FacebookSDKException $e) {
 
-            throw new \E4u\Authentication\Exception($e->getMessage(), null, $e);
+            throw new AuthenticationException($e->getMessage(), null, $e);
 
         }
     }

@@ -1,6 +1,7 @@
 <?php
 namespace E4u\Request;
 
+use E4u\Exception\LogicException;
 use Zend\Stdlib\Message,
     E4u\Request\Request as RequestDescription,
     Zend\Mvc\Router\SimpleRouteStack,
@@ -45,12 +46,12 @@ class Cli extends Message implements RequestDescription
 
     public function getPost($name = null, $default = null)
     {
-        throw new \E4u\Exception\LogicException('POST values are not available with CLI Request.');
+        throw new LogicException('POST values are not available with CLI Request.');
     }
 
     public function getQuery($name = null, $default = null)
     {
-        throw new \E4u\Exception\LogicException('GET values are not available with CLI Request.');
+        throw new LogicException('GET values are not available with CLI Request.');
     }
 
     public function setRouter(RouteStackInterface $router)

@@ -1,11 +1,13 @@
 <?php
 namespace E4u\Form\Builder;
 
+use E4u\Common\Variable;
 use E4u\Form\Base,
     E4u\Form\Element,
     E4u\Common\Html,
     E4u\Application\View\Html as HtmlView,
     Zend\Config\Config;
+use E4u\Form\Exception;
 
 class Bootstrap4 implements BuilderInterface
 {
@@ -435,10 +437,10 @@ class Bootstrap4 implements BuilderInterface
         $field = $this->form->getElement($name);
 
         if (!$field instanceof Element\Select) {
-            throw new \E4u\Form\Exception(sprintf(
+            throw new Exception(sprintf(
                 'Form field passed to Bootstrap#select must be
                  instance of Element\Select, %s given.',
-                \E4u\Common\Variable::getType($field)));
+                Variable::getType($field)));
         }
 
         $attributes = array_merge($field->getAttributes(), [
@@ -495,10 +497,10 @@ class Bootstrap4 implements BuilderInterface
         $field = $this->form->getElement($name);
 
         if (!$field instanceof Element\Options) {
-            throw new \E4u\Form\Exception(sprintf(
+            throw new Exception(sprintf(
                 'Form field passed to Bootstrap#radioGroup must be
                  instance of Element\Options, %s given.',
-                \E4u\Common\Variable::getType($field)));
+                Variable::getType($field)));
         }
 
         $div = '';
@@ -530,10 +532,10 @@ class Bootstrap4 implements BuilderInterface
         $field = $this->form->getElement($name);
 
         if (!$field instanceof Element\Options) {
-            throw new \E4u\Form\Exception(sprintf(
+            throw new Exception(sprintf(
                 'Form field passed to Bootstrap#checkboxGroup must be
                  instance of Element\Options, %s given.',
-                \E4u\Common\Variable::getType($field)));
+                Variable::getType($field)));
         }
 
         $div = '';

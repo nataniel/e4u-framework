@@ -14,7 +14,7 @@ chdir(dirname(__DIR__));
 define('APPLICATION', 'Main');
 
 // Bootstrap E4u\Application
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 $app = E4u\Loader::get(APPLICATION);
 $app->run()->send();
 ```

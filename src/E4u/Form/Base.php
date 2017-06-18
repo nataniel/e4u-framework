@@ -1,11 +1,14 @@
 <?php
 namespace E4u\Form;
 
+use E4u\Application\Helper\Url;
+use E4u\Common\Html;
+use E4u\Exception\LogicException;
 use E4u\Request\Request;
 
 class Base
 {
-    use \E4u\Application\Helper\Url;
+    use Url;
 
     const
         HTTP_GET = 'get',
@@ -92,91 +95,6 @@ class Base
     }
 
     /**
-     * @deprecated use Form\Builder instead
-     * @param  array $elements If null, show all elements
-     * @return string
-     */
-    public function showFields($elements = null)
-    {
-        if (null === $elements) {
-            $elements = array_keys($this->fields);
-        }
-
-        $html = '';
-        foreach ($elements as $element) {
-            $html .= $this->showField($element);
-        }
-
-        return $html;
-    }
-
-    /**
-     * @deprecated use Form\Builder instead
-     * @param  array  $elements
-     * @param  string $caption
-     * @return string
-     */
-    public function showFieldset($elements = null, $caption = null, $attributes = [])
-    {
-        if (is_string($attributes)) {
-            $class = $attributes;
-            $attributes = [ 'class' => $class ];
-        }
-
-        return sprintf('<fieldset %s>', \E4u\Common\Html::attributes($attributes)).
-                   ($caption ? '<legend><h3>'.$caption.'</h3></legend>' : '').
-                   $this->showFields($elements).
-               '</fieldset>';
-    }
-
-    /**
-     * @deprecated use Form\Builder instead
-     * @param  array $attributes
-     * @return string
-     */
-    public function startForm($attributes = [])
-    {
-        $attributes['id']      = @$attributes['id']      ?: $this->htmlId();
-        $attributes['name']    = @$attributes['name']    ?: $this->getName();
-        $attributes['action']  = @$attributes['action']  ?: $this->getAction();
-        $attributes['method']  = @$attributes['method']  ?: $this->getMethod();
-        $attributes['enctype'] = @$attributes['enctype'] ?: $this->getEnctype();
-        $attributes['class']   = @$attributes['class']   ?: 'powerForm';
-
-        return sprintf('<form %s>', \E4u\Common\Html::attributes($attributes)).
-               '<input type="hidden" name="'.$this->getName().'[submit]" value="1" />'.
-               $this->showCrsfToken();
-    }
-
-    /**
-     * @deprecated use Form\Builder instead
-     * @return string
-     */
-    public function endForm()
-    {
-        return '</form>';
-    }
-
-    /**
-     * @deprecated use Form\Builder instead
-     * @param  string $caption
-     * @return string
-     */
-    public function showForm($caption = null, $attributes = [])
-    {
-        $fieldset = [];
-        if (isset($attributes['fieldset'])) {
-            $fieldset = $attributes['fieldset'];
-            unset($attributes['fieldset']);
-        }
-
-        return $this->startForm($attributes).
-               $this->showErrors().
-               $this->showFieldset(array_keys($this->fields), $caption, $fieldset).
-               $this->endForm();
-    }
-
-    /**
      * @return string
      */
     public function getMethod()
@@ -193,16 +111,6 @@ class Base
     }
 
     /**
-     * @deprecated use Form\Builder instead
-     * @param  string $name
-     * @return string
-     */
-    public function showField($name)
-    {
-        return $this->getElement($name)->showHTML($this->getName());
-    }
-
-    /**
      * @return bool
      */
     public function verifyCrsfToken()
@@ -211,14 +119,9 @@ class Base
             return true;
         }
 
-        switch ($this->method) {
-            case self::HTTP_GET:
-                $crsf_token = $this->request->getQuery('crsf_token');
-                break;
-            case self::HTTP_POST:
-                $crsf_token = $this->request->getPost('crsf_token');
-                break;
-        }
+        $crsf_token = $this->method == self::HTTP_GET
+            ? $this->request->getQuery('crsf_token')
+            : $this->request->getPost('crsf_token');
 
         return isset($_SESSION['crsf_token'])
             ? $_SESSION['crsf_token'] == $crsf_token
@@ -226,7 +129,7 @@ class Base
     }
 
     /**
-     * @return Base
+     * @return $this
      */
     public function generateCrsfToken()
     {
@@ -257,57 +160,9 @@ class Base
     }
 
     /**
-     * @deprecated use Form\Builder instead
-     * @return string
-     */
-    public function showCrsfToken()
-    {
-        if (!$this->crsf_protection) {
-            return null;
-        }
-
-        $attributes = [
-            'type' => 'hidden',
-            'name' => 'crsf_token',
-            'value' => $this->getCrsfToken(),
-        ];
-
-        return \E4u\Common\Html::tag('input', $attributes);
-    }
-
-    /**
-     * @deprecated use Form\Builder instead
-     * @param  string $header
-     * @return string
-     */
-    public function showErrors($header = 'Wystąpiły błędy')
-    {
-        $errors = $this->getErrors();
-        if (empty($errors)) {
-            return null;
-        }
-
-        $html = '';
-        foreach ($errors as $key => $error) {
-            if (is_array($error)) {
-                foreach ($error as $type => $message) {
-                    $html .= '<li class="'.$type.'"><a href="#'.$this->getName().'-'.$key.'">'.$message.'</a></li>'."\n";
-                }
-            }
-            else {
-                $html .= '<li><a href="#'.$this->getName().'-'.$key.'">'.$error.'</a></li>'."\n";
-            }
-        }
-
-        $html = "<h3>$header</h3><ul>$html</ul>";
-        $html = '<header class="errors">'.$html.'</header>';
-        return $html;
-    }
-
-    /**
      * @param  Element[] $fields
      * @param  string $model
-     * @return Base
+     * @return $this
      */
     public function addFields($fields, $model = null)
     {
@@ -322,19 +177,19 @@ class Base
      * @param  Element $field
      * @param  string $model
      * @param  string $model_field
-     * @return Base
+     * @return $this
      */
     public function addField(Element $field, $model = null, $model_field = null)
     {
         $name = $field->getName();
         if (isset($this->fields[$name])) {
-            throw new \E4u\Exception\LogicException(
+            throw new LogicException(
                 "Field $name already defined for ".  get_class($this).".");
         }
 
         if (!is_null($model)) {
             if (!isset($this->models[$model])) {
-                throw new \E4u\Exception\LogicException(
+                throw new LogicException(
                     "Model $model not defined for ".  get_class($this).".");
             }
 
@@ -361,15 +216,6 @@ class Base
         }
 
         return $this->name;
-    }
-
-    /**
-     * @deprecated use Form\Builder instead
-     * @return string
-     */
-    public function htmlId()
-    {
-        return $this->getName();
     }
 
     /**
@@ -410,7 +256,7 @@ class Base
 
     /**
      * @param  array $files
-     * @return Base
+     * @return $this
      */
     protected function processFiles($files)
     {
@@ -498,8 +344,8 @@ class Base
     }
 
     /**
-     * @param array $defaults
-     * @return Base
+     * @param  array $defaults
+     * @return $this
      */
     public function setDefaults($defaults)
     {
@@ -516,13 +362,13 @@ class Base
      *
      * @param  string $message
      * @param  string $name
-     * @return Base
+     * @return $this
      */
     public function addError($message, $name = null)
     {
         if (null !== $name) {
             if (!isset($this->fields[$name])) {
-                throw new \E4u\Exception\LogicException(
+                throw new LogicException(
                     'Invalid form field: '.$name);
             }
 
@@ -543,7 +389,7 @@ class Base
     public function getElement($name)
     {
         if (!isset($this->fields[$name])) {
-            throw new \E4u\Exception\LogicException(
+            throw new LogicException(
                 'Invalid form field: '.$name);
         }
         
@@ -551,7 +397,7 @@ class Base
     }
 
     /**
-     * @return Base
+     * @return $this
      */
     public function validate()
     {
@@ -577,6 +423,9 @@ class Base
         return empty($this->errors);
     }
 
+    /**
+     * @return array
+     */
     public function getErrors()
     {
         return $this->errors;
@@ -592,8 +441,8 @@ class Base
     }
 
     /**
-     * @param bool $flag
-     * @return Base
+     * @param  bool $flag
+     * @return $this
      */
     public function setCrsfProtection($flag)
     {
@@ -604,7 +453,7 @@ class Base
     /**
      * @param  string $method
      * @param  bool $crsf_protection
-     * @return Base
+     * @return $this
      */
     public function setMethod($method, $crsf_protection = null)
     {
@@ -620,7 +469,7 @@ class Base
 
     /**
      * @param  string $enctype
-     * @return Base
+     * @return $this
      */
     public function setEnctype($enctype)
     {

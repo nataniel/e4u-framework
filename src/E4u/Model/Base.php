@@ -1,6 +1,9 @@
 <?php
 namespace E4u\Model;
 
+use E4u\Common\StringTools;
+use E4u\Exception\LogicException;
+
 class Base implements \ArrayAccess
 {
     public function __construct($attributes = [])
@@ -84,7 +87,7 @@ class Base implements \ArrayAccess
     {
         if (preg_match('/^(set|get|addTo|delFrom|has|unset)([A-Z].*)$/', $name, $matches)) {
             $method = '_'.$matches[1];
-            $property = \E4u\Common\StringTools::underscore($matches[2]);
+            $property = StringTools::underscore($matches[2]);
             
             /* PHP 5.6+ */
             # return $this->$method($property, ...$argv);
@@ -93,7 +96,7 @@ class Base implements \ArrayAccess
             return call_user_func_array([$this, $method], $argv);
         }
 
-        throw new \E4u\Exception\LogicException(
+        throw new LogicException(
                 sprintf('Call to undefined method %s::%s()',
                 get_class($this), $name));
     }
@@ -108,7 +111,7 @@ class Base implements \ArrayAccess
     protected function _get($property)
     {
         if (!property_exists($this, $property)) {
-            throw new \E4u\Exception\LogicException(
+            throw new LogicException(
                 sprintf('Undefined or unreachable property: %s::$%s.',
                 get_class($this), $property));
         }
@@ -127,7 +130,7 @@ class Base implements \ArrayAccess
     protected function _set($property, $value)
     {
         if (!property_exists($this, $property)) {
-            throw new \E4u\Exception\LogicException(
+            throw new LogicException(
                 sprintf('Undefined property %s::$%s.',
                 get_class($this), $property));
         }
@@ -144,7 +147,7 @@ class Base implements \ArrayAccess
     protected function _unset($property)
     {
         if (!property_exists($this, $property)) {
-            throw new \E4u\Exception\LogicException(
+            throw new LogicException(
                 sprintf('Undefined property %s::$%s.',
                     get_class($this), $property));
         }
@@ -160,7 +163,7 @@ class Base implements \ArrayAccess
     protected function _has($property)
     {
         if (!property_exists($this, $property)) {
-            throw new \E4u\Exception\LogicException(
+            throw new LogicException(
                 sprintf('Undefined property %s::$%s.',
                 get_class($this), $property));
         }
@@ -175,7 +178,7 @@ class Base implements \ArrayAccess
      */
     public static function propertyGetMethod($property)
     {
-        $method  = \E4u\Common\StringTools::camelCase($property);
+        $method  = StringTools::camelCase($property);
         $method = 'get'.$method;
         return $method;
     }
@@ -187,7 +190,7 @@ class Base implements \ArrayAccess
      */
     public static function propertyDelFromMethod($property)
     {
-        $method  = \E4u\Common\StringTools::camelCase($property);
+        $method  = StringTools::camelCase($property);
         $method = 'delFrom'.$method;
         return $method;
     }
@@ -199,7 +202,7 @@ class Base implements \ArrayAccess
      */
     public static function propertyAddToMethod($property)
     {
-        $method  = \E4u\Common\StringTools::camelCase($property);
+        $method  = StringTools::camelCase($property);
         $method = 'addTo'.$method;
         return $method;
     }
@@ -211,7 +214,7 @@ class Base implements \ArrayAccess
      */
     public static function propertySetMethod($property)
     {
-        $method  = \E4u\Common\StringTools::camelCase($property);
+        $method  = StringTools::camelCase($property);
         $method = 'set'.$method;
         return $method;
     }
@@ -223,7 +226,7 @@ class Base implements \ArrayAccess
      */
     public static function propertyUnsetMethod($property)
     {
-        $method  = \E4u\Common\StringTools::camelCase($property);
+        $method  = StringTools::camelCase($property);
         $method = 'unset'.$method;
         return $method;
     }

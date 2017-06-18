@@ -56,58 +56,6 @@ class BaseTest extends TestCase
     }
 
     /**
-     * @covers \E4u\Form\Base::showFields
-     */
-    public function testShowFields()
-    {
-        $this->assertContains('test[name]', $this->form->showFields());
-        $this->assertNotContains('test[name]', $this->form->showFields([ 'active' ]));
-    }
-
-    /**
-     * @covers \E4u\Form\Base::showFields
-     */
-    public function testShowFieldset()
-    {
-        $this->assertContains('<fieldset', $this->form->showFieldset());
-        $this->assertContains('</fieldset>', $this->form->showFieldset());
-
-        $this->assertContains('test[name]', $this->form->showFieldset());
-        $this->assertNotContains('test[name]', $this->form->showFieldset([ 'active' ]));
-    }
-
-    /**
-     * @covers \E4u\Form\Base::showForm
-     */
-    public function testStartForm()
-    {
-        $this->assertContains('<form', $this->form->startForm());
-        $this->assertNotContains('</form>', $this->form->startForm());
-
-        $this->assertContains('class="test"', $this->form->startForm([ 'class' => 'test' ]));
-        $this->assertContains('name="test[submit]"', $this->form->startForm());
-    }
-
-    /**
-     * @covers \E4u\Form\Base::showForm
-     */
-    public function testEndForm()
-    {
-        $this->assertContains('</form>', $this->form->endForm());
-    }
-
-    /**
-     * @covers \E4u\Form\Base::showForm
-     */
-    public function testShowForm()
-    {
-        $this->assertContains('<form', $this->form->showForm());
-        $this->assertContains('</form>', $this->form->showForm());
-        $this->assertContains('class="test"', $this->form->showForm('Test formularza', [ 'class' => 'test' ]));
-        $this->assertContains('Test formularza', $this->form->showForm('Test formularza', [ 'class' => 'test' ]));
-    }
-
-    /**
      * @covers \E4u\Form\Base::addField
      * @covers \E4u\Form\Base::getElement
      */
@@ -157,14 +105,6 @@ class BaseTest extends TestCase
         // override default method
         $this->form->setMethod('get');
         $this->assertEquals(Form\Base::HTTP_GET, $this->form->getMethod());
-    }
-
-    /**
-     * @covers \E4u\Form\Base::htmlId
-     */
-    public function testHtmlId()
-    {
-        $this->assertEquals('test', $this->form->htmlId());
     }
 
     /**

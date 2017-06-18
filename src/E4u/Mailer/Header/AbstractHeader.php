@@ -59,9 +59,7 @@ class AbstractHeader implements Header\HeaderInterface
             throw new LogicException('Invalid header value detected');
         }
 
-        $parts[0] = $parts[0];
         $parts[1] = ltrim($parts[1]);
-
         return $parts;
     }
 

@@ -3,6 +3,7 @@ namespace E4uTest\Tools;
 
 use PHPUnit\Framework\TestCase;
 use E4u\Tools\Console;
+use Zend\Config\Config;
 
 class ConsoleTest extends TestCase
 {
@@ -18,7 +19,7 @@ class ConsoleTest extends TestCase
     protected function setUp()
     {
         
-        $this->console = new Console(new \Zend\Config\Config([]));
+        $this->console = new Console(new Config([]));
     }
 
     /**
@@ -41,7 +42,7 @@ class ConsoleTest extends TestCase
         $_SERVER['argv'] = [ 'tools\console', 'version' ];
         
         ob_start();
-            $this->assertTrue($this->console->run());
+            $this->console->run();
             $output = ob_get_contents();
         ob_end_clean();
         $this->assertContains(\E4u\Version::VERSION, $output);
@@ -52,12 +53,12 @@ class ConsoleTest extends TestCase
      */
     public function testAddCommand()
     {
-        $this->console->addCommand('E4u\Tools\Console\Help', 'test_1');
+        $this->console->addCommand(Console\Help::class, 'test_1');
         $this->console->addCommand(new Console\Help, 'test_2');
         
         $commands = $this->console->getCommands();
-        $this->assertInstanceOf('E4u\Tools\Console\Help', $commands['test_1']);
-        $this->assertInstanceOf('E4u\Tools\Console\Help', $commands['test_2']);
+        $this->assertInstanceOf(Console\Help::class, $commands['test_1']);
+        $this->assertInstanceOf(Console\Help::class, $commands['test_2']);
     }
 
     /**
@@ -79,7 +80,7 @@ class ConsoleTest extends TestCase
     {
         $commands = $this->console->getCommands();
         foreach ($commands as $command) {
-            $this->assertInstanceOf('E4u\Tools\Console\Command', $command);
+            $this->assertInstanceOf(Console\Command::class, $command);
         }
     }
 }
