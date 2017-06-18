@@ -34,9 +34,7 @@ class Base implements \ArrayAccess
     public function offsetExists($offset)
     {
         $method = self::propertyGetMethod($offset);
-        if (method_exists($this, $method)) {
-            return true;
-        }
+        return method_exists($this, $method);
     }
 
     /**
@@ -170,15 +168,6 @@ class Base implements \ArrayAccess
         return !is_null($this->$property);
     }
 
-    /**
-     * @param  boolean $useGetters
-     * @return array
-     */
-    public function toArray($useGetters = true)
-    {
-        
-    }
-    
     /**
      * @assert ('product_name') == 'getProductName'
      * @param  string $property

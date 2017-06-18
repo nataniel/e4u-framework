@@ -1,6 +1,7 @@
 <?php
 namespace E4u\Form;
 
+use E4u\Common\StringTools;
 use E4u\Common\Variable;
 use E4u\Model\Entity;
 use Zend\Validator\ValidatorChain,
@@ -39,8 +40,6 @@ abstract class Element
     protected $label;
     protected $hint;
 
-    protected $cssClass;
-
     /** @var array HTML attributes for the element **/
     protected $attributes = array();
 
@@ -56,14 +55,14 @@ abstract class Element
     }
 
     /**
-     * @param array $properties
-     * @return \E4u\Form\Element
+     * @param  array $properties
+     * @return $this
      */
     public function setProperties($properties = [])
     {
         $properties = array_filter($properties, function ($val) { return !is_null($val); });
         foreach ($properties as $key => $value) {
-            $method  = 'set'.\E4u\Common\StringTools::camelCase($key);
+            $method  = 'set'.StringTools::camelCase($key);
             if (method_exists($this, $method)) {
                 call_user_func_array([$this, $method], [$value]);
             }
@@ -225,136 +224,6 @@ abstract class Element
     public function getLabel()
     {
         return $this->label ?: ucfirst($this->name);
-    }
-
-    /**
-     * @deprecated use Form\Builder instead
-     * @param  string $formName
-     * @return string
-     */
-    public function htmlId($formName)
-    {
-        return "{$formName}_{$this->getName()}";
-    }
-
-    /**
-     * Returns field name formatted for html "name" attribute:
-     * foo[bar] or foo[bar][]
-     *
-     * @deprecated use Form\Builder instead
-     * @param  string $formName
-     * @return string
-     */
-    public function htmlName($formName, $multiple = false)
-    {
-        return "{$formName}[{$this->getName()}]" . ($multiple ? '[]' : '');
-    }
-
-    /**
-     *  <label for="login_login">
-     *      Adres e-mail
-     *      <span>(wymagane)</span>
-     *  </label>
-     *
-     * @deprecated use Form\Builder instead
-     * @param  string $formName
-     * @return string
-     */
-    public function showLabel($formName)
-    {
-        $required = $this->isRequired() ? '<span>(wymagane)</span>' : '';
-        return '<label for="'.$this->htmlId($formName).'">'.
-                    $this->label.$required.
-                '</label>';
-    }
-
-    /**
-     * <div class="input">
-     *     <input type="text" name="login[login]" id="login_login" value="xxx" />
-     * </div>
-     *
-     * @deprecated use Form\Builder instead
-     * @param  string $formName
-     * @return string
-     */
-    public function showInput($formName)
-    {
-        return '<div class="input">'.
-                    $this->render($formName).
-                '</div>';
-    }
-
-    /**
-     * <input type="text" name="login[login]" id="login_login" value="xxx" />
-     *
-     * @deprecated use Form\Builder instead
-     * @param  string $formName
-     * @return string
-     */
-    public abstract function render($formName);
-
-    /**
-     * <p class="hint">np. kasia@kowalska.info.pl</p>
-     *
-     * @deprecated use Form\Builder instead
-     * @return string
-     */
-    public function showHint()
-    {
-        return '<p class="hint">'.$this->hint.'</p>';
-    }
-
-    /**
-     * <p class="error">Nieprawidłowy adres e-mail.</p>
-     *
-     * @deprecated use Form\Builder instead
-     * @return string
-     */
-    public function showError()
-    {
-        if ($errors = $this->getErrors()) {
-            if (is_array($errors)) {
-                $errors = join(' ', $errors);
-            }
-
-            return '<p class="error">'.$errors.'</p>';
-        }
-
-        return null;
-    }
-
-    /**
-     *  <div class="field text_field required" id="field-login_login">
-     *      <label for="login_login">
-     *          Adres e-mail
-     *          <span>(wymagane)</span>
-     *      </label>
-     *      <div class="input">
-     *          <input type="text" name="login[login]" id="login_login" value="xxx" />
-     *      </div>
-     *      <p class="hint">np. kasia@kowalska.info.pl</p>
-     *      <p class="error"></p>
-     *  </div>
-     *
-     * @deprecated use Form\Builder instead
-     */
-    public function showHTML($formName)
-    {
-
-        $id    = "field-".$this->htmlId($formName);
-        $class = join(' ', array_filter([
-            'field',
-            $this->cssClass,
-            $this->isRequired() ? 'required' : null,
-            $this->getErrors() ? 'invalid' : null,
-        ]));
-
-        return '<div class="'.$class.'" id="'.$id.'">'.
-                    $this->showLabel($formName).
-                    $this->showInput($formName).
-                    $this->showHint().
-                    $this->showError().
-                '</div>';
     }
 
     public function setName($name)

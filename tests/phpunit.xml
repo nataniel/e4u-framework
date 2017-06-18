@@ -1,9 +1,9 @@
-<phpunit
-    bootstrap="./bootstrap.php"
-    colors="false">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.5/phpunit.xsd"
+         bootstrap="./bootstrap.php">
     <testsuites>
-        <testsuite name="E4u Application Test Suite">
-            <directory>./</directory>
+        <testsuite name="E4u Framework Test Suite">
+            <directory>./src/</directory>
         </testsuite>
     </testsuites>
     <logging>

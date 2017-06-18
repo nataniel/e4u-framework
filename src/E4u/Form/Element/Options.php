@@ -75,44 +75,4 @@ abstract class Options extends Element
     {
         return $this->options;
     }
-
-    /**
-     * @deprecated use Form\Builder instead
-     * @param string $formName
-     * @param mixed $value
-     * @param string $caption
-     * @return string
-     */
-    public abstract function renderOption($formName, $value, $caption);
-
-    /**
-     * <input type="radio" name="game[max_players]" id="game_max_players_1" value="1" selected="selected" />
-     * <input type="radio" name="game[max_players]" id="game_max_players_2" value="2" />
-     * (...)
-     *
-     * @deprecated use Form\Builder instead
-     * @param  string $formName
-     * @return string
-     */
-    public function render($formName)
-    {
-        $html = '';
-        foreach ($this->options as $value => $caption) {
-            $html .= $this->renderOption($formName, $value, $caption);
-        }
-
-        return $html;
-    }
-
-    /**
-     * @deprecated use Form\Builder instead
-     * @param  string $formName
-     * @param  string $value
-     * @return string
-     */
-    public function optionId($formName, $value)
-    {
-        $value = \E4u\Common\StringTools::underscore($value);
-        return $this->htmlId($formName).'_'.$value;
-    }
 }

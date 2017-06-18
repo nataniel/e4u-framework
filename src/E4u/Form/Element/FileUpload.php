@@ -16,7 +16,6 @@ class FileUpload extends Element
         ACCEPT_VIDEO = 'video/*',
         ACCEPT_IMAGE = 'image/*';
 
-    protected $cssClass = 'file_upload';
     protected $maxSize = 5242880;  // 5MB
 
     /**
@@ -50,24 +49,6 @@ class FileUpload extends Element
 
         $this->attributes['accept'] = $mime;
         return $this;
-    }
-
-    /**
-     * <input type="file" name="foo[bar]" id="foo_bar" />
-     *
-     * @deprecated use Form\Builder instead
-     * @param  string $formName
-     * @return string
-     */
-    public function render($formName)
-    {
-        $this->setAttributes([
-            'type' => 'file',
-            'name' => $this->htmlName($formName),
-            'id' => $this->htmlId($formName),
-        ]);
-
-        return \E4u\Common\Html::tag('input', $this->attributes);
     }
 
     /**

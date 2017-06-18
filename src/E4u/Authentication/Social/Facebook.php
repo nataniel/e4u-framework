@@ -141,9 +141,9 @@ class Facebook implements Helper
     public function getPicture()
     {
         $picture = $this->me->getPicture();
-        if (!empty($picture)) {
-            return $picture->getUrl();
-        }
+        return !empty($picture)
+            ? $picture->getUrl()
+            : '';
     }
 
     /**
