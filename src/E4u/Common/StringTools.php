@@ -335,4 +335,23 @@ class StringTools
 
         return trim($short);
     }
+
+    public static function declineWordWithNumeral($number, $singularNominative, $pluralNominative, $pluralGenitive = null)
+    {
+        if ($number == 1) {
+            return $singularNominative;
+        }
+
+        if (empty($pluralGenitive)) {
+            return $pluralNominative;
+        }
+
+        $digits = str_split($number);
+        $lastDigit = array_pop($digits);
+        $digitBeforeLast = array_pop($digits);
+
+        return $lastDigit > 1 && $lastDigit < 5 && $digitBeforeLast != 1 ?
+            $pluralNominative :
+            $pluralGenitive;
+    }
 }
