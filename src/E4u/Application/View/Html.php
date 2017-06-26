@@ -5,7 +5,20 @@ use E4u\Application\View,
     E4u\Application\Helper,
     E4u\Common\File\Image,
     Zend\View\Helper\Doctype;
+use E4u\Common\Collection\Paginable;
 
+/**
+ * Class Html
+ * @package E4u\Application\View
+ *
+ * @method Helper\GaduGadu|string gg($gg, $description = null)
+ * @method Helper\Breadcrumbs|string bc($crumbs, $options = [])
+ * @method Helper\Flash|string flash()
+ * @method Helper\Pagination pagination(Paginable $collection, $options = [])
+ * @method Helper\Breadcrumbs|string breadcrumbs($crumbs, $options = [])
+ * @method Helper\Flaticon|string icon($icon, $title = null)
+ * @method Helper\BackUrl|string back()
+ */
 class Html extends View
 {
     protected $_viewSuffix = '.html';
