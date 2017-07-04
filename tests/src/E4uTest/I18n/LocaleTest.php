@@ -11,6 +11,7 @@ class LocaleTest extends TestCase
      */
     public function testPlural()
     {
+        $this->assertEquals('produktów', Locale::plural(0, 'produkt', 'produkty', 'produktów'));
         $this->assertEquals('produkt', Locale::plural(1, 'produkt', 'produkty', 'produktów'));
         $this->assertEquals('produktów', Locale::plural(11, 'produkt', 'produkty', 'produktów'));
         $this->assertEquals('produktów', Locale::plural(8, 'produkt', 'produkty', 'produktów'));

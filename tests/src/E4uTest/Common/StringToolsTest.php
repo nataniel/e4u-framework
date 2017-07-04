@@ -86,25 +86,4 @@ class StringToolsTest extends TestCase
 
         $this->assertEquals('jesteś jak zdrowie. Ile cię trzeba było z uśmiechem, a oni tak było przeznaczono, by', StringTools::shortVersion($txt, 15));
     }
-
-    /**
-     * @covers StringTools::declineWordWithNumeral()
-     */
-    public function testDeclineWordWithNumeral()
-    {
-        $this->assertEquals('złotych',
-            StringTools::declineWordWithNumeral(0, 'złoty', 'złote', 'złotych'));
-        $this->assertEquals('złoty',
-            StringTools::declineWordWithNumeral(1, 'złoty', 'złote', 'złotych'));
-        $this->assertEquals('złote',
-            StringTools::declineWordWithNumeral(2, 'złoty', 'złote', 'złotych'));
-        $this->assertEquals('złote',
-            StringTools::declineWordWithNumeral(34, 'złoty', 'złote', 'złotych'));
-        $this->assertEquals('złotych',
-            StringTools::declineWordWithNumeral(5, 'złoty', 'złote', 'złotych'));
-        $this->assertEquals('złotych',
-            StringTools::declineWordWithNumeral(3131313, 'złoty', 'złote', 'złotych'));
-        $this->assertEquals('złotych',
-            StringTools::declineWordWithNumeral(130, 'złoty', 'złote', 'złotych'));
-    }
 }
