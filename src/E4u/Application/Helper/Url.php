@@ -91,7 +91,10 @@ trait Url
             $options['name'] = isset($target['route']) ? $target['route'] : 'default';
             $options['force_canonical'] = $fullUrl;
 
-            return $this->getRequest()->getRouter()->assemble($target, $options);
+            $target = $this->getRequest()->getRouter()->assemble($target, $options);
+            if (!$fullUrl || self::isExternalUrl($target)) {
+                return $target;
+            }
         }
 
         $file = trim($target, '/');
