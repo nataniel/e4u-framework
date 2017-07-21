@@ -4,8 +4,8 @@ namespace E4u\Application\View;
 use E4u\Application\View,
     E4u\Application\Helper,
     E4u\Common\File\Image,
-    Zend\View\Helper\Doctype;
-use E4u\Common\Collection\Paginable;
+    E4u\Common\Collection\Paginable;
+use Zend\View\Helper as ZendHelper;
 
 /**
  * Class Html
@@ -18,6 +18,7 @@ use E4u\Common\Collection\Paginable;
  * @method Helper\Breadcrumbs|string breadcrumbs($crumbs, $options = [])
  * @method Helper\Flaticon|string icon($icon, $title = null)
  * @method Helper\BackUrl|string back()
+ * @method ZendHelper\Doctype|string doctype($doctype = null)
  */
 class Html extends View
 {
@@ -45,7 +46,7 @@ class Html extends View
 
     public function __construct()
     {
-        $this->_('doctype')->setDoctype(Doctype::HTML5);
+        $this->doctype()->setDoctype(ZendHelper\Doctype::HTML5);
         $this->registerHelpers();
     }
 
