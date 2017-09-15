@@ -371,12 +371,7 @@ class Bootstrap4 implements BuilderInterface
         ]);
 
         $label = $this->t($options->get('label', $field->getLabel()));
-        $content = $this->view->tag('button', $attributes, $label);
-        return $this->formGroup($options->get('group_class'), [
-
-            $content,
-
-        ]);
+        return $this->view->tag('button', $attributes, $label);
     }
 
     /**
