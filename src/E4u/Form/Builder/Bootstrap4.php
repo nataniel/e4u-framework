@@ -166,6 +166,7 @@ class Bootstrap4 implements BuilderInterface
 
             'type' => $options->get('input_type', 'text'),
             'class' => $this->fieldInputClass($field, $options),
+            'style' => $options->get('style', null),
             'placeholder' => $this->t($options->get('placeholder', $field->getLabel())),
             'aria-describedby' => $this->fieldHelp($name),
 
