@@ -119,40 +119,50 @@ class Base
             return true;
         }
 
+        $crsf_name = $this->getCrsfTokenName();
         $crsf_token = $this->method == self::HTTP_GET
-            ? $this->request->getQuery('crsf_token')
-            : $this->request->getPost('crsf_token');
+            ? $this->request->getQuery($crsf_name)
+            : $this->request->getPost($crsf_name);
 
-        return isset($_SESSION['crsf_token'])
-            ? $_SESSION['crsf_token'] == $crsf_token
+        return isset($_SESSION[ $crsf_name ])
+            ? $_SESSION[ $crsf_name ] == $crsf_token
             : false;
     }
 
     /**
      * @return $this
      */
-    public function generateCrsfToken()
+    public function generateCrsfToken($crsf_name)
     {
         $this->crsf_token = md5(uniqid(rand(), true));
-        $_SESSION['crsf_token'] = $this->crsf_token;
+        $_SESSION[ $crsf_name ] = $this->crsf_token;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getCrsfToken()
+    public function getCrsfTokenName()
+    {
+        return $this->getName() . '_crsf';
+    }
+
+    /**
+     * @return string
+     */
+    public function getCrsfTokenValue()
     {
         if (!$this->crsf_protection) {
             return null;
         }
 
         if (null == $this->crsf_token) {
-            if (isset($_SESSION['crsf_token'])) {
-                $this->crsf_token = $_SESSION['crsf_token'];
+            $crsf_name = $this->getCrsfTokenName();
+            if (isset($_SESSION[ $crsf_name ])) {
+                $this->crsf_token = $_SESSION[ $crsf_name ];
             }
             else {
-                $this->generateCrsfToken();
+                $this->generateCrsfToken($crsf_name);
             }
         }
 

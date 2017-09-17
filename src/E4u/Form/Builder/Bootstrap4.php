@@ -99,15 +99,15 @@ class Bootstrap4 implements BuilderInterface
 
     protected function crsfToken()
     {
-        $token = $this->form->getCrsfToken();
+        $token = $this->form->getCrsfTokenValue();
         if (empty($token)) {
             return null;
         }
 
         return $this->view->tag('input', [
             'type' => 'hidden',
-            'name' => 'crsf_token',
-            'value' => $this->form->getCrsfToken(),
+            'name' => $this->form->getCrsfTokenName(),
+            'value' => $token,
         ]);
     }
 
