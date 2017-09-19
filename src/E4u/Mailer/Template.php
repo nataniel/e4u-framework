@@ -259,7 +259,7 @@ class Template
         return $headers;
     }
 
-    public function getContentType()
+    private function getContentType()
     {
         return $this->format == self::FORMAT_HTML ?
             Mime\Mime::TYPE_HTML :
