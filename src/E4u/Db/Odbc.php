@@ -83,23 +83,23 @@ class Odbc
         return $array;
     }
 
-    public function select($query)
+    public function select($query, $params = [])
     {
-        return $this->execute($query)->toArray();
+        return $this->execute($query, $params)->toArray();
     }
 
-    public function selectRow($query)
+    public function selectRow($query, $params = [])
     {
-        $result = $this->select($query);
+        $result = $this->select($query, $params);
         return !empty($result) ? $result[0] : null;
     }
 
-    public function selectValue($query)
+    public function selectValue($query, $params = [])
     {
-        $result = $this->selectRow($query);
+        $result = $this->selectRow($query, $params);
         return !empty($result) ? reset($result) : null;
     }
-
+    
     public function quoteValue($value)
     {
         if (is_numeric($value)) {
