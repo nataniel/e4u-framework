@@ -353,6 +353,7 @@ class Bootstrap4 implements BuilderInterface
      * - group_class
      * - button_class
      * - button_type
+     * - disabled
      *
      * @param  string $name
      * @param  array $options
@@ -368,6 +369,7 @@ class Bootstrap4 implements BuilderInterface
             'id' => $this->fieldId($name),
             'type' => $options->get('button_type', 'submit'),
             'class' => trim('btn btn-primary ' . $options->get('button_class')),
+            'disabled' => $options->get('disabled'),
 
         ]);
 
