@@ -89,6 +89,8 @@ trait Url
 
         if (is_array($target)) {
             $options['name'] = isset($target['route']) ? $target['route'] : 'default';
+            $options['query'] = isset($target['query']) ? $target['query'] : null;
+            $options['fragment'] = isset($target['fragment']) ? $target['fragment'] : null;
             $options['force_canonical'] = $fullUrl;
 
             $target = $this->getRequest()->getRouter()->assemble($target, $options);
