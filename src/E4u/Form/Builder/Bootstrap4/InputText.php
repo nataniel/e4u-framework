@@ -1,17 +1,12 @@
 <?php
-namespace E4u\Form\Builder\Bootstrap;
+namespace E4u\Form\Builder\Bootstrap4;
 
-use E4u\Form\Base;
 use Zend\Config\Config;
 use E4u\Application\View\Html as HtmlView;
 
 class InputText
 {
     private $formElement;
-    /**
-     * @var Base
-     */
-    private $form;
 
     /** @var  Config */
     private $options;
@@ -22,50 +17,43 @@ class InputText
     private $view;
 
     /**
-     * @var string
-     */
-    private $name;
-
-    /**
      * @var Control
      */
     private $control;
 
+
     /**
-     * @param string $name
-     * @param array $options
-     * @param Base $form
+     * @param Control $control
+     * @param $options
      * @param HtmlView $view
      */
-    public function __construct($name, $options, Base $form, HtmlView $view)
+    public function __construct(Control $control, $options, HtmlView $view)
     {
-        $this->form = $form;
+        $this->control = $control;
+        $this->formElement = $control->getElement();
         $this->options = new Config($options);
         $this->view = $view;
-        $this->name = $name;
-        $this->control = new Control($name, $form);
-        $this->formElement = $this->form->getElement($this->name);
     }
 
 
     /**
      * @return string
      */
-    public function getTag()
+    public function getContent()
     {
         $attributes = $this->getAttributesMergedWithFieldAttributes();
 
         return $this->view->tag('input', $attributes);
     }
 
-    public function option($name, $default = null)
+    public function getOption($name, $default = null)
     {
         return $this->options->get($name, $default);
     }
 
     private function getClass()
     {
-        return trim('form-control ' . $this->option('input_class'));
+        return trim('form-control ' . $this->getOption('input_class'));
     }
 
     /**
@@ -85,16 +73,16 @@ class InputText
     {
         return [
 
-            'name' => $this->control->name(),
+            'name' => $this->control->getName(),
             'id' => $this->control->id(),
             'required' => $this->formElement->isRequired() ? 'required' : null,
             'value' => $this->getValue(),
 
-            'type' => $this->option('input_type', 'text'),
+            'type' => $this->getOption('input_type', 'text'),
             'class' => $this->getClass(),
-            'style' => $this->option('style'),
-            'placeholder' => $this->view->t($this->option('placeholder', $this->formElement->getLabel())),
-            'aria-describedby' => $this->control->help(),
+            'style' => $this->getOption('style'),
+            'placeholder' => $this->view->t($this->getOption('placeholder', $this->formElement->getLabel())),
+            'aria-describedby' => $this->control->getHelp(),
 
         ];
     }

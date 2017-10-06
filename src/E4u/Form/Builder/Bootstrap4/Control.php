@@ -1,5 +1,5 @@
 <?php
-namespace E4u\Form\Builder\Bootstrap;
+namespace E4u\Form\Builder\Bootstrap4;
 
 use E4u\Form\Base;
 
@@ -27,13 +27,18 @@ class Control
         return join('_', $parts);
     }
 
-    public function name()
+    public function getName()
     {
         return sprintf("%s[%s]", $this->form->getName(), $this->name);
     }
 
-    public function help()
+    public function getHelp()
     {
         return sprintf("%s_%sHelp", $this->form->getName(), $this->name);
+    }
+
+    public function getElement()
+    {
+        return $this->form->getElement($this->name);
     }
 }
