@@ -146,14 +146,28 @@ class Bootstrap4 implements BuilderInterface
      */
     public function text($name, $options = [])
     {
+        $content = $this->textTag($name, $options);
+        $options = new Config($options);
+        $field = $this->form->getElement($name);
+
+        return $this->field($field, $options, $content);
+    }
+
+
+    /**
+     * @param $name
+     * @param $options
+     * @return string
+     */
+    public function textTag($name, $options)
+    {
         $options = new Config($options);
         $field = $this->form->getElement($name);
 
         $value = $field->getValue();
         if ($value instanceof \DateTime) {
             $value = $value->format('Y-m-d');
-        }
-        elseif (is_null($value)) {
+        } elseif (is_null($value)) {
             $value = '';
         }
 
@@ -172,8 +186,7 @@ class Bootstrap4 implements BuilderInterface
 
         ]);
 
-        $content = $this->view->tag('input', $attributes);
-        return $this->field($field, $options, $content);
+        return $this->view->tag('input', $attributes);
     }
 
     /**
@@ -216,6 +229,12 @@ class Bootstrap4 implements BuilderInterface
         return $this->text($name, $options);
     }
 
+    public function numberTag($name, $options = [])
+    {
+        $options['input_type'] = 'number';
+        return $this->textTag($name, $options);
+    }
+
     /**
      * @see text()
      * @param  string $name
@@ -226,6 +245,12 @@ class Bootstrap4 implements BuilderInterface
     {
         $options['input_type'] = 'password';
         return $this->text($name, $options);
+    }
+
+    public function passwordTag($name, $options = [])
+    {
+        $options['input_type'] = 'password';
+        return $this->textTag($name, $options);
     }
 
     /**
@@ -250,6 +275,12 @@ class Bootstrap4 implements BuilderInterface
     {
         $options['input_type'] = 'email';
         return $this->text($name, $options);
+    }
+
+    public function emailTag($name, $options = [])
+    {
+        $options['input_type'] = 'email';
+        return $this->textTag($name, $options);
     }
 
     /**
@@ -390,6 +421,15 @@ class Bootstrap4 implements BuilderInterface
      */
     public function textarea($name, $options = [])
     {
+        $content = $this->textareaTag($name, $options);
+        $options = new Config($options);
+        $field = $this->form->getElement($name);
+
+        return $this->field($field, $options, $content);
+    }
+
+    public function textareaTag($name, $options = [])
+    {
         $options = new Config($options);
         $field = $this->form->getElement($name);
 
@@ -406,8 +446,7 @@ class Bootstrap4 implements BuilderInterface
         ]);
 
         $value = htmlentities($field->getValue(), ENT_COMPAT, 'UTF-8');
-        $content = $this->view->tag('textarea', $attributes, $value);
-        return $this->field($field, $options, $content);
+        return $this->view->tag('textarea', $attributes, $value);
     }
 
     public function selectOption($caption, $value, $selected = false)
@@ -430,6 +469,15 @@ class Bootstrap4 implements BuilderInterface
      * @return string
      */
     public function select($name, $options = [])
+    {
+        $content = $this->selectTag($name, $options);
+        $options = new Config($options);
+        $field = $this->form->getElement($name);
+
+        return $this->field($field, $options, $content);
+    }
+
+    public function selectTag($name, $options = [])
     {
         $options = new Config($options);
         $field = $this->form->getElement($name);
@@ -475,8 +523,7 @@ class Bootstrap4 implements BuilderInterface
             $html .= $this->selectOption($this->t($caption), $value, $field->getValue() == $value);
         }
 
-        $content = $this->view->tag('select', $attributes, $html);
-        return $this->field($field, $options, $content);
+        return $this->view->tag('select', $attributes, $html);
     }
 
     /**
