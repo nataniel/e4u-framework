@@ -642,12 +642,16 @@ class Bootstrap4 implements BuilderInterface
         ]);
     }
 
-    public function label($name, $showLabels = true)
+    public function label($name, $showLabels = true, $options = [ ])
     {
-        return $this->view->tag('label', [
+        $class = $showLabels ? null : 'sr-only';
+        $options = new Config($options);
+
+        $attributes = [
             'for' => $this->fieldId($name),
-            'class' => $showLabels ? null : 'sr-only',
-        ], $this->t($this->form->getElement($name)->getLabel()));
+            'class' => trim($options->get('label_class') . ' ' . $class),
+        ];
+        return $this->view->tag('label', $attributes, $this->t($this->form->getElement($name)->getLabel()));
     }
 
     public function formGroup($class, $elements)
