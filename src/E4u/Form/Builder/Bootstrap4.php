@@ -159,7 +159,7 @@ class Bootstrap4 implements BuilderInterface
      * @param $options
      * @return string
      */
-    public function textTag($name, $options)
+    public function textTag($name, $options = [])
     {
         $options = new Config($options);
         $field = $this->form->getElement($name);
