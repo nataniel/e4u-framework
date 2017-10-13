@@ -23,7 +23,9 @@ class Zip extends File
             $this->archive->addFile($file->getFullPath(), $file->getBasename());
         } else {
             $fullPath = str_replace(' ', '%20', $file->getFullPath());
-            $this->archive->addFromString($file->getBasename(), file_get_contents($fullPath));
+            if ($fileContent = @file_get_contents($fullPath)) {
+                $this->archive->addFromString($file->getBasename(), $fileContent);
+            }
         }
     }
     
