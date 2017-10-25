@@ -495,6 +495,7 @@ class Bootstrap4 implements BuilderInterface
             'id' => $this->fieldId($name),
             'required' => $field->isRequired() ? 'required' : null,
 
+            'placeholder' => $options->get('placeholder'),
             'class' => $this->fieldInputClass($field, $options),
             'aria-describedby' => $this->fieldHelp($name),
 
