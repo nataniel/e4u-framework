@@ -1,39 +1,11 @@
 <?php
 namespace E4u\Form\Builder\Bootstrap4;
 
-use Zend\Config\Config;
-use E4u\Application\View\Html as HtmlView;
 
-class InputText
+
+class InputText extends  Input
 {
-    private $formElement;
 
-    /** @var  Config */
-    private $options;
-
-    /**
-     * @var HtmlView,
-     */
-    private $view;
-
-    /**
-     * @var Control
-     */
-    private $control;
-
-
-    /**
-     * @param Control $control
-     * @param $options
-     * @param HtmlView $view
-     */
-    public function __construct(Control $control, $options, HtmlView $view)
-    {
-        $this->control = $control;
-        $this->formElement = $control->getElement();
-        $this->options = new Config($options);
-        $this->view = $view;
-    }
 
 
     /**
@@ -46,10 +18,6 @@ class InputText
         return $this->view->tag('input', $attributes);
     }
 
-    public function getOption($name, $default = null)
-    {
-        return $this->options->get($name, $default);
-    }
 
     private function getClass()
     {
