@@ -5,9 +5,6 @@ namespace E4u\Form\Builder\Bootstrap4;
 
 class InputText extends  Input
 {
-
-
-
     /**
      * @return string
      */

@@ -147,7 +147,7 @@ class Bootstrap4 implements BuilderInterface
      * @param  array $options
      * @return string
      */
-    public function text2($name, $options = [])
+    public function text($name, $options = [])
     {
         $content = $this->textTag($name, $options);
         $options = new Config($options);
@@ -192,14 +192,28 @@ class Bootstrap4 implements BuilderInterface
         return $this->view->tag('input', $attributes);
     }
 
-    public function textTag($name, $options = [])
+    public function text2($name, $options = [])
     {
-        $control = $this->getControl($name);
-        $input = new InputText($control, $options, $this->view);
+        $input = $this->getInputText($name, $options);
+        return $this->field2($input);
+    }
+
+    public function textTag2($name, $options = [])
+    {
+        $input = $this->getInputText($name, $options);
         return $input->getContent();
     }
 
-
+    /**
+     * @param $name
+     * @param $options
+     * @return InputText
+     */
+    private function getInputText($name, $options)
+    {
+        $control = $this->getControl($name);
+        return new InputText($control, $options, $this->view);
+    }
 
     private function getControl($name)
     {
@@ -671,6 +685,50 @@ class Bootstrap4 implements BuilderInterface
         return $this->view->tag('label', $attributes, $this->t($this->form->getElement($name)->getLabel()));
     }
 
+
+    protected function field2(Input $input)
+    {
+        $field = $input->getFormElement();
+
+        $class = $input->getOption('group_class');
+        if ($field->hasErrors()) {
+            $class .= ' has-danger';
+        }
+
+        return $this->formGroup(trim($class), [
+
+            $this->label(
+                $field->getName(),
+                $this->options->get('show_labels', false) || $input->getOption('show_label')
+            ),
+
+            $this->inputGroup([
+                $this->inputGroupAddon($input->getOption('prepend')),
+                $input->getContent(),
+                $this->inputGroupAddon($input->getOption('append')),
+            ]),
+
+            $this->helpBlock(
+                $field->getName(),
+                $input->getOption('hint') ?: $field->getHint()
+            ),
+
+        ]);
+    }
+
+    public function label2($name, $showLabels = true, $options = [])
+    {
+        $class = $showLabels ? null : 'sr-only';
+        $options = new Config($options);
+        $control = $this->getControl($name);
+
+        $attributes = [
+            'for' => $control->getName(),
+            'class' => trim($options->get('label_class') . ' ' . $class),
+        ];
+        return $this->view->tag('label', $attributes, $this->t($control->getElement()->getLabel()));
+    }
+
     public function formGroup($class, $elements)
     {
         $elements = array_filter($elements);
@@ -678,9 +736,10 @@ class Bootstrap4 implements BuilderInterface
             return '';
         }
 
-        return $this->view->tag('div', [
+        $attributes = [
             'class' => trim('form-group ' . $class),
-        ], join(' ', $elements));
+        ];
+        return $this->view->tag('div', $attributes, join(' ', $elements));
     }
 
     public function inputGroup($elements)
