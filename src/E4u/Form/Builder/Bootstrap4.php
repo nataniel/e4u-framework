@@ -503,9 +503,14 @@ class Bootstrap4 implements BuilderInterface
 
         $html = '';
 
-        $empty_caption = $options->get('empty_caption', '');
-        if ($empty_caption !== false) {
-            $html .= $this->view->tag('option', [], $empty_caption);
+        $placeholder = $options->get('placeholder');
+        if ($placeholder) {
+            $html .= $this->view->tag('option', [ 'selected' => true, 'disabled' => true, 'hidden' => true ], $placeholder);
+        }
+
+        $emptyCaption = $options->get('empty_caption', '');
+        if ($emptyCaption !== false) {
+            $html .= $this->view->tag('option', [], $emptyCaption);
         }
 
         if ($field->getOptGroups()) {
