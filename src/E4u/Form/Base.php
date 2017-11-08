@@ -469,9 +469,13 @@ class Base
     {
         if (constant('self::HTTP_'.strtoupper($method))) {
             $this->method = $method;
-            $this->crsf_protection = is_null($crsf_protection)
-                    ? $this->method != self::HTTP_GET
-                    : $crsf_protection;
+
+            if (!is_null($crsf_protection)) {
+                $this->crsf_protection = $crsf_protection;
+            }
+            elseif (is_null($this->crsf_protection)) {
+                $this->crsf_protection = $this->method != self::HTTP_GET;
+            }
         }
 
         return $this;
