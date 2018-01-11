@@ -1,6 +1,8 @@
 <?php
 namespace E4u\Db;
 
+use bar\baz\source_with_namespace;
+
 class PdoOdbc
 {
     /**
@@ -85,6 +87,23 @@ class PdoOdbc
     }
 
     /**
+     * @param  string $query
+     * @param  array $params
+     * @param  string $column
+     * @return array
+     */
+    public function selectColumn($query, $params = [], $column = null)
+    {
+        $result = $this->select($query, $params);
+        $values = [];
+        foreach ($result as $row) {
+            $values[] = $column ? $row[ $column ] : array_values($row)[0];
+        }
+
+        return $values;
+    }
+
+    /**
      * @return array
      */
     public function selectRow($query, $params = [])
@@ -100,5 +119,28 @@ class PdoOdbc
     {
         $result = $this->selectRow($query, $params);
         return !empty($result) ? reset($result) : null;
+    }
+
+    /**
+     * PDO::quote() is not supported by all drivers
+     *
+     * @param  mixed $value
+     * @param  int $type
+     * @return string
+     */
+    public function quote($value, $type = \PDO::PARAM_STR)
+    {
+        switch ($type) {
+            case \PDO::PARAM_INT: return (int)$value;
+            default: return "'" . str_replace("'", "''", (string)$value) . "'";
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function affectedRows()
+    {
+        return $this->result->rowCount();
     }
 }
