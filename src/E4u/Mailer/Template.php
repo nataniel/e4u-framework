@@ -9,6 +9,7 @@ class Template
 {
     const FORMAT_TXT = 1;
     const FORMAT_HTML = 2;
+    const CHARSET = 'utf-8';
 
     protected $from_name;
     protected $from_email;
@@ -106,8 +107,8 @@ class Template
     {
         $body = \E4u\Common\Template::merge($this->content, $this->vars);
         $text = new Mime\Part(trim($body));
-        $text->type = Mime\Mime::TYPE_TEXT;
-        $text->charset = 'utf-8';
+        $text->type = $this->getContentType();
+        $text->charset = self::CHARSET;
         return $text;
     }
 
@@ -249,12 +250,20 @@ class Template
     public function getHeaders()
     {
         $headers = new Mail\Headers();
-        $headers->addHeader(Mail\Header\ContentType::fromString('Content-Type: text/plain; charset=utf-8'));
+        $contentType = sprintf('Content-Type: %s; charset=%s', $this->getContentType(), self::CHARSET);
+        $headers->addHeader(Mail\Header\ContentType::fromString($contentType));
         foreach ($this->headers as $header) {
             $headers->addHeader($header);
         }
 
         return $headers;
+    }
+
+    private function getContentType()
+    {
+        return $this->format == self::FORMAT_HTML ?
+            Mime\Mime::TYPE_HTML :
+            Mime\Mime::TYPE_TEXT;
     }
 
     /**
@@ -271,6 +280,14 @@ class Template
     }
 
     /**
+     * @return string
+     */
+    private function getSubject()
+    {
+        return \E4u\Common\Template::merge($this->subject, $this->vars);
+    }
+
+    /**
      * @return Mail\Message
      */
     public function prepareMessage()
@@ -283,11 +300,11 @@ class Template
         $mimeMessage = new Mime\Message();
         $mimeMessage->setParts($parts);
 
-        $message->setEncoding('utf-8')
+        $message->setEncoding(self::CHARSET)
             ->setHeaders($headers)
             ->setFrom($this->from_email, $this->from_name)
             ->setTo($this->to_email, $this->to_name)
-            ->setSubject($this->subject)
+            ->setSubject($this->getSubject())
             ->setBody($mimeMessage);
         return $message;
     }

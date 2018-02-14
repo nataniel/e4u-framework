@@ -89,9 +89,14 @@ trait Url
 
         if (is_array($target)) {
             $options['name'] = isset($target['route']) ? $target['route'] : 'default';
+            $options['query'] = isset($target['query']) ? $target['query'] : null;
+            $options['fragment'] = isset($target['fragment']) ? $target['fragment'] : null;
             $options['force_canonical'] = $fullUrl;
 
-            return $this->getRequest()->getRouter()->assemble($target, $options);
+            $target = $this->getRequest()->getRouter()->assemble($target, $options);
+            if (!$fullUrl || self::isExternalUrl($target)) {
+                return $target;
+            }
         }
 
         $file = trim($target, '/');

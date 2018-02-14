@@ -111,7 +111,7 @@ class Resolver
         if (isset($_COOKIE[ $this->getCookieName() ])) {
             $user = $class::findByCookie($_COOKIE[ $this->getCookieName() ]);
             if ($user instanceof Identity) {
-                $this->loginAs($user);
+                $this->loginAs($user, true);
                 return true;
             }
         }

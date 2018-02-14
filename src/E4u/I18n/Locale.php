@@ -189,7 +189,7 @@ class Locale
     public static function plural($number, $p1, $p2, $p5 = null)
     {
         if ($number == 1) {
-            return $p1;
+            return sprintf($p1, $number);
         }
         
         if ((substr($number, -1) > 1)
@@ -197,10 +197,10 @@ class Locale
          && (substr($number, -2) != 12)
          && (substr($number, -2) != 13)
          && (substr($number, -2) != 14)) {
-            return $p2;
+            return sprintf($p2, $number);
         }
 
-        return !is_null($p5) ? $p5 : $p2;
+        return !is_null($p5) ? sprintf($p5, $number) : sprintf($p2, $number);
     }
     
     public static function countries()

@@ -33,6 +33,11 @@ abstract class Base implements Command
     protected $request;
 
     /**
+     * @var string
+     */
+    protected $_locale;
+
+    /**
      * @return string
      */
     protected function getScript()
@@ -75,7 +80,7 @@ abstract class Base implements Command
         $this->options = $options;
         return $this;
     }
-    
+
     /**
      * @return Console
      */
@@ -99,7 +104,7 @@ abstract class Base implements Command
         echo "Usage:\n";
         $this->getConsole()->showHelp($this);
     }
-    
+
     public function help()
     {
         return static::HELP;
@@ -123,5 +128,58 @@ abstract class Base implements Command
         }
 
         return $this->request;
+    }
+
+    /**
+     * @param  mixed $message
+     * @param  string $locale
+     * @return string
+     */
+    public function translate($message, $locale = null)
+    {
+        $message = (string)$message;
+        return \E4u\Loader::getTranslator()->translate($message, 'default', $locale ?: $this->getCurrentLocale());
+    }
+
+    /**
+     * @param mixed $message
+     * @param array $parameters
+     * @return string
+     */
+    public function t($message, $parameters = null)
+    {
+        $txt = $this->translate($message);
+        if (!empty($parameters)) {
+
+            if (!is_array($parameters)) {
+                $parameters = func_get_args();
+                array_shift($parameters);
+            }
+
+            return vsprintf($txt, $parameters);
+        }
+
+        return $txt;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCurrentLocale()
+    {
+        if (null === $this->_locale) {
+            $this->_locale = $this->detectCurrentLocale();
+        }
+
+        return $this->_locale;
+    }
+
+    /**
+     * @return string
+     */
+    protected function detectCurrentLocale()
+    {
+        return \E4u\Loader::getConfig()->get('default_locale')
+            ?: strtok(\E4u\Loader::getTranslator()->getLocale(), '_');
     }
 }

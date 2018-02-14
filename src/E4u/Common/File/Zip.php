@@ -19,7 +19,14 @@ class Zip extends File
 
     public function addFile(File $file)
     {
-        $this->archive->addFile($file->getFullPath(), $file->getBasename());
+        if ($file->isLocal()) {
+            $this->archive->addFile($file->getFullPath(), $file->getBasename());
+        } else {
+            $fullPath = str_replace(' ', '%20', $file->getFullPath());
+            if ($fileContent = @file_get_contents($fullPath)) {
+                $this->archive->addFromString($file->getBasename(), $fileContent);
+            }
+        }
     }
     
     public function close()
