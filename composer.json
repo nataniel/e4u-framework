@@ -2,7 +2,7 @@
   "name": "nataniel/e4u-framework",
   "description": "E4u Framework",
   "type": "library",
-  "license": "GPLv3",
+  "license": "Apache-2.0",
   "authors": [
     {
       "name": "Artur Jedlinski",
