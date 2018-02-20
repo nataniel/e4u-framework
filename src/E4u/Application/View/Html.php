@@ -431,8 +431,26 @@ class Html extends View
             unset($attributes['back']);
         }
 
-        $attributes['href'] = $this->urlTo($target) . (!empty($back) ? '?back=' . $back : '');
+        $attributes['href'] = $this->addUrlParam($this->urlTo($target), 'back', $back);
         return $this->tag('a', $attributes, $caption);
+    }
+
+    /**
+     * @param  string $url
+     * @param  string $name
+     * @param  string $value
+     * @return string
+     */
+    private function addUrlParam($url, $name, $value)
+    {
+        if (empty($value)) {
+            return trim($url, '&?');
+        }
+
+        $separator = strpos($url, '?') === false
+            ? '?'
+            : '&';
+        return $url . $separator . $name . '=' . $value;
     }
 
     /**
