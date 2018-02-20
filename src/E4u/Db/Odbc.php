@@ -20,8 +20,8 @@ class Odbc
     }
 
     /**
-     * @param bool $flag
-     * @return \E4u\Db\Odbc
+     * @param  bool $flag
+     * @return $this
      */
     public function dumpSQL($flag = true)
     {
@@ -46,8 +46,8 @@ class Odbc
     }
 
     /**
-     * @param string $query
-     * @return \E4u\Db\Odbc
+     * @param  string $query
+     * @return $this
      * @throws Exception\QueryFailed
      */
     public function execute($query, $params = [])

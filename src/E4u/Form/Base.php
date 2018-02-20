@@ -36,7 +36,7 @@ class Base
     /* @var Element[] */
     protected $fields = [];
 
-    protected $crsf_protection = true;
+    private $crsf_protection;
     protected $crsf_token;
 
     public function __construct(Request $request, $models = [], $name = null)
@@ -115,7 +115,7 @@ class Base
      */
     public function verifyCrsfToken()
     {
-        if (!$this->crsf_protection) {
+        if (!$this->isCrsfProtectionEnabled()) {
             return true;
         }
 
@@ -152,7 +152,7 @@ class Base
      */
     public function getCrsfTokenValue()
     {
-        if (!$this->crsf_protection) {
+        if (!$this->isCrsfProtectionEnabled()) {
             return null;
         }
 
@@ -167,6 +167,18 @@ class Base
         }
 
         return $this->crsf_token;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCrsfProtectionEnabled()
+    {
+        if (!is_null($this->crsf_protection)) {
+            return (bool)$this->crsf_protection;
+        }
+
+        return $this->method != self::HTTP_GET;
     }
 
     /**
@@ -469,9 +481,10 @@ class Base
     {
         if (constant('self::HTTP_'.strtoupper($method))) {
             $this->method = $method;
-            $this->crsf_protection = is_null($crsf_protection)
-                    ? $this->method != self::HTTP_GET
-                    : $crsf_protection;
+
+            if (!is_null($crsf_protection)) {
+                $this->crsf_protection = $crsf_protection;
+            }
         }
 
         return $this;

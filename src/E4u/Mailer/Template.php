@@ -280,6 +280,14 @@ class Template
     }
 
     /**
+     * @return string
+     */
+    private function getSubject()
+    {
+        return \E4u\Common\Template::merge($this->subject, $this->vars);
+    }
+
+    /**
      * @return Mail\Message
      */
     public function prepareMessage()
@@ -296,7 +304,7 @@ class Template
             ->setHeaders($headers)
             ->setFrom($this->from_email, $this->from_name)
             ->setTo($this->to_email, $this->to_name)
-            ->setSubject($this->subject)
+            ->setSubject($this->getSubject())
             ->setBody($mimeMessage);
         return $message;
     }
