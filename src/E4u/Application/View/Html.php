@@ -358,6 +358,10 @@ class Html extends View
      */
     public function telTo($phone, $caption = null, $attributes = [])
     {
+        if (empty($phone)) {
+            return '';
+        }
+
         if (is_array($caption)) {
             $caption = null;
             $attributes = $caption;
