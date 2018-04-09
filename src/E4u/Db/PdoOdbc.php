@@ -132,7 +132,8 @@ class PdoOdbc
     {
         switch ($type) {
             case \PDO::PARAM_INT: return (int)$value;
-            default: return "'" . str_replace("'", "''", (string)$value) . "'";
+            case \PDO::PARAM_STR: return "'" . str_replace("'", "''", (string)$value) . "'";
+            default: return $value;
         }
     }
 
