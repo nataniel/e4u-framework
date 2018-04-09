@@ -65,9 +65,43 @@ class PdoOdbc
             var_dump($params);
         }
 
+        $query = $this->includeParamsIntoQuery($query, $params);
+
         $this->prepare($query);
-        $this->result->execute($params);
+        $this->result->execute();
         return $this;
+    }
+
+    /**
+     * Some ODBC drivers don't support prepared statements
+     * with parameters, this method is simply a hack around it.
+     *
+     * @param  string $query
+     * @param  array $params
+     * @return string
+     */
+    private function includeParamsIntoQuery($query, $params)
+    {
+        $replacements = [];
+        foreach ($params as $key => $param)
+        {
+            switch (gettype($param)) {
+                case "boolean":
+                case "integer":
+                    $replacements[ ':' . $key ] = $this->quote($param, \PDO::PARAM_INT);
+                    break;
+                case "double":
+                    $replacements[ ':' . $key ] = $param;
+                    break;
+                case "NULL":
+                    $replacements[ ':' . $key ] = 'NULL';
+                    break;
+                default:
+                    $replacements[ ':' . $key ] = $this->quote($param, \PDO::PARAM_STR);
+            }
+        }
+
+        return str_replace(array_keys($replacements), array_values($replacements), $query);
     }
 
     /**
