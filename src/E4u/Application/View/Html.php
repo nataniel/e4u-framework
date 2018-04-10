@@ -334,6 +334,10 @@ class Html extends View
      */
     public function mailTo($email, $caption = null, $attributes = [])
     {
+        if (empty($email)) {
+            return '';
+        }
+
         if (is_array($caption)) {
             $caption = null;
             $attributes = $caption;
@@ -358,6 +362,10 @@ class Html extends View
      */
     public function telTo($phone, $caption = null, $attributes = [])
     {
+        if (empty($phone)) {
+            return '';
+        }
+
         if (is_array($caption)) {
             $caption = null;
             $attributes = $caption;
