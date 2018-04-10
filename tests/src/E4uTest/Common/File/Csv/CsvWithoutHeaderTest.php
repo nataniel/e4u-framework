@@ -48,4 +48,13 @@ class CsvWithoutHeaderTest extends TestCase
         $this->assertTrue(is_array($header));
         $this->assertEmpty($header);
     }
+
+
+    /**
+     * @covers CsvWithoutHeader::countColumns()
+     */
+    public function testCountColumns()
+    {
+        $this->assertEquals(3, $this->file->countColumns());
+    }
 }

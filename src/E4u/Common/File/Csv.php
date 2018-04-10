@@ -43,6 +43,14 @@ class Csv extends File
         return $this->header;
     }
 
+    /**
+     * @return int
+     */
+    public function countColumns()
+    {
+        return count($this->getHeader());
+    }
+
     protected function initialize()
     {
         if (!is_null($this->header)) {

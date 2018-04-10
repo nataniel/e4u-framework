@@ -5,6 +5,13 @@ use E4u\Common\File\Csv;
 
 class CsvWithoutHeader extends Csv
 {
+    /**
+     * @return int
+     */
+    public function countColumns()
+    {
+        return empty($this->getData()) ? 0 : count($this->data[0]);
+    }
 
     protected function initialize()
     {

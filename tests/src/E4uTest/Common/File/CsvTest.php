@@ -48,4 +48,12 @@ class CsvTest extends TestCase
         $this->assertTrue(is_array($array));
         $this->assertCount(3, $array);
     }
+
+    /**
+     * @covers Csv::countColumns()
+     */
+    public function testCountColumns()
+    {
+        $this->assertEquals(3, $this->file->countColumns());
+    }
 }
