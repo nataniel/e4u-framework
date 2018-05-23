@@ -449,12 +449,25 @@ class Bootstrap4 implements BuilderInterface
         return $this->view->tag('textarea', $attributes, $value);
     }
 
-    public function selectOption($caption, $value, $selected = false)
+    /**
+     * @param  string $caption
+     * @param  mixed $value
+     * @param  bool $selected
+     * @param  string[] $data
+     * @return string
+     */
+    public function selectOption($caption, $value, $selected = false, $data = [])
     {
-        return $this->view->tag('option', [
+        $attributes = [
             'value' => $value,
             'selected' => $selected,
-        ], $caption);
+        ];
+
+        foreach ($data as $key => $dataValue) {
+            $attributes[ 'data-' . $key ] = $dataValue;
+        }
+
+        return $this->view->tag('option', $attributes, $caption);
     }
 
     /**
@@ -516,17 +529,20 @@ class Bootstrap4 implements BuilderInterface
         if ($field->getOptGroups()) {
             foreach ($field->getOptGroups() as $groupName => $groupOptions) {
 
-                $groupHtml = '';
-                foreach ($groupOptions as $value => $caption) {
-                    $groupHtml .= $this->selectOption($this->t($caption), $value, $field->getValue() == $value);
-                }
+                if (!empty($groupOptions)) {
 
-                $html .= $this->view->tag('optgroup', [ 'label' => $groupName ], $groupHtml);
+                    $groupHtml = '';
+                    foreach ($groupOptions as $value => $caption) {
+                        $groupHtml .= $this->selectOption($this->t($caption), $value, $field->getValue() == $value, $field->getDataForOption($value));
+                    }
+
+                    $html .= $this->view->tag('optgroup', [ 'label' => $this->t($groupName) ], $groupHtml);
+                }
             }
         }
 
         foreach ($field->getOptions() as $value => $caption) {
-            $html .= $this->selectOption($this->t($caption), $value, $field->getValue() == $value);
+            $html .= $this->selectOption($this->t($caption), $value, $field->getValue() == $value, $field->getDataForOption($value));
         }
 
         return $this->view->tag('select', $attributes, $html);

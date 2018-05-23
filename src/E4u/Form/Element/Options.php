@@ -43,8 +43,8 @@ abstract class Options extends Element
      */
     public function addOption($value, $caption, $data = [])
     {
-        $this->options[$value] = $caption;
-        $this->data[$value] = $data;
+        $this->options[ $value ] = $caption;
+        $this->data[ $value ] = $data;
         return $this;
     }
 
@@ -54,8 +54,8 @@ abstract class Options extends Element
      */
     public function getDataForOption($value)
     {
-        return isset($this->data[$value])
-            ? $this->data[$value]
+        return isset($this->data[ $value ])
+            ? $this->data[ $value ]
             : [];
     }
 
