@@ -644,10 +644,7 @@ class Entity extends Base
                 $this->showEntity(false)));
         }
 
-        if (property_exists($this, 'updated_at')) {
-            $this->updated_at = new \DateTime();
-        }
-
+        $this->setUpdatedNow();
         $this->validate();
     }
 
@@ -668,10 +665,7 @@ class Entity extends Base
                 $this->showEntity(false)));
         }
 
-        if (property_exists($this, 'updated_at')) {
-            $this->updated_at = new \DateTime();
-        }
-
+        $this->setUpdatedNow();
         $this->validate();
     }
 
@@ -696,6 +690,18 @@ class Entity extends Base
 
     /** @PostUpdate */
     public function postUpdate() {}
+
+    /**
+     * @return $this
+     */
+    public function setUpdatedNow()
+    {
+        if (property_exists($this, 'updated_at')) {
+            $this->updated_at = new \DateTime();
+        }
+
+        return $this;
+    }
 
     /**
      * @return boolean
@@ -739,7 +745,7 @@ class Entity extends Base
     {
         empty($field) ?
             $this->_errors[] = $message :
-            $this->_errors[$field] = $message;
+            $this->_errors[ $field ] = $message;
         return $this;
     }
 
@@ -794,11 +800,11 @@ class Entity extends Base
     public function doSave(array &$visited)
     {
         $oid = spl_object_hash($this);
-        if (isset($visited[$oid])) {
+        if (isset($visited[ $oid ])) {
             return false; // Prevent infinite recursion
         }
 
-        $visited[$oid] = $this; // Mark visited
+        $visited[ $oid ] = $this; // Mark visited
 
         $meta = $this->getClassMetadata();
         foreach ($meta->getAssociationMappings() as $property => $map) {
@@ -995,11 +1001,11 @@ class Entity extends Base
     public function cascadeMerge(array &$visited)
     {
         $oid = spl_object_hash($this);
-        if (isset($visited[$oid])) {
-            return $visited[$oid]; // Prevent infinite recursion
+        if (isset($visited[ $oid ])) {
+            return $visited[ $oid ]; // Prevent infinite recursion
         }
 
-        $visited[$oid] = $this;
+        $visited[ $oid ] = $this;
         $meta = $this->getClassMetadata();
         foreach ($meta->getAssociationNames() as $assoc) {
             if ($meta->isCollectionValuedAssociation($assoc)) {
