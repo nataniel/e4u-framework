@@ -29,7 +29,8 @@
     "google/apiclient": "^2.0",
     "abraham/twitteroauth": "^0.6.4",
     "facebook/graph-sdk": "^5.3",
-    "iignatov/lightopenid": "^1.0"
+    "iignatov/lightopenid": "^1.0",
+    "jdorn/sql-formatter": "^1.2"
   },
   "autoload": {
     "psr-4": {
