@@ -523,7 +523,7 @@ class Bootstrap4 implements BuilderInterface
 
         $emptyCaption = $options->get('empty_caption', '');
         if ($emptyCaption !== false) {
-            $html .= $this->view->tag('option', [], $emptyCaption);
+            $html .= $this->view->tag('option', [ 'value' => '' ], $emptyCaption);
         }
 
         if ($field->getOptGroups()) {
