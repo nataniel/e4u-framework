@@ -167,14 +167,14 @@ class Loader
 
         $config = self::getConfig();
         if (!empty($config->mailer)) {
-            $type = $config->mailer->get('type', 'sendmail');
+            $type = $config->mailer->get('type', Mailer\Factory::SENDMAIL);
             $options = $config->mailer->get('options');
             if ($options instanceof Config) {
                 $options = $options->toArray();
             }
         }
         else {
-            $type = 'sendmail';
+            $type = Mailer\Factory::SENDMAIL;
             $options = null;
         }
 
