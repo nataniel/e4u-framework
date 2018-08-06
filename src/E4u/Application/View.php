@@ -236,7 +236,7 @@ abstract class View implements Renderer, Resolver, ContainerInterface
     protected function renderFile($name)
     {
         try {
-            $filename = $this->_viewPath.DIRECTORY_SEPARATOR.$name.$this->_viewSuffix;
+            $filename = $this->getFilename($name);
             if (!is_file($filename)) {
                 throw new LogicException("File $filename does not exist.");
             }
@@ -248,6 +248,21 @@ abstract class View implements Renderer, Resolver, ContainerInterface
         catch (LogicException $e) {
             return '<pre><h3>'.$e->getMessage()."</h3>\n".$e->getTraceAsString().'</pre>';
         }
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function viewFileExists($name)
+    {
+        $filename = $this->getFilename($name);
+        return is_file($filename);
+    }
+
+    protected function getFilename($viewName)
+    {
+        return $this->_viewPath . DIRECTORY_SEPARATOR . $viewName . $this->_viewSuffix;
     }
 
     /**
