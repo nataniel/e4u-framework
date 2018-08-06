@@ -250,16 +250,6 @@ abstract class View implements Renderer, Resolver, ContainerInterface
         }
     }
 
-    /**
-     * @param string $name
-     * @return bool
-     */
-    public function viewFileExists($name)
-    {
-        $filename = $this->getFilename($name);
-        return is_file($filename);
-    }
-
     protected function getFilename($viewName)
     {
         return $this->_viewPath . DIRECTORY_SEPARATOR . $viewName . $this->_viewSuffix;
