@@ -14,9 +14,16 @@ trait Tree
      **/
     # protected $parent;
 
+    /** @return bool */
     abstract public function isActive();
+
+    /** @return string */
     abstract public function __toString();
+
+    /** @return Tree */
     abstract public function getParent();
+
+    /** @return Tree[] */
     abstract public function getChildren();
 
     /**
@@ -115,5 +122,24 @@ trait Tree
         }
 
         return join($separator, $pieces);
+    }
+
+    /**
+     * @param  Tree $target
+     * @return bool
+     */
+    public function isChildOf($target)
+    {
+        $parent = $this->getParent();
+
+        if ($parent === $target) {
+            return true;
+        }
+
+        if (empty($parent)) {
+            return false;
+        }
+
+        return $parent->isChildOf($target);
     }
 }
