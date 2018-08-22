@@ -65,7 +65,7 @@ class Html extends View
     /**
      * @param string $type
      * @param string $glue
-     * @return string
+     * @return string|array
      */
     public function getFlash($type = null, $glue = '<br />')
     {

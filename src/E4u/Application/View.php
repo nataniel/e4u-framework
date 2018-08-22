@@ -116,7 +116,7 @@ abstract class View implements Renderer, Resolver, ContainerInterface
     /**
      * @param  string $type
      * @param  string $glue
-     * @return string
+     * @return string|array
      */
     public function getFlash($type = null, $glue = "\n")
     {
@@ -129,7 +129,7 @@ abstract class View implements Renderer, Resolver, ContainerInterface
 
         if (!empty($type)) {
             if (!empty($this->flash[$type])) {
-                return join($glue, $this->flash[$type]);
+                return join($glue, $this->flash[ $type ]);
             }
             else {
                 return null;
