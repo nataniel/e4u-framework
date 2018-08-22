@@ -7,7 +7,6 @@ abstract class Options extends Element
 {
     protected $options = [];
     protected $data = [];
-    protected $default = [];
 
     /**
      * @param  array $options

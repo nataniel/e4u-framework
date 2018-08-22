@@ -3,6 +3,8 @@ namespace E4u\Form\Element;
 
 class CheckBoxGroup extends Options
 {
+    protected $default = [];
+
     /**
      * @param  string $message
      * @return $this

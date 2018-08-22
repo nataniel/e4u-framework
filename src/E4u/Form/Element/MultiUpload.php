@@ -12,6 +12,7 @@ use E4u\Form\Element;
 class MultiUpload extends FileUpload
 {
     protected $value = [];
+    protected $default = [];
 
     /**
      * @return boolean
