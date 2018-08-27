@@ -14,7 +14,7 @@ use Zend\View\Helper as ZendHelper;
  * @method Helper\GaduGadu|string gg($gg, $description = null)
  * @method Helper\Breadcrumbs|string bc($crumbs, $options = [])
  * @method Helper\Flash|string flash()
- * @method Helper\Pagination pagination(Paginable $collection, $options = [])
+ * @method Helper\Pagination|string pagination(Paginable $collection, $options = [])
  * @method Helper\Breadcrumbs|string breadcrumbs($crumbs, $options = [])
  * @method Helper\Flaticon|string icon($icon, $title = null)
  * @method Helper\BackUrl|string back()
