@@ -607,25 +607,32 @@ class Bootstrap4 implements BuilderInterface
 
         $div = '';
         foreach ($field->getOptions() as $value => $caption) {
-
-            $attributes = array_merge($field->getAttributes(), [
-
-                'name' => $this->fieldName($name) . '[]',
-                'id' => $this->fieldId($name, $value),
-                'checked' => in_array($value, $field->getValue()) ? 'checked' : null,
-                'value' => $value,
-
-                'type' => 'checkbox',
-                'class' => trim('form-check-input' . $options->get('input_class')),
-            ]);
-
-            $content = $this->view->tag('input', $attributes);
-            $label = $this->view->tag('label', [ 'class' => 'form-check-label' ], $content . ' ' . $this->t($caption));
-            $div .= $this->view->tag('div', [ 'class' => 'form-check' ], $label);
-
+            $div .= $this->checkboxOption($name, $value, $caption, $options->toArray());
         }
 
         return $this->field($field, $options, $div);
+    }
+
+    public function checkboxOption($name, $value, $caption, $options = [])
+    {
+        $options = new Config($options);
+        $field = $this->form->getElement($name);
+
+        $attributes = array_merge($field->getAttributes(), [
+
+            'name' => $this->fieldName($name) . '[]',
+            'id' => $this->fieldId($name, $value),
+            'checked' => in_array($value, $field->getValue()) ? 'checked' : null,
+            'value' => $value,
+
+            'type' => 'checkbox',
+            'class' => trim('form-check-input' . $options->get('input_class')),
+        ]);
+
+        $content = $this->view->tag('input', $attributes);
+        $label = $this->view->tag('label', [ 'class' => 'form-check-label' ], trim($content . ' ' . $this->t($caption)));
+
+        return $this->view->tag('div', [ 'class' => 'form-check' ], $label);
     }
 
     protected function fieldInputClass(Element $field, Config $options)
