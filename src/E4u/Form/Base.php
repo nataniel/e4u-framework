@@ -338,7 +338,7 @@ class Base
 
                 if (!empty($this->values)) {
                     foreach ($this->fields as $key => $element) {
-                        if (!$element->isReadonly() && !$element->isDisabled()) {
+                        if (!$element->isDisabled()) {
                             $element->setValue(isset($this->values[ $key ])
                                 ? $this->values[ $key ]
                                 : null);
