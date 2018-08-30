@@ -15,4 +15,18 @@ class CheckBoxGroup extends Options
         unset($this->attributes['required']);
         return $this;
     }
+
+    /**
+     * @param  mixed $value
+     * @return $this
+     */
+    public function setValue($value)
+    {
+        if (empty($value)) {
+            $value = [];
+        }
+
+        parent::setValue($value);
+        return $this;
+    }
 }

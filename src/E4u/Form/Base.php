@@ -340,8 +340,8 @@ class Base
 
                 if (!empty($this->values)) {
                     foreach ($this->fields as $key => $element) {
-                        $element->setValue(isset($this->values[$key])
-                                ? $this->values[$key]
+                        $element->setValue(isset($this->values[ $key ])
+                                ? $this->values[ $key ]
                                 : null);
                     }
                 }
