@@ -284,24 +284,23 @@ class Base
     {
         if (is_array($files)) {
 
-            # echo "<pre>"; var_dump($files); echo "</pre>";
             foreach ($files as $key => $field) {
 
                 if (array_key_exists('name', $field)) {
 
                     // single file
                     if (!empty($field['name']) && is_uploaded_file($field['tmp_name'])) {
-                        $this->values[$key] = $field;
+                        $this->values[ $key ] = $field;
                     }
 
                 }
                 else {
 
                     // multiple files
-                    $this->values[$key] = [];
+                    $this->values[ $key ] = [];
                     foreach ($field as $file) {
                         if (!empty($file['name']) && is_uploaded_file($file['tmp_name'])) {
-                            $this->values[$key][] = $file;
+                            $this->values[ $key ][] = $file;
                         }
                     }
 
@@ -311,7 +310,6 @@ class Base
 
         }
 
-        # echo "<pre>"; var_dump($this->values); exit();
         return $this;
     }
 
@@ -340,9 +338,11 @@ class Base
 
                 if (!empty($this->values)) {
                     foreach ($this->fields as $key => $element) {
-                        $element->setValue(isset($this->values[ $key ])
+                        if (!$element->isReadonly() && !$element->isDisabled()) {
+                            $element->setValue(isset($this->values[ $key ])
                                 ? $this->values[ $key ]
                                 : null);
+                        }
                     }
                 }
 
@@ -425,7 +425,7 @@ class Base
     {
         foreach ($this->fields as $key => $field) {
             if (!$field->isValid()) {
-                $this->errors[$key] = $field->getErrors();
+                $this->errors[ $key ] = $field->getErrors();
             }
         }
 

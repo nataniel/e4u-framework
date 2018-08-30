@@ -123,6 +123,30 @@ abstract class Element
     }
 
     /**
+     * @param  bool $flag
+     * @return $this
+     */
+    public function setReadonly($flag = true)
+    {
+        if ($flag == true) {
+            $this->attributes['readonly'] = 'readonly';
+        }
+        elseif (isset($this->attributes['readonly'])) {
+            unset($this->attributes['readonly']);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isReadonly()
+    {
+        return !empty($this->attributes['readonly']);
+    }
+
+    /**
      * @param  boolean $flag
      * @return $this
      */
@@ -136,6 +160,14 @@ abstract class Element
         }
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDisabled()
+    {
+        return !empty($this->attributes['disabled']);
     }
 
     /**
@@ -209,6 +241,9 @@ abstract class Element
         return $this->model;
     }
 
+    /**
+     * @return string
+     */
     public function getModelField()
     {
         return $this->model_field ?: $this->getName();
@@ -222,49 +257,58 @@ abstract class Element
         return $this->attributes;
     }
 
+    /**
+     * @return string
+     */
     public function getLabel()
     {
         return $this->label ?: ucfirst($this->name);
     }
 
+    /**
+     * @param  string $name
+     * @return $this
+     */
     public function setName($name)
     {
         $this->name = $name;
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * @param  string $label
+     * @return $this
+     */
     public function setLabel($label)
     {
         $this->label = $label;
         return $this;
     }
 
+    /**
+     * @param  string $hint
+     * @return $this
+     */
     public function setHint($hint)
     {
         $this->hint = $hint;
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getHint()
     {
         return $this->hint;
-    }
-
-    public function setReadonly($flag = true)
-    {
-        if ($flag == true) {
-            $this->attributes['readonly'] = 'readonly';
-        }
-        else {
-            unset($this->attributes['readonly']);
-        }
-
-        return $this;
     }
 
     /**
@@ -328,13 +372,18 @@ abstract class Element
         return $this;
     }
 
+    /**
+     * @param  string $message
+     * @return $this
+     */
     public function addError($message)
     {
         $this->errors[] = $message;
+        return $this;
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getErrors()
     {
@@ -375,7 +424,7 @@ abstract class Element
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isRequired()
     {
