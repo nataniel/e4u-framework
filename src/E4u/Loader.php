@@ -44,11 +44,11 @@
 
 namespace E4u;
 
-use Doctrine\Common\Proxy\Autoloader;
+use Doctrine\ORM;
 use Zend\Config\Config,
     Zend\Loader\StandardAutoloader,
     Doctrine\Common\Proxy,
-    Doctrine\ORM\EntityManager;
+    Doctrine\Common\Proxy\Autoloader;
 
 #mb_internal_encoding('utf-8');
 
@@ -193,7 +193,7 @@ class Loader
             throw new \E4u\Exception\ConfigException('Config passed to E4u\Loader::getDoctrine() must have "doctrine" key set');
         }
 
-        $ormConfig = new \Doctrine\ORM\Configuration();
+        $ormConfig = new ORM\Configuration();
 
         $ormConfig->setProxyDir($config->doctrine->get('proxy_dir', self::DEFAULT_PROXY_DIR));
         $ormConfig->setProxyNamespace($config->doctrine->get('proxy_namespace', $config->namespace . '\Proxies'));
@@ -201,7 +201,7 @@ class Loader
 
         if ($entities_xml = $config->doctrine->get('entities_xml')) {
             if ($entities_xml instanceof Config) { $entities_xml = $entities_xml->toArray(); }
-            $driverImpl = new \Doctrine\ORM\Mapping\Driver\XmlDriver($entities_xml);
+            $driverImpl = new ORM\Mapping\Driver\XmlDriver($entities_xml);
         }
         else {
             $entities_dir = $config->doctrine->get('entities_dir', [ self::DEFAULT_MODELS_DIR ]);
@@ -220,6 +220,13 @@ class Loader
         if ($cache instanceof \Doctrine\Common\Cache\CacheProvider) {
             $cache->setNamespace($cacheNamespace);
         }
+
+        $cacheConfig = new ORM\Cache\RegionsConfiguration();
+        $factory = new ORM\Cache\DefaultCacheFactory($cacheConfig, $cache);
+
+        $ormConfig->setSecondLevelCacheEnabled();
+        $ormConfig->getSecondLevelCacheConfiguration()
+            ->setCacheFactory($factory);
 
         $ormConfig->setMetadataDriverImpl($driverImpl);
         $ormConfig->setMetadataCacheImpl($cache);
@@ -256,7 +263,7 @@ class Loader
     }
 
     /**
-     * @return EntityManager
+     * @return ORM\EntityManager
      */
     public static function getDoctrine()
     {
@@ -270,8 +277,7 @@ class Loader
         }
 
         $ormConfig = self::configureDoctrine($config);
-        $events = new \Doctrine\Common\EventManager;
-        $em = EntityManager::create($config->database->toArray(), $ormConfig, $events);
+        $em = ORM\EntityManager::create($config->database->toArray(), $ormConfig);
 
         Registry::set('doctrine/em', $em);
         return $em;
