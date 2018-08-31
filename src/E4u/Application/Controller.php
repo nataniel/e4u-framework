@@ -155,7 +155,7 @@ abstract class Controller
      */
     protected function redirectToSelf($message = null, $type = View::FLASH_MESSAGE)
     {
-        return $this->redirectTo($this->currentUrl());
+        return $this->redirectTo($this->currentUrl(), $message, $type);
     }
 
     /**
