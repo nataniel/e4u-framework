@@ -79,6 +79,7 @@ class Bootstrap4 implements BuilderInterface
             'method' => $this->form->getMethod(),
             'enctype' => $this->form->getEnctype(),
             'novalidate' => $this->options->get('novalidate') ? 'novalidate' : null,
+            'class' => $this->form->isSubmitted() ? 'was-validated' : null,
             'action' => $this->form->getAction(),
         ];
 
@@ -639,6 +640,7 @@ class Bootstrap4 implements BuilderInterface
     {
         return trim(
             'form-control ' .
+            ($field->hasErrors() ? 'is-invalid ' : null) .
             $options->get('input_class')
         );
     }
@@ -646,10 +648,6 @@ class Bootstrap4 implements BuilderInterface
     protected function field(Element $field, Config $options, $content)
     {
         $class = $options->get('group_class');
-        if ($field->hasErrors()) {
-            $class .= ' has-danger';
-        }
-
         return $this->formGroup(trim($class), [
 
             $this->label(
