@@ -148,6 +148,17 @@ abstract class Controller
     }
 
     /**
+     * @param array|string $message
+     * @param string $type
+     * @return Response
+     * @throws Controller\Redirect
+     */
+    protected function redirectToSelf($message = null, $type = View::FLASH_MESSAGE)
+    {
+        return $this->redirectTo($this->currentUrl());
+    }
+
+    /**
      * @return array
      */
     public function getParams()

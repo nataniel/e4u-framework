@@ -43,14 +43,22 @@ trait Url
      */
     public function backUrl()
     {
-        $current = $this->getRequest()->getCurrentPath();
+        $current = $this->currentUrl();
+        return $this->urlEncode($current);
+    }
 
-        if ($this->getRequest() instanceof Request\Http) {
-            $query = $this->getRequest()->getQueryString();
-            return $this->urlEncode(empty($query) ? $current : $current . '?' . $query);
+    /**
+     * @return string
+     */
+    public function currentUrl()
+    {
+        $current = $this->getRequest()->getCurrentPath();
+        if (!$this->getRequest() instanceof Request\Http) {
+            return $current;
         }
 
-        return $this->urlEncode($current);
+        $query = $this->getRequest()->getQueryString();
+        return empty($query) ? $current : $current . '?' . $query;
     }
 
     /**
