@@ -6,7 +6,10 @@ class Xhr extends Base
     public function __construct($content = null, $data = null)
     {
         parent::__construct($content);
-        $this->setMetadata($data);
+
+        if (!empty($data)) {
+            $this->setMetadata($data);
+        }
     }
 
     /**
