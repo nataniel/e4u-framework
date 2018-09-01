@@ -228,7 +228,7 @@ abstract class Controller
     public function dispatch(Request\Request $request)
     {
         $this->_request = $request;
-        $action = $this->getActionName($request);
+        $action = $this->getActionName();
         $method = static::getMethodFromAction($action);
 
         if (!method_exists($this, $method)) {

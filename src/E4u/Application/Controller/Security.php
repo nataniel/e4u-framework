@@ -7,5 +7,5 @@ interface Security
 {
     public function loginAction();
     public function logoutAction();
-    public function getActionName(Request $request);
+    public function getActionName();
 }

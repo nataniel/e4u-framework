@@ -7,5 +7,5 @@ interface Errors
 {
     public function notFoundAction();
     public function invalidAction();
-    public function getActionName(Request $request);
+    public function getActionName();
 }
