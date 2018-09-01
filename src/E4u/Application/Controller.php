@@ -215,8 +215,7 @@ abstract class Controller
         }
 
         $loginPath = $this->getAuthentication()->getLoginPath();
-        $currentPath = $this->getRequest()->getCurrentPath();
-        $url = $loginPath . '?back=' . $this->urlEncode($currentPath);
+        $url = $loginPath . '?back=' . $this->backUrl();
         return $this->redirectTo($url);
     }
 
