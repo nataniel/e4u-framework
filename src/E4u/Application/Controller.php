@@ -1,18 +1,20 @@
 <?php
 namespace E4u\Application;
 
-use E4u\Common\StringTools;
 use E4u\Exception\LogicException;
-use E4u\Request\Http;
 use E4u\Application\Exception;
-use Zend\Stdlib\Message;
+
 use Zend\Stdlib\RequestInterface,
     Zend\Stdlib\ResponseInterface,
     Zend\Config\Config,
-    E4u\Request\Request,
-    E4u\Response\Response,
-    E4u\Authentication\Resolver,
-    ArrayAccess;
+    Zend\Stdlib\Message;
+
+use E4u\Authentication,
+    E4u\Common\StringTools,
+    E4u\Request,
+    E4u\Response;
+
+use ArrayAccess;
 
 abstract class Controller
 {
@@ -31,21 +33,15 @@ abstract class Controller
 
     /**
      * Authentication resolver.
-     * @var Resolver
+     * @var Authentication\Resolver
      */
     protected $_authentication;
 
     /**
      * Should be populated via dispatch()
-     * @var Request
+     * @var Request\Request
      */
     protected $_request;
-
-    /**
-     * Defaults to E4u\Response\Http
-     * @var Response
-     */
-    protected $_response;
 
     /**
      * @var string
@@ -101,25 +97,21 @@ abstract class Controller
     }
 
     /**
+     * @deprecated Use new Response\Xhr instead
      * @param  mixed $content
      * @param  array  $data
-     * @return \E4u\Response\Xhr|Message
+     * @return Response\Xhr|Message
      */
-    public function sendXhrResponse($content, $data = null)
+    protected function sendXhrResponse($content, $data = null)
     {
-        $response = new \E4u\Response\Xhr();
-        if (!empty($data)) {
-            $response->setMetadata($data);
-        }
-
-        return $response->setContent($content);
+        return new Response\Xhr($content, $data);
     }
 
     /**
-     * @param array|string $target
-     * @param string $message
-     * @param string $type
-     * @return Response
+     * @param  array|string $target
+     * @param  string $message
+     * @param  string $type
+     * @return Response\Redirect
      */
     protected function redirectBackOrTo($target, $message = null, $type = View::FLASH_MESSAGE)
     {
@@ -131,10 +123,10 @@ abstract class Controller
     }
 
     /**
-     * @param array|string $target
-     * @param array|string $message
-     * @param string $type
-     * @return Response
+     * @param  array|string $target
+     * @param  array|string $message
+     * @param  string $type
+     * @return Response\Redirect
      * @throws Controller\Redirect
      */
     protected function redirectTo($target, $message = null, $type = View::FLASH_MESSAGE)
@@ -148,9 +140,9 @@ abstract class Controller
     }
 
     /**
-     * @param array|string $message
-     * @param string $type
-     * @return Response
+     * @param  array|string $message
+     * @param  string $type
+     * @return Response\Redirect
      * @throws Controller\Redirect
      */
     protected function redirectToSelf($message = null, $type = View::FLASH_MESSAGE)
@@ -180,7 +172,7 @@ abstract class Controller
     }
 
     /**
-     * @return \E4u\Authentication\Identity
+     * @return Authentication\Identity
      */
     public function getCurrentUser()
     {
@@ -189,22 +181,22 @@ abstract class Controller
 
     /**
      * @todo   Use interface instead of actual resolver class
-     * @param  Resolver $authentication
-     * @return Controller
+     * @param  Authentication\Resolver $authentication
+     * @return $this
      */
-    public function setAuthentication(Resolver $authentication)
+    public function setAuthentication(Authentication\Resolver $authentication)
     {
         $this->_authentication = $authentication;
         return $this;
     }
 
     /**
-     * @return Resolver
+     * @return Authentication\Resolver
      */
     public function getAuthentication()
     {
         if (null == $this->_authentication) {
-            $resolver = new Resolver($this->getRequest(), $this->getConfig()->get('authentication'));
+            $resolver = new Authentication\Resolver($this->getRequest(), $this->getConfig()->get('authentication'));
             $this->setAuthentication($resolver);
         }
 
@@ -214,7 +206,7 @@ abstract class Controller
     /**
      * @param  string|null $message
      * @throws Controller\Redirect
-     * @return Response
+     * @return Response\Redirect
      */
     protected function denyAccess($message = null)
     {
@@ -231,20 +223,14 @@ abstract class Controller
     /**
      * Dispatch a request
      *
-     * @param  Request  $_request
-     * @param  Response $_response
-     * @return Response
+     * @param  Request\Request $request
+     * @return Response\Response
      */
-    public function dispatch(Request $_request, Response $_response = null)
+    public function dispatch(Request\Request $request)
     {
-        $this->_request = $_request;
-        if (null !== $_response) {
-            $this->setResponse($_response);
-        }
-
-        $action = $this->getActionName($_request);
+        $this->_request = $request;
+        $action = $this->getActionName($request);
         $method = static::getMethodFromAction($action);
-        $response = $this->getResponse();
 
         if (!method_exists($this, $method)) {
             throw new Exception\NoMethodForAction("No method for '$action' action.");
@@ -266,20 +252,18 @@ abstract class Controller
             $actionResult = $this->init($action) ?: $this->$method();
 
             // if we already get a Response, just send it back
-            if ($actionResult instanceof Response) {
-                $this->setResponse($actionResult);
+            if ($actionResult instanceof Response\Response) {
                 return $actionResult;
             }
 
             // otherwise, render the selected action into a response
-            return $this->render($action, $actionResult);
+            return $this->renderView($action, $actionResult);
 
         } catch (Controller\Redirect $e) {
 
             $url = $this->urlTo($e->getUrl());
-            $response->setStatus($e->getCode())
-                     ->setMetadata('location', $url);
-            return $response;
+            return new Response\Redirect($url);
+
         }
     }
 
@@ -290,7 +274,7 @@ abstract class Controller
      * If returns Response object, the return value will be passed
      * to the application, otherwise the action result will.
      *
-     * @return null|Response
+     * @return null|Response\Response
      */
     protected function init($action)
     {
@@ -300,11 +284,11 @@ abstract class Controller
     /**
      * Invoke view for an action
      *
-     * @param string $action
-     * @param array|ArrayAccess $vars
-     * @return Response
+     * @param  string $action
+     * @param  array|ArrayAccess $vars
+     * @return Response\Response
      */
-    protected function render($action, $vars = null)
+    protected function renderView($action, $vars = null)
     {
         if ($view = $this->getView())
         {
@@ -327,15 +311,25 @@ abstract class Controller
             // If no view defined ($this->renderView == false),
             // just pass the action result to the response.
             $content = (($vars instanceof ArrayAccess) && isset($vars['content']))
-                       ? $vars['content']
-                       : $vars;
+                ? $vars['content']
+                : $vars;
         }
 
         // attach to response
-        $response = $this->getResponse();
+        $response = $this->getDefaultResponse();
         $response->setContent($content);
 
         return $response;
+    }
+
+    /**
+     * Invoke view for an action
+     *
+     * @deprecated Use renderView instead
+     */
+    protected function render($action, $vars = null)
+    {
+        return $this->renderView($action, $vars);
     }
 
     /**
@@ -375,7 +369,7 @@ abstract class Controller
 
     /**
      * @param  View $view
-     * @return Controller
+     * @return $this
      */
     public function setView(View $view)
     {
@@ -415,7 +409,7 @@ abstract class Controller
 
     /**
      * @param  string $layout
-     * @return Controller
+     * @return $this
      */
     public function setLayout($layout)
     {
@@ -436,7 +430,7 @@ abstract class Controller
     }
 
     /**
-     * @return Controller
+     * @return $this
      */
     public function disableLayout()
     {
@@ -445,7 +439,7 @@ abstract class Controller
     }
 
     /**
-     * @return Controller
+     * @return $this
      */
     public function disableView()
     {
@@ -474,12 +468,11 @@ abstract class Controller
     /**
      * Pulls action name from current request.
      *
-     * @param  Request $request
      * @return string
      */
-    public function getActionName(Request $request)
+    public function getActionName()
     {
-        $routeMatch = $request->getCurrentRoute();
+        $routeMatch = $this->getRequest()->getCurrentRoute();
         return $routeMatch->getParam('action', 'index');
     }
 
@@ -490,17 +483,17 @@ abstract class Controller
      */
     public function indexAction()
     {
-        return ['content' => 'It works!'];
+        return [ 'content' => 'It works!' ];
     }
 
     /**
      * Get the request object
      *
-     * @return Http|Request
+     * @return Request\Http|Request\Request
      */
     public function getRequest()
     {
-        if (!$this->_request instanceof Request) {
+        if (!$this->_request instanceof Request\Request) {
             throw new LogicException('No valid Request set.');
         }
 
@@ -508,30 +501,15 @@ abstract class Controller
     }
 
     /**
-     * Set the response object
-     * @param  Response $response
-     * @return Controller
-     */
-    public function setResponse(Response $response)
-    {
-        $this->_response = $response;
-        return $this;
-    }
-
-    /**
      * Get the response object
      *
-     * @return Response
+     * @return Response\Xhr|Response\Http
      */
-    public function getResponse()
+    public function getDefaultResponse()
     {
-        if (null === $this->_response) {
-            $this->_response = $this->isXhr()
-                ? new \E4u\Response\Xhr()
-                : new \E4u\Response\Http();
-        }
-
-        return $this->_response;
+        return $this->isXhr()
+            ? new Response\Xhr()
+            : new Response\Http();
     }
 
     /**
@@ -560,8 +538,8 @@ abstract class Controller
     }
 
     /**
-     * @param mixed $message
-     * @param array $parameters
+     * @param  mixed $message
+     * @param  array $parameters
      * @return string
      */
     public function t($message, $parameters = null)

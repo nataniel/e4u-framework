@@ -3,6 +3,15 @@ namespace E4u\Response;
 
 class Xhr extends Base
 {
+    public function __construct($content = null, $data = null)
+    {
+        parent::__construct($content);
+        $this->setMetadata($data);
+    }
+
+    /**
+     * @return $this
+     */
     public function send()
     {
         $result = $this->getMetadata();

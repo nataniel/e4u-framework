@@ -20,16 +20,6 @@ class File extends Http
         }
     }
 
-    public function fileExists($content)
-    {
-        if (parse_url($content, PHP_URL_SCHEME) != '') {
-            $headers = get_headers($content);
-            return stripos($headers[0], "200 OK") !== false;
-        }
-
-        return file_exists($content);
-    }
-
     /**
      * @param  mixed $value
      * @param  string $name
@@ -44,6 +34,20 @@ class File extends Http
         $this->setName($name ?: basename($value));
         $this->content = $value;
         return $this;
+    }
+
+    /**
+     * @param  string $filename
+     * @return bool
+     */
+    private function fileExists($filename)
+    {
+        if (parse_url($filename, PHP_URL_SCHEME) != '') {
+            $headers = get_headers($filename);
+            return stripos($headers[0], "200 OK") !== false;
+        }
+
+        return file_exists($filename);
     }
 
     /**
