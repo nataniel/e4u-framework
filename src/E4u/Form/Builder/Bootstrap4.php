@@ -34,6 +34,14 @@ class Bootstrap4 implements BuilderInterface
     }
 
     /**
+     * @return Base
+     */
+    public function getForm()
+    {
+        return $this->form;
+    }
+
+    /**
      * @param  string $text
      * @return string
      */
