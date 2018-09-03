@@ -154,7 +154,6 @@ class Bootstrap4 implements BuilderInterface
         return $this->field($field, $options, $content);
     }
 
-
     /**
      * @param $name
      * @param $options

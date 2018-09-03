@@ -58,13 +58,13 @@ class Base
 
     public function setModel($name, $model)
     {
-        $this->models[$name] = $model;
+        $this->models[ $name ] = $model;
         return $this;
     }
 
     public function getModel($name)
     {
-        return $this->models[$name];
+        return $this->models[ $name ];
     }
 
     public function setAction($url)
@@ -182,6 +182,15 @@ class Base
     }
 
     /**
+     * @param  string $name
+     * @return bool
+     */
+    public function hasField($name)
+    {
+        return isset($this->fields[ $name ]);
+    }
+
+    /**
      * @param  Element[] $fields
      * @param  string $model
      * @return $this
@@ -204,13 +213,13 @@ class Base
     public function addField(Element $field, $model = null, $model_field = null)
     {
         $name = $field->getName();
-        if (isset($this->fields[$name])) {
+        if (isset($this->fields[ $name ])) {
             throw new LogicException(
                 "Field $name already defined for ".  get_class($this).".");
         }
 
         if (!is_null($model)) {
-            if (!isset($this->models[$model])) {
+            if (!isset($this->models[ $model ])) {
                 throw new LogicException(
                     "Model $model not defined for ".  get_class($this).".");
             }
@@ -222,7 +231,7 @@ class Base
             $this->setEnctype(self::ENCTYPE_MULTIPART);
         }
 
-        $this->fields[$name] = $field;
+        $this->fields[ $name ] = $field;
         return $this;
     }
 
@@ -247,7 +256,7 @@ class Base
     public function getValue($name)
     {
         $this->initValues();
-        return $this->fields[$name]->getValue();
+        return $this->fields[ $name ]->getValue();
     }
 
     /**
@@ -262,7 +271,7 @@ class Base
 
         $this->initValues();
         foreach ($list as $name) {
-            $values[$name] = $this->fields[$name]->getValue();
+            $values[ $name ] = $this->fields[ $name ]->getValue();
         }
 
         return $values;
@@ -359,7 +368,7 @@ class Base
     {
         $defaults = [];
         foreach ($this->fields as $key => $element) {
-            $defaults[$key] = $element->getDefault();
+            $defaults[ $key ] = $element->getDefault();
         }
 
         return $defaults;
@@ -372,8 +381,8 @@ class Base
     public function setDefaults($defaults)
     {
         foreach ($defaults as $name => $value) {
-            if (isset($this->fields[$name])) {
-                $this->fields[$name]->setDefault($value);
+            if (isset($this->fields[ $name ])) {
+                $this->fields[ $name ]->setDefault($value);
             }
         }
 
@@ -389,13 +398,13 @@ class Base
     public function addError($message, $name = null)
     {
         if (null !== $name) {
-            if (!isset($this->fields[$name])) {
+            if (!isset($this->fields[ $name ])) {
                 throw new LogicException(
                     'Invalid form field: '.$name);
             }
 
-            $this->fields[$name]->addError($message);
-            $this->errors[$name] = $message;
+            $this->fields[ $name ]->addError($message);
+            $this->errors[ $name ] = $message;
         }
         else {
             $this->errors[] = $message;
@@ -410,12 +419,12 @@ class Base
      */
     public function getElement($name)
     {
-        if (!isset($this->fields[$name])) {
+        if (!isset($this->fields[ $name ])) {
             throw new LogicException(
                 'Invalid form field: '.$name);
         }
         
-        return $this->fields[$name];
+        return $this->fields[ $name ];
     }
 
     /**
