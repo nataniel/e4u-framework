@@ -362,25 +362,20 @@ class Bootstrap41 implements BuilderInterface
             'value' => '1',
 
             'type' => 'checkbox',
-            'class' => trim('custom-control-input ' . $options->get('input_class')),
+            'class' => trim('custom-control-input ' . $options->get('input_class') . ($field->getErrors() ? 'is-invalid' : '')),
         ]);
 
         $content = join('', [
             $this->view->tag('input', $attributes),
-            $this->view->tag('span', [ 'class' => 'custom-control-indicator' ], ''),
-            $this->view->tag('span', [ 'class' => 'custom-control-description' ], $this->t($field->getLabel())),
+            $this->view->tag('label', [ 'class' => 'custom-control-label', 'for' => $this->fieldId($name) ], $this->t($field->getLabel())),
         ]);
 
-        $label = $this->view->tag('label', [ 'class' => 'custom-control custom-checkbox' ], $content);
+        $div = $this->view->tag('div', [ 'class' => 'custom-control custom-checkbox' ], $content);
 
         $class = $options->get('group_class');
-        if ($field->getErrors()) {
-            $class .= ' has-danger';
-        }
-
         return $this->formGroup(trim($class), [
 
-            $label,
+            $div,
             $this->helpBlock($name, $options->get('hint') ?: $field->getHint()),
 
         ]);
@@ -637,10 +632,13 @@ class Bootstrap41 implements BuilderInterface
             'class' => trim('form-check-input' . $options->get('input_class')),
         ]);
 
-        $content = $this->view->tag('input', $attributes);
-        $label = $this->view->tag('label', [ 'class' => 'form-check-label' ], trim($content . ' ' . $this->t($caption)));
+        $label = $this->view->tag('label', [
+            'class' => 'form-check-label',
+            'for' => $this->fieldId($name, $value),
+        ], $this->t($caption));
 
-        return $this->view->tag('div', [ 'class' => 'form-check' ], $label);
+        $content = $this->view->tag('input', $attributes);
+        return $this->view->tag('div', [ 'class' => 'form-check' ], $content . $label);
     }
 
     protected function fieldInputClass(Element $field, Config $options)
