@@ -82,6 +82,14 @@ class File
     }
 
     /**
+     * @return string
+     */
+    public function getDirname()
+    {
+        return pathinfo($this->getFilename(), PATHINFO_DIRNAME);
+    }
+
+    /**
      * @return float|null
      */
     public function getFilesize()
@@ -105,6 +113,14 @@ class File
         }
 
         return $this->mime;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return strpos($this->getBasename(), '.') === 0;
     }
 
     /**
@@ -149,10 +165,20 @@ class File
      */
     public static function factory($filename, $publicPath = 'public/')
     {
-        $file = trim($publicPath, '/') . '/' . trim($filename, '/');
+        $file = trim(trim($publicPath, '/') . '/' . trim($filename, '/'), '/');
 
-        return exif_imagetype($file)
-            ? new File\Image($filename, $publicPath)
-            : new File($filename, $publicPath);
+        if (Url::isExternalUrl($filename) || Url::isExternalUrl($file)) {
+            return new File($filename, $publicPath);
+        }
+
+        if (is_dir($file)) {
+            return new File\Directory($filename, $publicPath);
+        }
+
+        if (exif_imagetype($file)) {
+            return new File\Image($filename, $publicPath);
+        }
+
+        return new File($filename, $publicPath);
     }
 }

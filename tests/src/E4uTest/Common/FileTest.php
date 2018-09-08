@@ -91,4 +91,32 @@ class FileTest extends TestCase
         $file = new File('C:\Windows\Temp\phpDFA0.tmp', '/');
         $this->assertEquals('C:\Windows\Temp\phpDFA0.tmp', $file->getFullPath());
     }
+
+    public function testIsHidden()
+    {
+        $file = new File('files/.hidden', 'tests/');
+        $this->assertTrue($file->isHidden());
+    }
+
+    /**
+     * @dataProvider filesForFactory
+     * @param string $expected
+     * @param string $filename
+     * @covers File::factory
+     */
+    public function testFactory($expected, $filename)
+    {
+        $this->assertInstanceOf($expected, File::factory($filename, 'tests/'));
+    }
+
+    public function filesForFactory()
+    {
+        return [
+            [ File\Directory::class, 'files/directory' ],
+            [ File\Directory::class, 'files' ],
+            [ File\Image::class, 'files/test.jpg' ],
+            [ File::class, 'files/test.pdf' ],
+            [ File::class, 'http://www.test.pl/file.html' ],
+        ];
+    }
 }
