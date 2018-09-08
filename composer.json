@@ -31,8 +31,7 @@
     "facebook/graph-sdk": "^5.3",
     "iignatov/lightopenid": "^1.0",
     "jdorn/sql-formatter": "^1.2",
-    "ext-fileinfo": "^1.0",
-    "ext-exif": "^1.0"
+    "ext-fileinfo": "^1.0"
   },
   "autoload": {
     "psr-4": {
