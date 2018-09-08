@@ -171,10 +171,23 @@ class Bootstrap41 implements BuilderInterface
     {
         $options = new Config($options);
         $field = $this->form->getElement($name);
+        $type = $options->get('input_type', 'text');
 
         $value = $field->getValue();
         if ($value instanceof \DateTime) {
-            $value = $value->format('Y-m-d');
+
+            switch ($type) {
+                case 'datetime':
+                case 'datetime-local':
+                    $value = $value->format('Y-m-d\TH:i');
+                    break;
+                case 'date':
+                    $value = $value->format('Y-m-d');
+                    break;
+                default:
+                    $value = $value->format('Y-m-d H:i');
+            }
+
         } elseif (is_null($value)) {
             $value = '';
         }
@@ -186,7 +199,7 @@ class Bootstrap41 implements BuilderInterface
             'required' => $field->isRequired() ? 'required' : null,
             'value' => $value,
 
-            'type' => $options->get('input_type', 'text'),
+            'type' => $type,
             'class' => $this->fieldInputClass($field, $options),
             'style' => $options->get('style', null),
             'placeholder' => $this->t($options->get('placeholder', $field->getLabel())),
@@ -270,6 +283,18 @@ class Bootstrap41 implements BuilderInterface
     public function date($name, $options = [])
     {
         $options['input_type'] = 'date';
+        return $this->text($name, $options);
+    }
+
+    /**
+     * @see text()
+     * @param  string $name
+     * @param  array $options
+     * @return string
+     */
+    public function datetime($name, $options = [])
+    {
+        $options['input_type'] = 'datetime-local';
         return $this->text($name, $options);
     }
 
