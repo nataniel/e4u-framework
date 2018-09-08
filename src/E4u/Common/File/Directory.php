@@ -9,7 +9,7 @@ class Directory extends File implements \IteratorAggregate, \Countable
     /**
      * @var File[]
      */
-    protected $files;
+    protected $entries;
 
     public function __construct($filename, $publicPath = 'public/')
     {
@@ -18,6 +18,8 @@ class Directory extends File implements \IteratorAggregate, \Countable
         }
 
         parent::__construct($filename, $publicPath);
+        $this->filename .= '/';
+
         if (!is_dir($this->getFullPath())) {
             throw new RuntimeException(sprintf('%s is not a directory.', $filename));
         }
@@ -28,19 +30,19 @@ class Directory extends File implements \IteratorAggregate, \Countable
      */
     public function getParent()
     {
-        return $this->filename != ''
+        return $this->filename != '/'
             ? new Directory($this->getDirname(), $this->publicPath)
             : null;
     }
 
     protected function initialize()
     {
-        if (null === $this->files) {
+        if (null === $this->entries) {
             $this->files = [];
             $files = scandir($this->getFullPath());
             foreach ($files as $entry) {
                 if (($entry != '.') && ($entry != '..')) {
-                    $this->files[] = File::factory($this->filename . '/' . $entry, $this->publicPath);
+                    $this->entries[] = File::factory($this->filename . $entry, $this->publicPath);
                 }
             }
         }
@@ -54,7 +56,30 @@ class Directory extends File implements \IteratorAggregate, \Countable
     public function getFiles()
     {
         $this->initialize();
-        return $this->files;
+        $files = [];
+        foreach ($this->entries as $entry) {
+            if (!$entry instanceof Directory) {
+                $files[] = $entry;
+            }
+        }
+
+        return $files;
+    }
+
+    /**
+     * @return File\Directory[]
+     */
+    public function getDirectories()
+    {
+        $this->initialize();
+        $directories = [];
+        foreach ($this->entries as $entry) {
+            if ($entry instanceof Directory) {
+                $directories[] = $entry;
+            }
+        }
+
+        return $directories;
     }
 
     /**
@@ -63,7 +88,7 @@ class Directory extends File implements \IteratorAggregate, \Countable
     public function getIterator()
     {
         $this->initialize();
-        return new \ArrayIterator($this->files);
+        return new \ArrayIterator($this->entries);
     }
 
     /**
@@ -72,6 +97,6 @@ class Directory extends File implements \IteratorAggregate, \Countable
     public function count()
     {
         $this->initialize();
-        return count($this->files);
+        return count($this->entries);
     }
 }

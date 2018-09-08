@@ -16,7 +16,7 @@ class DirectoryTest extends TestCase
     public function testIfConstructorAcceptsPath()
     {
         $dir = new Directory('/files/', 'tests/');
-        $this->assertEquals('files', $dir->getFilename());
+        $this->assertEquals('files/', $dir->getFilename());
 
         $this->expectException(RuntimeException::class);
         new Directory('/files/directory/test.html', 'tests/');
@@ -27,7 +27,7 @@ class DirectoryTest extends TestCase
         $dir = new Directory('/files', 'tests/');
         $parent = $dir->getParent();
 
-        $this->assertEquals('', $parent->getFilename());
+        $this->assertEquals('/', $parent->getFilename());
         $this->assertNull($parent->getParent());
     }
 
