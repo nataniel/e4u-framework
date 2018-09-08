@@ -299,8 +299,32 @@ class Bootstrap4 implements BuilderInterface
      */
     public function file($name, $options = [])
     {
-        $options['input_type'] = 'file';
-        return $this->text($name, $options);
+        $options = new Config($options);
+
+        /** @var Element\FileUpload $field */
+        $field = $this->form->getElement($name);
+
+        $value = $field->getValue();
+        if (!empty($value)) {
+            // TODO: render currently uploaded file?
+        }
+
+        $attributes = array_merge($field->getAttributes(), [
+
+            'name' => $this->fieldName($name),
+            'id' => $this->fieldId($name),
+            'required' => $field->isRequired() ? 'required' : null,
+
+            'type' => 'file',
+            'accept' => $options->get('accept'),
+
+            'class' => $this->fieldInputClass($field, $options),
+            'aria-describedby' => $this->fieldHelp($name),
+
+        ]);
+
+        $content = $this->view->tag('input', $attributes);
+        return $this->field($field, $options, $content);
     }
 
     /**
