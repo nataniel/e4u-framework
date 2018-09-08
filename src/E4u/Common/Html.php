@@ -15,6 +15,7 @@ class Html
             }
             elseif (!is_null($value)) {
                 $value = htmlentities($value, ENT_COMPAT, 'UTF-8');
+                $value = str_replace('%2F', '/', $value);
                 $attr[] = "$key=\"$value\"";
             }
         }

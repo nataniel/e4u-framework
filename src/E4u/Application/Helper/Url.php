@@ -111,4 +111,14 @@ trait Url
         $base = $fullUrl ? $this->getRequest()->getFullUrl() : $this->getRequest()->getBaseUrl();
         return rtrim($base, '/') . '/' . str_replace(' ', '%20', $file);
     }
+
+    /**
+     * @param  array $array
+     * @return string
+     */
+    public function buildQuery($array)
+    {
+        $query = http_build_query($array);
+        return str_replace('%2F', '/', $query);
+    }
 }
