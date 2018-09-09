@@ -148,6 +148,9 @@ class Bootstrap41 implements BuilderInterface
      * - input_class
      * - input_type
      * - placeholder
+     * - disabled
+     * - required
+     * - readonly
      *
      * @param  string $name
      * @param  array $options
@@ -196,7 +199,11 @@ class Bootstrap41 implements BuilderInterface
 
             'name' => $this->fieldName($name),
             'id' => $this->fieldId($name),
-            'required' => $field->isRequired() ? 'required' : null,
+
+            'required' => $options->get('required', $field->isRequired()) ? 'required' : null,
+            'disabled' => $options->get('disabled', $field->isDisabled()) ? 'disabled' : null,
+            'readonly' => $options->get('readonly', $field->isReadonly()) ? 'readonly' : null,
+
             'value' => $value,
 
             'type' => $type,
@@ -338,7 +345,10 @@ class Bootstrap41 implements BuilderInterface
 
             'name' => $this->fieldName($name),
             'id' => $this->fieldId($name),
-            'required' => $field->isRequired() ? 'required' : null,
+
+            'required' => $options->get('required', $field->isRequired()) ? 'required' : null,
+            'disabled' => $options->get('disabled', $field->isDisabled()) ? 'disabled' : null,
+            'readonly' => $options->get('readonly', $field->isReadonly()) ? 'readonly' : null,
 
             'type' => 'file',
             'accept' => $options->get('accept'),
@@ -373,7 +383,10 @@ class Bootstrap41 implements BuilderInterface
 
             'name' => $this->fieldName($name) . '[]',
             'id' => $this->fieldId($name),
-            'required' => $field->isRequired() ? 'required' : null,
+
+            'required' => $options->get('required', $field->isRequired()) ? 'required' : null,
+            'disabled' => $options->get('disabled', $field->isDisabled()) ? 'disabled' : null,
+            'readonly' => $options->get('readonly', $field->isReadonly()) ? 'readonly' : null,
 
             'type' => 'file',
             'accept' => $options->get('accept'),
@@ -392,6 +405,9 @@ class Bootstrap41 implements BuilderInterface
      * Available options:
      * - group_class
      * - input_class
+     * - disabled
+     * - required
+     * - readonly
      *
      * @param  string $name
      * @param  array $options
@@ -406,7 +422,11 @@ class Bootstrap41 implements BuilderInterface
 
             'name' => $this->fieldName($name),
             'id' => $this->fieldId($name),
-            'required' => $field->isRequired() ? 'required' : null,
+
+            'required' => $options->get('required', $field->isRequired()) ? 'required' : null,
+            'disabled' => $options->get('disabled', $field->isDisabled()) ? 'disabled' : null,
+            'readonly' => $options->get('readonly', $field->isReadonly()) ? 'readonly' : null,
+
             'checked' => $field->getValue() ? 'checked' : null,
             'value' => '1',
 
@@ -466,6 +486,9 @@ class Bootstrap41 implements BuilderInterface
      * - input_class
      * - cols
      * - rows
+     * - disabled
+     * - required
+     * - readonly
      *
      * @param  string $name
      * @param  array $options
@@ -489,7 +512,11 @@ class Bootstrap41 implements BuilderInterface
 
             'name' => $this->fieldName($name),
             'id' => $this->fieldId($name),
-            'required' => $field->isRequired() ? 'required' : null,
+
+            'required' => $options->get('required', $field->isRequired()) ? 'required' : null,
+            'disabled' => $options->get('disabled', $field->isDisabled()) ? 'disabled' : null,
+            'readonly' => $options->get('readonly', $field->isReadonly()) ? 'readonly' : null,
+
             'class' => $this->fieldInputClass($field, $options),
             'aria-describedby' => $this->fieldHelp($name),
 
@@ -528,6 +555,9 @@ class Bootstrap41 implements BuilderInterface
      * - input_class
      * - show_label
      * - empty_caption
+     * - disabled
+     * - required
+     * - readonly
      *
      * @param  string $name
      * @param  array $options
@@ -558,7 +588,10 @@ class Bootstrap41 implements BuilderInterface
 
             'name' => $this->fieldName($name),
             'id' => $this->fieldId($name),
-            'required' => $field->isRequired() ? 'required' : null,
+
+            'required' => $options->get('required', $field->isRequired()) ? 'required' : null,
+            'disabled' => $options->get('disabled', $field->isDisabled()) ? 'disabled' : null,
+            'readonly' => $options->get('readonly', $field->isReadonly()) ? 'readonly' : null,
 
             'placeholder' => $options->get('placeholder'),
             'class' => $this->fieldInputClass($field, $options),
@@ -605,6 +638,9 @@ class Bootstrap41 implements BuilderInterface
      * - group_class
      * - input_class
      * - show_label
+     * - disabled
+     * - required
+     * - readonly
      *
      * @param  string $name
      * @param  array $options
