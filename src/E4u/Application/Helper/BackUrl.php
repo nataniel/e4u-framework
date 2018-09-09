@@ -7,11 +7,11 @@ class BackUrl extends ViewHelper
 {
     public function show()
     {
-        $request = $this->getView()->getRequest();
+        $request = $this->view->getRequest();
         $query = $request->getQueryString();
 
         $current = $request->getCurrentPath();
-        return $this->getView()->urlEncode(empty($query) ? $current : $current . '?' . $query);
+        return $this->view->urlEncode(empty($query) ? $current : $current . '?' . $query);
     }
 
     /**

@@ -22,15 +22,15 @@ class Breadcrumbs extends ViewHelper
 
             $i++;
             if ($i < $cnt) {
-                $li[] = $this->getView()->tag('li',
-                    $this->getView()->linkTo($caption, $url, [ 'itemprop' => 'url' ]));
+                $li[] = $this->view->tag('li',
+                    $this->view->linkTo($caption, $url, [ 'itemprop' => 'url' ]));
             }
             else {
-                $li[] = $this->getView()->tag('li', [ 'class' => 'active' ], $caption);
+                $li[] = $this->view->tag('li', [ 'class' => 'active' ], $caption);
             }
         }
 
         $attributes = [ 'itemprop' => 'breadcrumb' ];
-        return $this->getView()->tag('ol', array_merge($attributes, $options), join('', $li));
+        return $this->view->tag('ol', array_merge($attributes, $options), join('', $li));
     }
 }

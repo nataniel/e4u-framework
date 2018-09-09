@@ -8,11 +8,11 @@ class GaduGadu extends ViewHelper
 
     public function show($gg, $description = null)
     {
-        $img = $this->getView()->image(sprintf(self::GG_IMG, $gg), $gg);
+        $img = $this->view->image(sprintf(self::GG_IMG, $gg), $gg);
         if (is_null($description)) {
             $description = $gg;
         }
         
-        return $this->getView()->tag('a', [ 'href' => sprintf(self::GG_HREF, $gg), 'class' => 'gadugadu' ], $img.'&nbsp;'.$description);
+        return $this->view->tag('a', [ 'href' => sprintf(self::GG_HREF, $gg), 'class' => 'gadugadu' ], $img.'&nbsp;'.$description);
     }
 }

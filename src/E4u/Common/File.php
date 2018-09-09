@@ -5,6 +5,10 @@ use E4u\Application\Helper\Url;
 
 class File
 {
+    const B = 1,
+        KB = 1024,
+        MB = 1048576;
+
     protected $publicPath;
     protected $filename;
     protected $errors = [];
@@ -92,13 +96,13 @@ class File
     /**
      * @return float|null
      */
-    public function getFilesize()
+    public function getFilesize($precision = self::KB)
     {
         if (!is_file($this->getFullPath())) {
             return null;
         }
 
-        return round(filesize($this->getFullPath()) / 1024, 2);
+        return round(filesize($this->getFullPath()) / $precision, 2);
     }
 
     /**

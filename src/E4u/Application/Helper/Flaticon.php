@@ -5,7 +5,7 @@ class Flaticon extends ViewHelper
 {
     public function show($icon, $title = null)
     {
-        return $this->getView()->tag('i', [
+        return $this->view->tag('i', [
             'class' => 'flaticon flaticon-' . $icon,
             'title' => $title,
         ], '');

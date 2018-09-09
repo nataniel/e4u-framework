@@ -90,7 +90,7 @@ class Pagination extends ViewHelper
         }
 
         $li[] = $this->listElement($next = $collection->nextPage(), $nextCaption);
-        return $this->getView()->tag('ul', $options, join('', $li));
+        return $this->view->tag('ul', $options, join('', $li));
     }
 
     protected function listElement($page, $options = [])
@@ -125,7 +125,7 @@ class Pagination extends ViewHelper
             $class = 'disabled';
         }
 
-        return $this->getView()->tag('li', [
+        return $this->view->tag('li', [
             'class' => trim('page-item ' . $class)
         ], $this->linkToPage($page, $caption));
     }
@@ -137,8 +137,12 @@ class Pagination extends ViewHelper
      */
     protected function linkToPage($page, $caption = null)
     {
-        $href = '?' . $this->getView()->getRequest()->mergeQuery([ 'page' => $page ]);
-        return $this->getView()->tag('a', [
+        /** @var Http $request */
+        $request = $this->view->getRequest();
+        $href = $this->view->urlTo($request->getCurrentPath())
+            . '?' . $request->mergeQuery([ 'page' => $page ]);
+
+        return $this->view->tag('a', [
             'href' => $href,
             'class' => 'page-link',
             'data-page' => $page,
