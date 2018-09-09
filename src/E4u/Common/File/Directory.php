@@ -38,8 +38,10 @@ class Directory extends File implements \IteratorAggregate, \Countable
     protected function initialize()
     {
         if (null === $this->entries) {
-            $this->files = [];
+
             $files = scandir($this->getFullPath());
+            $this->entries = [];
+
             foreach ($files as $entry) {
                 if (($entry != '.') && ($entry != '..')) {
                     $this->entries[] = File::factory($this->filename . $entry, $this->publicPath);
