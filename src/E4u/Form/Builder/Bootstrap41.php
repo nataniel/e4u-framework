@@ -421,8 +421,8 @@ class Bootstrap41 implements BuilderInterface
 
         $div = $this->view->tag('div', [ 'class' => 'custom-control custom-checkbox' ], $content);
 
-        $class = $options->get('group_class');
-        return $this->formGroup(trim($class), [
+        $class = $this->formGroupClass($field, $options);
+        return $this->formGroup($class, [
 
             $div,
             $this->helpBlock($name, $options->get('hint') ?: $field->getHint()),
@@ -699,10 +699,23 @@ class Bootstrap41 implements BuilderInterface
         );
     }
 
+    /**
+     * @param  Element $field
+     * @param  Config $options
+     * @return string
+     */
+    protected function formGroupClass(Element $field, Config $options)
+    {
+        $class
+            = $options->get('group_class')
+            . ' form-group-' . $field->getName();
+        return trim($class);
+    }
+
     protected function field(Element $field, Config $options, $content)
     {
-        $class = $options->get('group_class');
-        return $this->formGroup(trim($class), [
+        $class = $this->formGroupClass($field, $options);
+        return $this->formGroup($class, [
 
             $this->label(
                 $field->getName(),
