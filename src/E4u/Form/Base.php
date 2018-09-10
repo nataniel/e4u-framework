@@ -309,7 +309,7 @@ class Base
                     $this->values[ $key ] = [];
                     foreach ($field as $file) {
                         if (!empty($file['name']) && is_uploaded_file($file['tmp_name'])) {
-                            $this->values[ $key ][] = $file;
+                            $this->values[ $key ][] = $field;
                         }
                     }
 

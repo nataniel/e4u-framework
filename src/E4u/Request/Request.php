@@ -46,4 +46,5 @@ interface Request extends RequestInterface
 
     public function getPost($name = null, $default = null);
     public function getQuery($name = null, $default = null);
+    public function getFiles($name = null, $default = null);
 }

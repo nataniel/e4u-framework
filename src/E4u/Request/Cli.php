@@ -54,6 +54,11 @@ class Cli extends Message implements RequestDescription
         throw new LogicException('GET values are not available with CLI Request.');
     }
 
+    public function getFiles($name = null, $default = null)
+    {
+        throw new LogicException('FILES are not available with CLI Request.');
+    }
+
     public function setRouter(RouteStackInterface $router)
     {
         $this->router = $router;
