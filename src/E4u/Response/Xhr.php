@@ -19,6 +19,7 @@ class Xhr extends Base
     {
         $result = $this->getMetadata();
         $result['status'] = $this->getStatus();
+        $result['location'] = $_SERVER['REQUEST_URI'];
         $result['content'] = ($this->getStatus() == self::STATUS_OK)
                            ? $this->getContent()
                            : '';
