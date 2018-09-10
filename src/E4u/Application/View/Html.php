@@ -510,6 +510,7 @@ class Html extends View
     }
 
     /**
+     * @deprecated use Image#getThumbnail instead
      * @param  string|Image $file
      * @param  int    $maxWidth
      * @param  int    $maxHeight
@@ -534,7 +535,7 @@ class Html extends View
     }
 
     /**
-     * @param  string|Image $file
+     * @param  mixed $file
      * @param  string $alt
      * @param  array  $attributes
      * @return string
@@ -552,14 +553,12 @@ class Html extends View
             $attributes['alt'] = $alt;
         }
 
-        if ($file instanceof Image) {
-            if (!isset($attributes['width'])) {
-                $attributes['width'] = $file->getWidth();
-            }
+        if (!isset($attributes['width']) && is_object($file) && method_exists($file, 'getWidth')) {
+            $attributes['width'] = $file->getWidth();
+        }
 
-            if (!isset($attributes['height'])) {
-                $attributes['height'] = $file->getHeight();
-            }
+        if (!isset($attributes['height']) && is_object($file) && method_exists($file, 'getHeight')) {
+            $attributes['height'] = $file->getHeight();
         }
 
         $attributes['src'] = $this->urlTo($file);

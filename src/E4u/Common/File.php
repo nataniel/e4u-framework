@@ -94,6 +94,7 @@ class File
     }
 
     /**
+     * @param  int $precision
      * @return float|null
      */
     public function getFilesize($precision = self::KB)

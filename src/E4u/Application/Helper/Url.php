@@ -118,7 +118,10 @@ trait Url
      */
     public function buildQuery($array)
     {
-        $query = http_build_query($array);
+        $query = http_build_query(array_filter($array, function ($x) {
+            return !is_null($x);
+        }));
+
         $query = str_replace('%5B', '[', $query);
         $query = str_replace('%5D', ']', $query);
         return str_replace('%2F', '/', $query);
