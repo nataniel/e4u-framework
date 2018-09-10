@@ -63,16 +63,6 @@ class Html extends View
     }
 
     /**
-     * @param string $type
-     * @param string $glue
-     * @return string|array
-     */
-    public function getFlash($type = null, $glue = '<br />')
-    {
-        return parent::getFlash($type, $glue);
-    }
-
-    /**
      * @return string
      */
     public function getDescription()

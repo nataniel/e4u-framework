@@ -14,11 +14,11 @@ class Flash extends ViewHelper
     {
         $html = '';
         $types = [ View::FLASH_MESSAGE, View::FLASH_SUCCESS, View::FLASH_ERROR ];
+        $flash = $this->view->getFlash();
 
         foreach ($types as $type) {
-            $msg = $this->view->getFlash($type);
-            if (!empty($msg)) {
-                $html .= $this->view->tag('p', [ 'class' => $type ], $msg);
+            if (!empty($flash[ $type ])) {
+                $html .= $this->view->tag('p', [ 'class' => $type ], join('<br />', $flash[ $type ]));
             }
         }
         

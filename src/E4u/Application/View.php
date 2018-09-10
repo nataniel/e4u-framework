@@ -33,7 +33,6 @@ abstract class View implements Renderer, Resolver, ContainerInterface
     protected $_viewPath = 'application/views';
     protected $_viewSuffix;
 
-    protected $flash = [];
     protected $locale;
 
     /**
@@ -105,38 +104,26 @@ abstract class View implements Renderer, Resolver, ContainerInterface
      */
     public function addFlash($message, $type = self::FLASH_MESSAGE)
     {
-        if (!isset($_SESSION['flash'][$type])) {
-            $_SESSION['flash'][$type] = [];
+        if (!isset($_SESSION['flash'][ $type ])) {
+            $_SESSION['flash'][ $type ] = [];
         }
 
-        $_SESSION['flash'][$type][] = $this->t($message);
+        $_SESSION['flash'][ $type ][] = $this->t($message);
         return $this;
     }
 
     /**
-     * @param  string $type
-     * @param  string $glue
-     * @return string|array
+     * @return array
      */
-    public function getFlash($type = null, $glue = "\n")
+    public function getFlash()
     {
-        if (null == $this->flash) {
-            if (!empty($_SESSION['flash'])) {
-                $this->flash = $_SESSION['flash'];
-                unset($_SESSION['flash']);
-            }
+        if (empty($_SESSION['flash'])) {
+            return [];
         }
 
-        if (!empty($type)) {
-            if (!empty($this->flash[$type])) {
-                return join($glue, $this->flash[ $type ]);
-            }
-            else {
-                return null;
-            }
-        }
-
-        return $this->flash;
+        $flash = $_SESSION['flash'];
+        unset($_SESSION['flash']);
+        return $flash;
     }
 
     /**
@@ -209,7 +196,7 @@ abstract class View implements Renderer, Resolver, ContainerInterface
      */
     public function setPartial($name, $content)
     {
-        $this->__partials[$name] = $content;
+        $this->__partials[ $name ] = $content;
         return $this;
     }
 
@@ -220,11 +207,11 @@ abstract class View implements Renderer, Resolver, ContainerInterface
      */
     public function getPartial($name)
     {
-        if (!isset($this->__partials[$name])) {
+        if (!isset($this->__partials[ $name ])) {
             return null;
         }
 
-        return $this->__partials[$name];
+        return $this->__partials[ $name ];
     }
 
     /**
