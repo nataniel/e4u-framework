@@ -292,31 +292,44 @@ class Base
     protected function processFiles($files)
     {
         if (is_array($files)) {
+            foreach ($files as $key => $value) {
 
-            foreach ($files as $key => $field) {
-
-                if (array_key_exists('name', $field)) {
-
-                    // single file
-                    if (!empty($field['name']) && is_uploaded_file($field['tmp_name'])) {
-                        $this->values[ $key ] = $field;
-                    }
-
-                }
-                else {
-
-                    // multiple files
-                    $this->values[ $key ] = [];
-                    foreach ($field as $file) {
-                        if (!empty($file['name']) && is_uploaded_file($file['tmp_name'])) {
-                            $this->values[ $key ][] = $field;
-                        }
-                    }
-
-                }
+                array_key_exists('name', $value)
+                    ? $this->processSingleFile($value, $key)
+                    : $this->processMultipleFiles($value, $key);
 
             }
+        }
 
+        return $this;
+    }
+
+    /**
+     * @param  string[] $file
+     * @param  string $key
+     * @return $this
+     */
+    protected function processSingleFile($file, $key)
+    {
+        if (!empty($file['name']) && is_uploaded_file($file['tmp_name'])) {
+            $this->values[ $key ] = $file;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param  array $files
+     * @param  string $key
+     * @return $this
+     */
+    protected function processMultipleFiles($files, $key)
+    {
+        $this->values[ $key ] = [];
+        foreach ($files as $file) {
+            if (!empty($file['name']) && is_uploaded_file($file['tmp_name'])) {
+                $this->values[ $key ][] = $file;
+            }
         }
 
         return $this;
