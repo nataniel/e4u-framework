@@ -144,7 +144,8 @@ class Pagination extends ViewHelper
 
         return $this->view->tag('a', [
             'href' => $href,
-            'class' => 'page-link',
+            'class' => 'page-link internal',
+            'role' => 'button',
             'data-page' => $page,
             'title' => $page ? 'strona '.$page : null
         ], $caption ?: $page).' ';
