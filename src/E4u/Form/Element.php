@@ -258,6 +258,17 @@ abstract class Element
     }
 
     /**
+     * @param  string $name
+     * @return string|null
+     */
+    public function getAttribute($name)
+    {
+        return isset($this->attributes[ $name ])
+            ? $this->attributes[ $name ]
+            : null;
+    }
+
+    /**
      * @return string
      */
     public function getLabel()

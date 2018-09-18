@@ -214,9 +214,9 @@ class Bootstrap41 implements BuilderInterface
             'value' => $value,
             'type' => $type,
 
-            'min' => $options->get('min'),
-            'max' => $options->get('max'),
-            'step' => $options->get('step'),
+            'min' => $options->get('min', $field->getAttribute('min')),
+            'max' => $options->get('max', $field->getAttribute('max')),
+            'step' => $options->get('step', $field->getAttribute('step')),
 
             'class' => $this->fieldInputClass($field, $options),
             'style' => $options->get('style', null),
