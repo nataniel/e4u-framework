@@ -205,8 +205,12 @@ class Bootstrap41 implements BuilderInterface
             'readonly' => $options->get('readonly', $field->isReadonly()) ? 'readonly' : null,
 
             'value' => $value,
-
             'type' => $type,
+
+            'min' => $options->get('min'),
+            'max' => $options->get('max'),
+            'step' => $options->get('step'),
+
             'class' => $this->fieldInputClass($field, $options),
             'style' => $options->get('style', null),
             'placeholder' => $this->t($options->get('placeholder', $field->getLabel())),

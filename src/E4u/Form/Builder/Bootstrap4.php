@@ -171,12 +171,32 @@ class Bootstrap4 implements BuilderInterface
     {
         $options = new Config($options);
         $field = $this->form->getElement($name);
+        $type = $options->get('input_type', 'text');
 
         $value = $field->getValue();
         if ($value instanceof \DateTime) {
-            $value = $value->format('Y-m-d');
+
+            switch ($type) {
+                case 'datetime':
+                case 'datetime-local':
+                    $value = $value->format('Y-m-d\TH:i');
+                    break;
+                case 'date':
+                    $value = $value->format('Y-m-d');
+                    break;
+                default:
+                    $value = $value->format('Y-m-d H:i');
+            }
+
+        } elseif (is_string($value) && $type == 'number') {
+
+            $value = str_replace(',', '.', $value);
+            $value = str_replace(' ', '', $value);
+
         } elseif (is_null($value)) {
+
             $value = '';
+
         }
 
         $attributes = array_merge($field->getAttributes(), [
@@ -184,9 +204,18 @@ class Bootstrap4 implements BuilderInterface
             'name' => $this->fieldName($name),
             'id' => $this->fieldId($name),
             'required' => $field->isRequired() ? 'required' : null,
-            'value' => $value,
 
-            'type' => $options->get('input_type', 'text'),
+            'required' => $options->get('required', $field->isRequired()) ? 'required' : null,
+            'disabled' => $options->get('disabled', $field->isDisabled()) ? 'disabled' : null,
+            'readonly' => $options->get('readonly', $field->isReadonly()) ? 'readonly' : null,
+
+            'value' => $value,
+            'type' => $type,
+
+            'min' => $options->get('min'),
+            'max' => $options->get('max'),
+            'step' => $options->get('step'),
+
             'class' => $this->fieldInputClass($field, $options),
             'style' => $options->get('style', null),
             'placeholder' => $this->t($options->get('placeholder', $field->getLabel())),
