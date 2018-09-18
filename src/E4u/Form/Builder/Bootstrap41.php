@@ -191,8 +191,15 @@ class Bootstrap41 implements BuilderInterface
                     $value = $value->format('Y-m-d H:i');
             }
 
+        } elseif (is_string($value) && $type == 'number') {
+
+            $value = str_replace(',', '.', $value);
+            $value = str_replace(' ', '', $value);
+
         } elseif (is_null($value)) {
+
             $value = '';
+
         }
 
         $attributes = array_merge($field->getAttributes(), [
@@ -207,6 +214,11 @@ class Bootstrap41 implements BuilderInterface
             'value' => $value,
 
             'type' => $type,
+
+            'step' => $options->get('step'),
+            'min' => $options->get('min'),
+            'max' => $options->get('max'),
+
             'class' => $this->fieldInputClass($field, $options),
             'style' => $options->get('style', null),
             'placeholder' => $this->t($options->get('placeholder', $field->getLabel())),
