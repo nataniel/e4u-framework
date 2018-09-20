@@ -7,6 +7,8 @@ interface Criteria
 {
     public function __construct($options = []);
     public function isEmpty();
+    public function get($name);
+    public function set($name, $value);
     public function getSortField();
     public function getSortOrder();
     public function setSortBy($orderBy);
