@@ -338,7 +338,7 @@ class Base
     /**
      * @return array
      */
-    protected function initValues()
+    public function initValues()
     {
         if (null == $this->values) {
 
