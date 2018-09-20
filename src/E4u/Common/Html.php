@@ -14,7 +14,8 @@ class Html
                 }
             }
             elseif (!is_null($value)) {
-                $value = htmlentities($value, ENT_COMPAT, 'UTF-8');
+                $value = htmlspecialchars($value, ENT_COMPAT | ENT_HTML5, 'UTF-8', false);
+                $value = str_replace('%2C', ',', $value);
                 $value = str_replace('%2F', '/', $value);
                 $attr[] = "$key=\"$value\"";
             }
