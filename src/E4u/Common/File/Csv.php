@@ -13,6 +13,16 @@ class Csv extends File
     protected $escape = '\\';
 
     /**
+     * @param  string $delimiter
+     * @return $this
+     */
+    public function setDelimiter($delimiter)
+    {
+        $this->delimiter = $delimiter;
+        return $this;
+    }
+
+    /**
      * @return string[]
      */
     public function toArray()
