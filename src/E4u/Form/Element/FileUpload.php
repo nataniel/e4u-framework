@@ -80,7 +80,7 @@ class FileUpload extends Element
      */
     private function uploadErrorMessage($error)
     {
-        switch ($file['error']) {
+        switch ($error) {
 
             case UPLOAD_ERR_OK:
                 return null;
