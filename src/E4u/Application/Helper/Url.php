@@ -124,6 +124,8 @@ trait Url
 
         $query = str_replace('%5B', '[', $query);
         $query = str_replace('%5D', ']', $query);
+        $query = str_replace('%28', '(', $query);
+        $query = str_replace('%29', ')', $query);
         return str_replace('%2F', '/', $query);
     }
 }
