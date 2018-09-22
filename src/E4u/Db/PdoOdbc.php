@@ -1,6 +1,8 @@
 <?php
 namespace E4u\Db;
 
+use E4u\Db\Exception\QueryFailed;
+
 class PdoOdbc
 {
     /**
@@ -64,9 +66,14 @@ class PdoOdbc
         }
 
         $query = $this->includeParamsIntoQuery($query, $params);
-
         $this->prepare($query);
-        $this->result->execute();
+
+        $ok = $this->result->execute();
+        if (!$ok) {
+            $errorInfo = $this->result->errorInfo();
+            throw new QueryFailed($errorInfo[2]);
+        }
+
         return $this;
     }
 
