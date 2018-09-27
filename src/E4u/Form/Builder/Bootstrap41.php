@@ -715,7 +715,10 @@ class Bootstrap41 implements BuilderInterface
     public function checkboxOption($name, $value, $caption, $options = [])
     {
         $options = new Config($options);
+
+        /** @var Element\CheckBoxGroup $field */
         $field = $this->form->getElement($name);
+        $data = $field->getDataForOption($value);
 
         $attributes = array_merge($field->getAttributes(), [
 
@@ -727,6 +730,10 @@ class Bootstrap41 implements BuilderInterface
             'type' => 'checkbox',
             'class' => trim('form-check-input' . $options->get('input_class')),
         ]);
+
+        foreach ($data as $key => $dataValue) {
+            $attributes[ 'data-' . $key ] = $dataValue;
+        }
 
         $label = $this->view->tag('label', [
             'class' => 'form-check-label',
