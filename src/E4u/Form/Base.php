@@ -278,6 +278,32 @@ class Base
     }
 
     /**
+     * @return UploadedFile[]
+     */
+    public function getFiles($name)
+    {
+        $files = [];
+        $value = $this->getValue($name);
+
+        if (!is_array($value)) {
+            throw new Exception('Invalid file value.');
+        }
+
+        if (isset($value['tmp_name'])) {
+            // single file
+            $files[] = new UploadedFile($value);
+        }
+        else {
+            // array of files
+            foreach ($value as $val) {
+                $files[] = new UploadedFile($val);
+            }
+        }
+
+        return $files;
+    }
+
+    /**
      * @return array
      */
     public function toArray()
