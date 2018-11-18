@@ -131,11 +131,12 @@ class Application
      */
     protected function addToLog($e, $filename = 'application.log')
     {
-        $message = sprintf("%s %s:\nREFERER: %s\nUSER_AGENT: %s\nERROR %s\n%s\n\n",
+        $message = sprintf("%s %s:\nREFERER: %s\nUSER_AGENT: %s\nREMOTE_ADDR: %s\nERROR %s\n%s\n\n",
             date('d.m.Y H:i:s'),
             $this->getRequest()->getCurrentPath(),
             isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '',
             isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '',
+            isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '',
             $e->getMessage(),
             $e->getTraceAsString());
         file_put_contents('logs/' . $filename, $message, FILE_APPEND);
