@@ -674,6 +674,7 @@ class Bootstrap41 implements BuilderInterface
      * - disabled
      * - required
      * - readonly
+     * - inline
      *
      * @param  string $name
      * @param  array $options
@@ -707,7 +708,7 @@ class Bootstrap41 implements BuilderInterface
 
             $content = $this->view->tag('input', $attributes);
             $label = $this->view->tag('label', [ 'class' => 'form-check-label' ], $content . ' ' . $this->t($caption));
-            $div .= $this->view->tag('div', [ 'class' => 'form-check' ], $label);
+            $div .= $this->view->tag('div', [ 'class' => $this->optionClass($options) ], $label);
 
         }
 
@@ -763,7 +764,13 @@ class Bootstrap41 implements BuilderInterface
         ], $this->t($caption));
 
         $content = $this->view->tag('input', $attributes);
-        return $this->view->tag('div', [ 'class' => 'form-check' ], $content . $label);
+        return $this->view->tag('div', [ 'class' => $this->optionClass($options) ], $content . $label);
+    }
+
+    protected function optionClass(Config $options)
+    {
+        $isInline = $options->get('inline', false);
+        return $isInline ? 'form-check-inline' : 'form-check';
     }
 
     protected function fieldInputClass(Element $field, Config $options)
