@@ -750,7 +750,7 @@ class Bootstrap41 implements BuilderInterface
             'value' => $value,
 
             'type' => 'checkbox',
-            'class' => trim('form-check-input' . $options->get('input_class')),
+            'class' => trim('form-check-input ' . $options->get('input_class')),
         ]);
 
         foreach ($data as $key => $dataValue) {
