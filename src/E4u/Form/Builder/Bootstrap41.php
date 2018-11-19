@@ -419,12 +419,47 @@ class Bootstrap41 implements BuilderInterface
      * - disabled
      * - required
      * - readonly
+     * - hint
      *
      * @param  string $name
      * @param  array $options
      * @return string
      */
     public function checkbox($name, $options = [])
+    {
+        $checkboxTag = $this->checkboxTag($name, $options);
+        $options = new Config($options);
+        $field = $this->form->getElement($name);
+
+        $content = join('', [
+            $checkboxTag,
+            $this->view->tag('label', [ 'class' => 'custom-control-label', 'for' => $this->fieldId($name) ], $this->t($field->getLabel())),
+        ]);
+
+        $div = $this->view->tag('div', [ 'class' => 'custom-control custom-checkbox' ], $content);
+
+        $class = $this->formGroupClass($field, $options);
+        return $this->formGroup($class, [
+
+            $div,
+            $this->helpBlock($name, $options->get('hint') ?: $field->getHint()),
+
+        ]);
+    }
+
+    /**
+     * Available options:
+     * - input_class
+     * - disabled
+     * - required
+     * - readonly
+     * - hint
+     *
+     * @param  string $name
+     * @param  array $options
+     * @return string
+     */
+    public function checkboxTag($name, $options = [])
     {
         $options = new Config($options);
         $field = $this->form->getElement($name);
@@ -445,20 +480,7 @@ class Bootstrap41 implements BuilderInterface
             'class' => trim('custom-control-input ' . $options->get('input_class') . ($field->getErrors() ? 'is-invalid' : '')),
         ]);
 
-        $content = join('', [
-            $this->view->tag('input', $attributes),
-            $this->view->tag('label', [ 'class' => 'custom-control-label', 'for' => $this->fieldId($name) ], $this->t($field->getLabel())),
-        ]);
-
-        $div = $this->view->tag('div', [ 'class' => 'custom-control custom-checkbox' ], $content);
-
-        $class = $this->formGroupClass($field, $options);
-        return $this->formGroup($class, [
-
-            $div,
-            $this->helpBlock($name, $options->get('hint') ?: $field->getHint()),
-
-        ]);
+        return $this->view->tag('input', $attributes);
     }
 
     /**
