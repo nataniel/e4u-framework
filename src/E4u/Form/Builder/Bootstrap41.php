@@ -151,6 +151,7 @@ class Bootstrap41 implements BuilderInterface
      * - disabled
      * - required
      * - readonly
+     * - list
      *
      * @param  string $name
      * @param  array $options
@@ -217,6 +218,7 @@ class Bootstrap41 implements BuilderInterface
             'min' => $options->get('min', $field->getAttribute('min')),
             'max' => $options->get('max', $field->getAttribute('max')),
             'step' => $options->get('step', $field->getAttribute('step')),
+            'list' => $options->get('list'),
 
             'class' => $this->fieldInputClass($field, $options),
             'style' => $options->get('style', null),
