@@ -364,7 +364,8 @@ class Bootstrap41 implements BuilderInterface
             'readonly' => $options->get('readonly', $field->isReadonly()) ? 'readonly' : null,
 
             'type' => 'file',
-            'accept' => $options->get('accept'),
+            'accept' => $options->get('accept', $field->getAttribute('accept')) ?: null,
+            'capture' => $options->get('capture') ?: null,
 
             'class' => $this->fieldInputClass($field, $options),
             'aria-describedby' => $this->fieldHelp($name),
