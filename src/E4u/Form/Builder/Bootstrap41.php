@@ -416,6 +416,50 @@ class Bootstrap41 implements BuilderInterface
     }
 
     /**
+     * @param  string $name
+     * @param  array $options
+     * @return string
+     */
+    public function customFile($name, $options = [])
+    {
+        $options = new Config($options, true);
+
+        /** @var Element\FileUpload $field */
+        $field = $this->form->getElement($name);
+
+        $value = $field->getValue();
+        if (!empty($value)) {
+            // TODO: render currently uploaded file?
+        }
+
+        $attributes = array_merge($field->getAttributes(), [
+
+            'name' => $this->fieldName($name),
+            'id' => $this->fieldId($name),
+
+            'required' => $options->get('required', $field->isRequired()) ? 'required' : null,
+            'disabled' => $options->get('disabled', $field->isDisabled()) ? 'disabled' : null,
+            'readonly' => $options->get('readonly', $field->isReadonly()) ? 'readonly' : null,
+
+            'type' => 'file',
+            'accept' => $options->get('accept', $field->getAttribute('accept')) ?: null,
+            'capture' => $options->get('capture') ?: null,
+
+            'class' => 'custom-file-input',
+            'aria-describedby' => $this->fieldHelp($name),
+
+        ]);
+
+        $content = $this->view->tag('input', $attributes);
+        $label = $this->label($name, true, [ 'label_class' => 'custom-file-label' ]);
+
+        $class = $this->formGroupClass($field, $options);
+        return $this->formGroup($class, [
+            $this->view->tag('div', [ 'class' => 'custom-file', ], $content . $label)
+        ]);
+    }
+
+    /**
      * Available options:
      * - group_class
      * - input_class
