@@ -82,12 +82,12 @@ class Bootstrap3 implements BuilderInterface
             if (is_array($error)) {
                 foreach ($error as $type => $message) {
 
-                    $content[] = Html::tag('li', [ 'class' => is_string($type) ? $type : null ], $message);
+                    $content[] = Html::tag('li', [ 'class' => is_string($type) ? $type : null ], $this->t($message));
                 }
             }
             else {
 
-                $content[] = Html::tag('li', $error);
+                $content[] = Html::tag('li', $this->t($error));
             }
         }
 
@@ -135,7 +135,7 @@ class Bootstrap3 implements BuilderInterface
         return Html::tag('label', [
             'for' => $this->fieldId($name),
             'class' => $showLabels ? 'control-label' : 'control-label sr-only',
-        ], $this->form->getElement($name)->getLabel());
+        ], $this->t($this->form->getElement($name)->getLabel()));
     }
 
     public function inputGroupAddon($content)
@@ -238,7 +238,7 @@ class Bootstrap3 implements BuilderInterface
         ]);
 
         $content = Html::tag('input', $attributes);
-        $label = Html::tag('label', [ 'class' => 'checkbox' ], $content . ' ' . $field->getLabel());
+        $label = Html::tag('label', [ 'class' => 'checkbox' ], $content . ' ' . $this->t($field->getLabel()));
         $div = Html::tag('div', [ 'class' => 'checkbox' ], $label);
 
         $class = $options->get('group_class');
@@ -469,7 +469,7 @@ class Bootstrap3 implements BuilderInterface
 
             'type' => $options->get('input_type', 'text'),
             'class' => trim('form-control ' . $options->get('input_class')),
-            'placeholder' => $options->get('placeholder', $field->getLabel()),
+            'placeholder' => $this->t($options->get('placeholder', $field->getLabel())),
 
         ]);
     }
@@ -535,15 +535,15 @@ class Bootstrap3 implements BuilderInterface
 
                 $groupHtml = '';
                 foreach ($groupOptions as $value => $caption) {
-                    $groupHtml .= $this->selectOption($caption, $value, $field->getValue() == $value, $field->getDataForOption($value));
+                    $groupHtml .= $this->selectOption($this->t($caption), $value, $field->getValue() == $value, $field->getDataForOption($value));
                 }
 
-                $html .= Html::tag('optgroup', [ 'label' => $groupName ], $groupHtml);
+                $html .= Html::tag('optgroup', [ 'label' => $this->t($groupName) ], $groupHtml);
             }
         }
 
         foreach ($field->getOptions() as $value => $caption) {
-            $html .= $this->selectOption($caption, $value, $field->getValue() == $value, $field->getDataForOption($value));
+            $html .= $this->selectOption($this->t($caption), $value, $field->getValue() == $value, $field->getDataForOption($value));
         }
 
         $content = Html::tag('select', $attributes, $html);
@@ -582,7 +582,7 @@ class Bootstrap3 implements BuilderInterface
                 ]);
 
                 $content = Html::tag('input', $attributes);
-                $label = Html::tag('label', [ 'class' => 'radio' ], $content . ' ' . $caption);
+                $label = Html::tag('label', [ 'class' => 'radio' ], $content . ' ' . $this->t($caption));
                 $div .= Html::tag('div', [ 'class' => 'radio' ], $label);
 
             }
@@ -615,7 +615,7 @@ class Bootstrap3 implements BuilderInterface
 
         ]);
 
-        $label = $options->get('label', $field->getLabel());
+        $label = $this->t($options->get('label', $field->getLabel()));
         $content = Html::tag('button', $attributes, $label);
         return $this->formGroup($options->get('group_class'), [
 

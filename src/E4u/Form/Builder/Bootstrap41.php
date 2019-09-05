@@ -871,11 +871,10 @@ class Bootstrap41 implements BuilderInterface
         $class = $showLabels ? null : 'sr-only';
         $options = new Config($options);
 
-        $attributes = [
+        return $this->view->tag('label', [
             'for' => $this->fieldId($name),
             'class' => trim($options->get('label_class') . ' ' . $class),
-        ];
-        return $this->view->tag('label', $attributes, $this->t($this->form->getElement($name)->getLabel()));
+        ], $this->t($this->form->getElement($name)->getLabel()));
     }
 
     public function formGroup($class, $elements)
