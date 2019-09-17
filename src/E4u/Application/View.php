@@ -354,7 +354,7 @@ abstract class View implements Renderer, Resolver, ContainerInterface
     }
 
     /**
-     * @return Controller
+     * @return Controller|null
      */
     function getController()
     {
@@ -406,7 +406,12 @@ abstract class View implements Renderer, Resolver, ContainerInterface
      */
     public function getActiveController()
     {
-        $route = $this->getController()->getRequest()->getCurrentRoute();
+        $controller = $this->getController();
+        if (!$controller) {
+            return null;
+        }
+
+        $route = $controller->getRequest()->getCurrentRoute();
         return $route->getParam('controller');
     }
 
