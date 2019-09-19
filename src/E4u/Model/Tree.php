@@ -14,6 +14,9 @@ trait Tree
      **/
     # protected $parent;
 
+    /** @return mixed */
+    abstract public function id();
+
     /** @return bool */
     abstract public function isActive();
 
