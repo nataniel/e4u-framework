@@ -122,6 +122,7 @@ trait Url
             return !is_null($x);
         }));
 
+        $query = str_replace('%2C', ',', $query);
         $query = str_replace('%5B', '[', $query);
         $query = str_replace('%5D', ']', $query);
         $query = str_replace('%28', '(', $query);
