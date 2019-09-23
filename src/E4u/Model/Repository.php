@@ -2,11 +2,12 @@
 namespace E4u\Model;
 
 use Doctrine\ORM\EntityRepository,
-    Doctrine\ORM\QueryBuilder;
+    Doctrine\ORM\QueryBuilder,
+    Doctrine\ORM\Query\Expr;
 
 class Repository extends EntityRepository
 {
-    const PATTERN_PHRASE_ID = '/^(ID:|#)(\d+)$/i';
+    const PATTERN_PHRASE_ID = '/^(ID:|#) ?(\d+)$/i';
     const PATTERN_FIELD_ID = '/^\w+\.id$/i';
 
     /**
@@ -14,7 +15,7 @@ class Repository extends EntityRepository
      * @param mixed $x
      * @param mixed $y
      * @param QueryBuilder $qb
-     * @return \Doctrine\ORM\Query\Expr\Orx
+     * @return Expr\Orx
      */
     public function notEqOrNull($x, $y, $qb)
     {
@@ -58,11 +59,12 @@ class Repository extends EntityRepository
      * @param string $phrase
      * @param array $fields
      * @param QueryBuilder $qb
-     * @return \Doctrine\ORM\Query\Expr\Orx|\Doctrine\ORM\Query\Expr\Comparison
+     * @return Expr\Orx|Expr\Comparison
      */
     protected function wherePhrase($phrase, $fields, $qb)
     {
         $ex = $qb->expr();
+        $phrase = trim($phrase);
 
         // if the search phrase is something like #123456 or ID:123456
         // and we have id in field list, we narrow the search to id-only
