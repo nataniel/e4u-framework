@@ -365,7 +365,7 @@ class Html extends View
             $caption = $phone;
         }
 
-        $attributes['href'] = 'tel:'.preg_replace('/[\s\-\.]/', '', $phone);
+        $attributes['href'] = 'tel:'.preg_replace('/[\s\-.]/', '', $phone);
         return $this->tag('a', $attributes, $caption);
     }
 
@@ -445,10 +445,12 @@ class Html extends View
             return trim($url, '&?');
         }
 
+        $url = strtok($url, '#');
+        $anchor = strtok('');
         $separator = strpos($url, '?') === false
             ? '?'
             : '&';
-        return $url . $separator . $name . '=' . $value;
+        return $url . $separator . $name . '=' . $value . ($anchor ? '#' . $anchor : '');
     }
 
     /**
