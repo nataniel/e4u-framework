@@ -227,6 +227,12 @@ class Bootstrap41 implements BuilderInterface
 
         ]);
 
+        foreach ($options as $key => $option) {
+            if (strpos($key, 'data-') === 0) {
+                $attributes[ $key ] = $option;
+            }
+        }
+
         return $this->view->tag('input', $attributes);
     }
 
@@ -372,6 +378,12 @@ class Bootstrap41 implements BuilderInterface
 
         ]);
 
+        foreach ($options as $key => $option) {
+            if (strpos($key, 'data-') === 0) {
+                $attributes[ $key ] = $option;
+            }
+        }
+
         $content = $this->view->tag('input', $attributes);
         return $this->field($field, $options, $content);
     }
@@ -411,6 +423,12 @@ class Bootstrap41 implements BuilderInterface
 
         ]);
 
+        foreach ($options as $key => $option) {
+            if (strpos($key, 'data-') === 0) {
+                $attributes[ $key ] = $option;
+            }
+        }
+
         $content = $this->view->tag('input', $attributes);
         return $this->field($field, $options, $content);
     }
@@ -449,6 +467,12 @@ class Bootstrap41 implements BuilderInterface
             'aria-describedby' => $this->fieldHelp($name),
 
         ]);
+
+        foreach ($options as $key => $option) {
+            if (strpos($key, 'data-') === 0) {
+                $attributes[ $key ] = $option;
+            }
+        }
 
         $content = $this->view->tag('input', $attributes);
         $label = $this->label($name, true, [ 'label_class' => 'custom-file-label' ]);
@@ -527,6 +551,12 @@ class Bootstrap41 implements BuilderInterface
             'class' => trim('custom-control-input ' . $options->get('input_class') . ($field->getErrors() ? 'is-invalid' : '')),
         ]);
 
+        foreach ($options as $key => $option) {
+            if (strpos($key, 'data-') === 0) {
+                $attributes[ $key ] = $option;
+            }
+        }
+
         return $this->view->tag('input', $attributes);
     }
 
@@ -555,6 +585,12 @@ class Bootstrap41 implements BuilderInterface
             'disabled' => $options->get('disabled'),
 
         ]);
+
+        foreach ($options as $key => $option) {
+            if (strpos($key, 'data-') === 0) {
+                $attributes[ $key ] = $option;
+            }
+        }
 
         $label = $this->t($options->get('label', $field->getLabel()));
         return $this->view->tag('button', $attributes, $label);
@@ -603,6 +639,12 @@ class Bootstrap41 implements BuilderInterface
             'cols' => $options->get('cols', 50),
             'rows' => $options->get('rows', 15),
         ]);
+
+        foreach ($options as $key => $option) {
+            if (strpos($key, 'data-') === 0) {
+                $attributes[ $key ] = $option;
+            }
+        }
 
         $value = htmlentities($field->getValue(), ENT_COMPAT, 'UTF-8');
         return $this->view->tag('textarea', $attributes, $value);
@@ -678,6 +720,12 @@ class Bootstrap41 implements BuilderInterface
             'aria-describedby' => $this->fieldHelp($name),
 
         ]);
+
+        foreach ($options as $key => $option) {
+            if (strpos($key, 'data-') === 0) {
+                $attributes[ $key ] = $option;
+            }
+        }
 
         $html = '';
 
