@@ -3,7 +3,8 @@ namespace E4u\Request;
 
 use Zend\Mvc\Router\RouteStackInterface,
     Zend\Mvc\Router\RouteMatch,
-    Zend\Stdlib\RequestInterface;
+    Zend\Stdlib\RequestInterface,
+    Zend\Stdlib\ParametersInterface;
 
 interface Request extends RequestInterface
 {
@@ -24,27 +25,36 @@ interface Request extends RequestInterface
      */
     public function setCurrentRoute(RouteMatch $route);
 
-    /**
-     * @return RouteMatch
-     */
+    /** @return RouteMatch */
     public function getCurrentRoute();
 
-    /**
-     * @return string
-     */
+    /** @return string */
     public function getCurrentPath();
 
-    /**
-     * @return string
-     */
+    /** @return string */
     public function getBaseUrl();
 
-    /**
-     * @return string
-     */
+    /** @return string */
     public function getFullUrl();
 
+    /**
+     * @param  string $name
+     * @param  mixed $default
+     * @return ParametersInterface
+     */
     public function getPost($name = null, $default = null);
+
+    /**
+     * @param  string $name
+     * @param  mixed $default
+     * @return ParametersInterface
+     */
     public function getQuery($name = null, $default = null);
+
+    /**
+     * @param  string $name
+     * @param  mixed $default
+     * @return ParametersInterface
+     */
     public function getFiles($name = null, $default = null);
 }
