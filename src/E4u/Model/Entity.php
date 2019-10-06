@@ -58,7 +58,7 @@ class Entity extends Base
      */
     public function id()
     {
-        return $this->id;
+        return $this->getId();
     }
 
     /**
@@ -513,38 +513,27 @@ class Entity extends Base
     }
 
     /**
-     * If $value is int, returns reference to the instance of $targetEntity.
+     * If $value is int|string, returns reference to the instance of $targetEntity.
      * If $value is associative array, create new instance of $targetEntity.
-     * If $value is string, returns reference to the entity, based on fixture id
      * Otherwise returns the value itself.
      *
      * @param  Entity|int|string[]|string $value
      * @param  string $targetEntity
-     * @return bool
      */
     public static function normalizeValue(&$value, $targetEntity)
     {
         if ($value instanceof $targetEntity) {
-            return true;
+            return;
         }
 
         if (($value === "") || ($value === 0) || ($value === null)) {
             $value = null;
-            return true;
+            return;
         }
 
-        if (is_string($value)) {
-            if (((int)$value == $value) && (strlen($value) == strlen((int)$value))) {
-                $value = (int)$value;
-            }
-            else {
-                $value = Fixture::generateID($value, $targetEntity);
-            }
-        }
-
-        if (is_int($value)) {
+        if (is_string($value) || is_int($value)) {
             $value = self::getEM()->getReference($targetEntity, $value);
-            return true;
+            return;
         }
 
         if (ArrayUtils::isHashTable($value)) {
@@ -563,12 +552,12 @@ class Entity extends Base
                     }
 
                     $value = new $type($value);
-                    return true;
+                    return;
                 }
             }
 
             $value = new $targetEntity($value);
-            return true;
+            return;
         }
 
         throw new LogicException(
@@ -781,7 +770,7 @@ class Entity extends Base
      */
     public function update()
     {
-        if ($this->isManaged() && $this->id) {
+        if ($this->isManaged() && $this->id()) {
             self::getEM()->flush($this);
         }
 
