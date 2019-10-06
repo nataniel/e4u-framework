@@ -40,21 +40,21 @@ interface Request extends RequestInterface
     /**
      * @param  string $name
      * @param  mixed $default
-     * @return ParametersInterface
+     * @return ParametersInterface|mixed
      */
     public function getPost($name = null, $default = null);
 
     /**
      * @param  string $name
      * @param  mixed $default
-     * @return ParametersInterface
+     * @return ParametersInterface|mixed
      */
     public function getQuery($name = null, $default = null);
 
     /**
      * @param  string $name
      * @param  mixed $default
-     * @return ParametersInterface
+     * @return ParametersInterface|mixed
      */
     public function getFiles($name = null, $default = null);
 }
