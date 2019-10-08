@@ -886,6 +886,7 @@ class Bootstrap41 implements BuilderInterface
     {
         $class
             = $options->get('group_class')
+            . ' type-' . $field->getType()
             . ' form-group-' . $field->getName();
         return trim($class);
     }

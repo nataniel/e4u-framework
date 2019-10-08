@@ -295,6 +295,15 @@ abstract class Element
     }
 
     /**
+     * @return string
+     */
+    public function getType()
+    {
+        $class = static::class;
+        return strtolower(basename($class));
+    }
+
+    /**
      * @param  string $label
      * @return $this
      */
