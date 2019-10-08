@@ -897,7 +897,7 @@ class Bootstrap41 implements BuilderInterface
 
             $this->label(
                 $field->getName(),
-                $this->options->get('show_labels', false) || $options->get('show_label')
+                $options->get('show_label', $this->options->get('show_labels', false))
             ),
 
             $this->inputGroup([
