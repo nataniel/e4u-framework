@@ -300,7 +300,7 @@ abstract class Element
     public function getType()
     {
         $class = static::class;
-        return strtolower(basename($class));
+        return strtolower(preg_replace('/.*\\\\/', '', $class));
     }
 
     /**
