@@ -18,8 +18,10 @@ class Date extends TextField
      */
     public function setValue($value)
     {
-        if (!empty($value)) {
-            $value = new \DateTime($value);
+        if (is_string($value)) {
+            $value = !empty($value)
+                ? new \DateTime($value)
+                : null;
         }
 
         parent::setValue($value);
