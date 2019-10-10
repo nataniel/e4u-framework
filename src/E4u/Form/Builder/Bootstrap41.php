@@ -140,6 +140,41 @@ class Bootstrap41 implements BuilderInterface
         return "{$this->form->getName()}_{$name}" . 'Help';
     }
 
+    public function show($name, $options = [])
+    {
+        $field = $this->form->getElement($name);
+        switch (get_class($field)) {
+            case Element\TextArea::class:
+                return $this->textarea($name, $options);
+            case Element\Select::class:
+                return $this->select($name, $options);
+            case Element\CheckBox::class:
+                return $this->checkbox($name, $options);
+            case Element\CheckBoxGroup::class:
+                return $this->checkboxGroup($name, $options);
+            case Element\RadioGroup::class:
+                return $this->radioGroup($name, $options);
+            case Element\Password::class:
+                return $this->password($name, $options);
+            case Element\Submit::class:
+                return $this->button($name, $options);
+            case Element\FileUpload::class:
+                return $this->file($name, $options);
+            case Element\MultiUpload::class:
+                return $this->multifile($name, $options);
+            case Element\Date::class:
+                return $this->date($name, $options);
+            case Element\Number::class:
+                return $this->number($name, $options);
+            case Element\Url::class:
+                return $this->text($name, array_merge($options, [ 'input_type' => 'url' ]));
+            case Element\EmailAddress::class:
+                return $this->text($name, array_merge($options, [ 'input_type' => 'email' ]));
+            default:
+                return $this->text($name, $options);
+        }
+    }
+
     /**
      * Available options:
      * - append
