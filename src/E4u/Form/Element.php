@@ -393,6 +393,7 @@ abstract class Element
         $field = $this->getModelField();
         if ($this->model instanceof \ArrayAccess) {
             $this->model[ $field ] = $value;
+            return $this;
         }
 
         /** deprecated, model should always be \ArrayAccess instance */
