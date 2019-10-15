@@ -203,8 +203,8 @@ abstract class Element
     }
 
     /**
-     * @param  mixed    $model to attach
-     * @param  string   $model_field model field name
+     * @param  \ArrayAccess   $model to attach
+     * @param  string         $model_field model field name
      * @return $this  Current instance
      */
     public function setModel($model, $model_field = null)
@@ -214,10 +214,6 @@ abstract class Element
         // because element knows nothing about
         // the models defined in parent form
         
-//        if (is_string($model)) {
-//            $model = $this->getModel($model);
-//        }
-
         $this->model = $model;
         $this->model_field = $model_field;
         return $this;
@@ -336,18 +332,25 @@ abstract class Element
      */
     public function getValue()
     {
-        if (!is_null($this->model)) {
-            $method = Variable::propertyGetMethod($this->getModelField());
-            $value = $this->getModel()->$method();
-
-            return ($value instanceof Entity)
-                 ? $value->id()
-                 : $value;
+        if (null === $this->model) {
+            return is_null($this->value)
+                ? $this->default
+                : $this->value;
         }
 
-        return is_null($this->value)
-             ? $this->default
-             : $this->value;
+        $field = $this->getModelField();
+        if ($this->model instanceof \ArrayAccess) {
+            $value = $this->model[ $field ];
+        }
+        else {
+            /** deprecated, model should always be \ArrayAccess instance */
+            $method = Variable::propertyGetMethod($field);
+            $value = $this->getModel()->$method();
+        }
+
+        return ($value instanceof Entity)
+            ? $value->id()
+            : $value;
     }
 
     /**
@@ -387,6 +390,12 @@ abstract class Element
             return $this;
         }
 
+        $field = $this->getModelField();
+        if ($this->model instanceof \ArrayAccess) {
+            $this->model[ $field ] = $value;
+        }
+
+        /** deprecated, model should always be \ArrayAccess instance */
         $method = Variable::propertySetMethod($this->getModelField());
         $this->getModel()->$method($value);
         return $this;

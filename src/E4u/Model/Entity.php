@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager,
     Doctrine\Common\Collections\ArrayCollection,
     Doctrine\Common\Util\Debug,
     Zend\Stdlib\ArrayUtils;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\PersistentCollection;
 use E4u\Common\Variable;
 use E4u\Exception\LogicException;
@@ -83,41 +84,6 @@ class Entity extends Base
     }
 
     /**
-     * Defined by ArrayAccess.
-     *
-     * @param string $offset
-     * @return mixed
-     */
-    public function offsetGet($offset)
-    {
-        $method = self::propertyGetMethod($offset);
-        return $this->$method();
-    }
-
-    /**
-     * Defined by ArrayAccess.
-     *
-     * @param string $offset
-     * @param mixed  $value
-     */
-    public function offsetSet($offset, $value)
-    {
-        $method = self::propertySetMethod($offset);
-        $this->$method($value);
-    }
-
-    /**
-     * Defined by ArrayAccess.
-     *
-     * @param string $offset
-     */
-    public function offsetUnset($offset)
-    {
-        $method = self::propertySetMethod($offset);
-        $this->$method(null);
-    }
-
-    /**
      * @param \E4u\Form\Base $form
      * @return static
      */
@@ -139,7 +105,7 @@ class Entity extends Base
         $array = [];
         foreach ($meta->getFieldNames() as $field) {
             $method = self::propertyGetMethod($field);
-            $array[$field] = $useGetters
+            $array[ $field ] = $useGetters
                 ? $this->$method()
                 : $this->$field;
         }
@@ -227,8 +193,7 @@ class Entity extends Base
 
     private function _show($field)
     {
-        $method = self::propertyGetMethod($field);
-        $value = $this->$method();
+        $value = $this[ $field ];
 
         if (null === $value) {
             return 'NULL';
@@ -254,7 +219,7 @@ class Entity extends Base
 
             case Type::STRING:
             case Type::TEXT:
-                return "'".mb_strimwidth($value, 0, 50, '...')."'";
+                return "'" . mb_strimwidth($value, 0, 50, '...') . "'";
 
             default:
                 return $meta->getTypeOfField($field);
@@ -712,13 +677,14 @@ class Entity extends Base
     }
 
     /**
+     * @param  string $field
      * @return array|string
      */
     public function getErrors($field = null)
     {
         if (!is_null($field)) {
-            return isset($this->_errors[$field])
-                ? $this->_errors[$field]
+            return isset($this->_errors[ $field ])
+                ? $this->_errors[ $field ]
                 : null;
         }
 
@@ -728,6 +694,7 @@ class Entity extends Base
     /**
      *
      * @param  string $message
+     * @param  string $field
      * @return static
      */
     public function addError($message, $field = '')
@@ -878,7 +845,7 @@ class Entity extends Base
 
     /**
      *
-     * @return \Doctrine\ORM\EntityRepository The repository class.
+     * @return EntityRepository The repository class.
      */
     public static function getRepository()
     {
@@ -918,7 +885,7 @@ class Entity extends Base
      * you may want to @see getReference() instead.
      *
      * @param   int $id
-     * @return  static|null
+     * @return  static|object|null
      */
     public static function find($id)
     {
@@ -938,12 +905,13 @@ class Entity extends Base
 
     private function _mergeCollection($assoc, array &$visited)
     {
+        /** @var Entity[] $collection */
         $collection = $this->$assoc;
         foreach ($collection as $key => $v) {
             if (!is_null($v) && $v instanceof Entity) {
-                $collection[$key]->cascadeMerge($visited);
+                $collection[ $key ]->cascadeMerge($visited);
                 if ($v->id()) {
-                   $collection[$key] = self::getEM()->merge($v);
+                   $collection[ $key ] = self::getEM()->merge($v);
                 }
 
             }
@@ -985,7 +953,7 @@ class Entity extends Base
      * </code>
      *
      * @param  array $visited
-     * @return static
+     * @return static|object
      */
     public function cascadeMerge(array &$visited)
     {

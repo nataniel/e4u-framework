@@ -49,7 +49,9 @@ class Base implements \ArrayAccess
     public function offsetGet($offset)
     {
         $method = self::propertyGetMethod($offset);
-        return $this->$method();
+        return method_exists($this, $method)
+            ? $this->$method()
+            : $this->_get($offset);
     }
 
     /**
@@ -61,7 +63,9 @@ class Base implements \ArrayAccess
     public function offsetSet($offset, $value)
     {
         $method = self::propertySetMethod($offset);
-        $this->$method($value);
+        method_exists($this, $method)
+            ? $this->$method($value)
+            : $this->_set($offset, $value);
     }
 
     /**
@@ -72,7 +76,9 @@ class Base implements \ArrayAccess
     public function offsetUnset($offset)
     {
         $method = self::propertySetMethod($offset);
-        $this->$method(null);
+        method_exists($this, $method)
+            ? $this->$method(null)
+            : $this->_set($offset, null);
     }
 
     /**
@@ -93,7 +99,7 @@ class Base implements \ArrayAccess
             # return $this->$method($property, ...$argv);
             
             array_unshift($argv, $property);
-            return call_user_func_array([$this, $method], $argv);
+            return call_user_func_array([ $this, $method ], $argv);
         }
 
         throw new LogicException(

@@ -32,6 +32,7 @@
     "stevenmaguire/oauth2-microsoft": "^2.2",
     "iignatov/lightopenid": "^1.0",
     "jdorn/sql-formatter": "^1.2",
+    "ext-mbstring": "*",
     "ext-fileinfo": "*",
     "ext-intl": "*",
     "ext-curl": "*"
