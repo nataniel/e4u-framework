@@ -35,6 +35,7 @@
     "ext-mbstring": "*",
     "ext-fileinfo": "*",
     "ext-intl": "*",
+    "ext-json": "*",
     "ext-curl": "*"
   },
   "autoload": {

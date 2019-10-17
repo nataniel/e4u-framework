@@ -97,7 +97,7 @@ class Steam implements Helper
      */
     public function getFirstName()
     {
-        return strtok($this->me->realname, ' ');
+        return strtok($this->me->realname, ' ') ?: $this->me->personaname;
     }
 
     /**
@@ -122,7 +122,7 @@ class Steam implements Helper
      */
     public function getEmail()
     {
-        $username = trim(str_replace('http://steamcommunity.com/id/', '', $this->me->profileurl), '/');
+        $username = trim(str_replace('https://steamcommunity.com/id/', '', $this->me->profileurl), '/');
         return $username . '@steamcommunity.com';
     }
 
