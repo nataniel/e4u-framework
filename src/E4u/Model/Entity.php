@@ -2,6 +2,7 @@
 namespace E4u\Model;
 
 use Doctrine\ORM\EntityManager,
+    Doctrine\ORM\Event,
     Doctrine\ORM\Mapping\ClassMetadata,
     Doctrine\DBAL\Types\Type,
     Doctrine\Common\Collections\ArrayCollection,
@@ -602,8 +603,11 @@ class Entity extends Base
         $this->validate();
     }
 
-    /** @PreUpdate */
-    public function preUpdate(\Doctrine\ORM\Event\PreUpdateEventArgs $event)
+    /**
+     * @PreUpdate
+     * @param Event\PreUpdateEventArgs $event
+     */
+    public function preUpdate(Event\PreUpdateEventArgs $event)
     {
         $changes = $event->getEntityChangeSet();
         foreach ($changes as $key => $values) {
@@ -642,8 +646,11 @@ class Entity extends Base
     /** @PostRemove */
     public function postRemove() {}
 
-    /** @PostUpdate */
-    public function postUpdate() {}
+    /**
+     * @PostUpdate
+     * @param Event\LifecycleEventArgs $event
+     */
+    public function postUpdate(Event\LifecycleEventArgs $event) {}
 
     /**
      * @return $this
