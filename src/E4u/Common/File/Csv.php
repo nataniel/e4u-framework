@@ -23,7 +23,7 @@ class Csv extends File
     }
 
     /**
-     * @return string[]
+     * @return string[][]
      */
     public function toArray()
     {
@@ -36,7 +36,7 @@ class Csv extends File
     }
 
     /**
-     * @return string[]
+     * @return string[][]
      */
     public function getData()
     {
