@@ -282,7 +282,7 @@ class StringTools
         // trim
         $txt = trim($txt, '-');
 
-        // remove duplicate -
+        // remove duplicate - and .
         $txt = preg_replace('~-+~', '-', $txt);
         $txt = preg_replace('~\.+~', '.', $txt);
 
