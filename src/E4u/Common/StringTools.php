@@ -277,16 +277,17 @@ class StringTools
         $txt = str_replace('&nbsp;', '-', $txt);
 
         // replace non letter or digits by -
-        $txt = preg_replace('~[^\\pL\d]+~u', '-', $txt);
+        $txt = preg_replace('~[^\\pL\d\.]+~u', '-', $txt);
 
         // trim
         $txt = trim($txt, '-');
 
         // remove duplicate -
         $txt = preg_replace('~-+~', '-', $txt);
+        $txt = preg_replace('~\.+~', '.', $txt);
 
         // remove unwanted characters
-        $txt = preg_replace('~[^-\w]+~u', '', $txt);
+        $txt = preg_replace('~[^-\.\w]+~u', '', $txt);
 
         $txt = mb_strtolower($txt);
 
