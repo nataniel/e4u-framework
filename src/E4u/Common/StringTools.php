@@ -280,7 +280,7 @@ class StringTools
         $txt = preg_replace('~[^\\pL\d\.]+~u', '-', $txt);
 
         // trim
-        $txt = trim($txt, '-');
+        $txt = trim($txt, '-.');
 
         // remove duplicate - and .
         $txt = preg_replace('~-+~', '-', $txt);
