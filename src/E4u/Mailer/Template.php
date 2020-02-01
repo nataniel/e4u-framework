@@ -38,6 +38,7 @@ class Template
 
     public function __construct($vars = [])
     {
+        $this->addToHeaders('Date', gmdate('r'));
         $this->vars = $vars;
         $this->init();
     }
