@@ -19,7 +19,7 @@ class Base
         ENCTYPE_MULTIPART = 'multipart/form-data',
         ENCTYPE_TEXT = 'text/plain';
 
-    const VALID_EMAIL = 'Zend\Validator\EmailAddress';
+    const VALID_EMAIL = \Zend\Validator\EmailAddress::class;
 
     protected $method = self::HTTP_POST;
     protected $name;
@@ -317,14 +317,16 @@ class Base
      */
     protected function processFiles($files)
     {
-        if (is_array($files)) {
-            foreach ($files as $key => $value) {
+        if (!is_array($files)) {
+            return $this;
+        }
 
-                array_key_exists('name', $value)
-                    ? $this->processSingleFile($value, $key)
-                    : $this->processMultipleFiles($value, $key);
+        foreach ($files as $key => $value) {
 
-            }
+            array_key_exists('name', $value)
+                ? $this->processSingleFile($value, $key)
+                : $this->processMultipleFiles($value, $key);
+
         }
 
         return $this;
@@ -362,42 +364,43 @@ class Base
     }
 
     /**
-     * @return array
+     * @return $this
      */
     public function initValues()
     {
-        if (null == $this->values) {
-
-            $this->values = [];
-            if ($this->verifyCrsfToken()) {
-
-                switch ($this->method) {
-                    case self::HTTP_GET:
-                        $this->values = $this->request->getQuery($this->getName());
-                        break;
-                    case self::HTTP_POST:
-                        $this->values = $this->request->getPost($this->getName());
-                        if ($this->enctype == self::ENCTYPE_MULTIPART) {
-                            $this->processFiles($this->request->getFiles($this->getName()));
-                        }
-
-                        break;
-                }
-
-                if (!empty($this->values)) {
-                    foreach ($this->fields as $key => $element) {
-                        if (!$element->isDisabled()) {
-                            $element->setValue(isset($this->values[ $key ])
-                                ? $this->values[ $key ]
-                                : null);
-                        }
-                    }
-                }
-
-            }
+        if (null !== $this->values) {
+            return $this;
         }
 
-        return $this->values;
+        $this->values = [];
+        if (!$this->verifyCrsfToken()) {
+            return $this;
+        }
+
+        switch ($this->method) {
+            case self::HTTP_GET:
+                $this->values = $this->request->getQuery($this->getName());
+                break;
+            case self::HTTP_POST:
+                $this->values = $this->request->getPost($this->getName());
+                if ($this->enctype == self::ENCTYPE_MULTIPART) {
+                    $this->processFiles($this->request->getFiles($this->getName()));
+                }
+
+                break;
+        }
+
+        if (empty($this->values)) {
+            return $this;
+        }
+
+        foreach ($this->fields as $key => $element) {
+            if (!$element->isDisabled()) {
+                $element->setValue(isset($this->values[ $key ])
+                    ? $this->values[ $key ]
+                    : null);
+            }
+        }
     }
 
     /**
@@ -506,8 +509,8 @@ class Base
      */
     public function isSubmitted()
     {
-        $values = $this->initValues();
-        return !empty($values['submit']);
+        $this->initValues();
+        return !empty($this->values['submit']);
     }
 
     /**
@@ -527,7 +530,7 @@ class Base
      */
     public function setMethod($method, $crsf_protection = null)
     {
-        if (constant('self::HTTP_'.strtoupper($method))) {
+        if (constant('self::HTTP_' . strtoupper($method))) {
             $this->method = $method;
 
             if (!is_null($crsf_protection)) {
