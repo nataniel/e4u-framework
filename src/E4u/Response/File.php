@@ -3,27 +3,12 @@ namespace E4u\Response;
 
 use E4u\Application\Exception\PageNotFound;
 
-class File extends Http
+class File extends Stream
 {
-    protected $defaultContentType = 'application/octet-stream';
-    protected $headers = [
-        'Content-Transfer-Encoding' => 'binary',
-    ];
-    protected $type = 'attachment';
-
-    public function __construct($filename = null, $name = null)
-    {
-        parent::__construct($filename);
-
-        if (!is_null($name)) {
-            $this->setName($name);
-        }
-    }
-
     /**
      * @param  mixed $value
      * @param  string $name
-     * @return File
+     * @return $this
      */
     public function setContent($value, $name = null)
     {
@@ -51,17 +36,7 @@ class File extends Http
     }
 
     /**
-     * @param  string $name
-     * @return File
-     */
-    public function setName($name)
-    {
-        $this->addHeader('Content-Disposition', sprintf('%s; filename=%s', $this->type, $name));
-        return $this;
-    }
-
-    /**
-     * @return Http
+     * @return $this
      */
     public function sendContent()
     {
