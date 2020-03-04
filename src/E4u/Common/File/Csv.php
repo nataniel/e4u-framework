@@ -54,6 +54,16 @@ class Csv extends File
     }
 
     /**
+     * @param  string $name Column name
+     * @return bool
+     */
+    public function hasHeader($name)
+    {
+        $this->initialize();
+        return in_array($name, $this->header);
+    }
+
+    /**
      * @return int
      */
     public function countColumns()
@@ -75,7 +85,7 @@ class Csv extends File
         while ($data = $this->readLineToArray($file)) {
             foreach ($data as $i => $value) {
                 $key = $this->header[$i];
-                $this->data[$row][$key] = $value;
+                $this->data[ $row ][ $key ] = $value;
             }
 
             $row++;
@@ -90,7 +100,7 @@ class Csv extends File
      * @param  int $length
      * @return string[]
      */
-    protected function readLineToArray($file, $length = null)
+    protected function readLineIntoArray($file, $length = null)
     {
         return fgetcsv($file, $length, $this->delimiter, $this->enclosure, $this->escape);
     }
