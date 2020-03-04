@@ -78,11 +78,11 @@ class Csv extends File
         }
 
         $file = fopen($this->getFullPath(), 'r');
-        $this->header = $this->readLineToArray($file);
+        $this->header = $this->readLineIntoArray($file);
 
         $row = 0;
         $this->data = [];
-        while ($data = $this->readLineToArray($file)) {
+        while ($data = $this->readLineIntoArray($file)) {
             foreach ($data as $i => $value) {
                 $key = $this->header[$i];
                 $this->data[ $row ][ $key ] = $value;
