@@ -1,11 +1,11 @@
 <?php
 namespace E4u\Request;
 
-use Zend\Http\PhpEnvironment\Request as HttpRequest,
-    E4u\Request\Request as RequestDescription,
-    Zend\Mvc\Router\Http\TreeRouteStack as HttpRouter,
-    Zend\Mvc\Router\RouteStackInterface,
-    Zend\Mvc\Router\RouteMatch;
+use E4u\Request\Request as RequestDescription;
+use Laminas\Http\PhpEnvironment\Request as HttpRequest,
+    Laminas\Mvc\Router\Http\TreeRouteStack as HttpRouter,
+    Laminas\Mvc\Router\RouteStackInterface,
+    Laminas\Mvc\Router\RouteMatch;
 
 class Http extends HttpRequest implements RequestDescription
 {

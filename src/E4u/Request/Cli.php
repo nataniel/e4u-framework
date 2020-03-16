@@ -2,12 +2,12 @@
 namespace E4u\Request;
 
 use E4u\Exception\LogicException;
-use Zend\Stdlib\Message,
-    E4u\Request\Request as RequestDescription,
-    Zend\Mvc\Router\SimpleRouteStack,
-    Zend\Mvc\Router\RouteStackInterface,
-    Zend\Mvc\Router\RouteMatch,
-    Zend\Console\Getopt;
+use E4u\Request\Request as RequestDescription;
+use Laminas\Stdlib\Message,
+    Laminas\Mvc\Router\SimpleRouteStack,
+    Laminas\Mvc\Router\RouteStackInterface,
+    Laminas\Mvc\Router\RouteMatch,
+    Laminas\Console\Getopt;
 
 class Cli extends Message implements RequestDescription
 {

@@ -1,11 +1,11 @@
 <?php
 namespace E4u\Application\Router;
 
-use Zend\Mvc\Router\Http\Regex as ZendRegex,
-    Zend\Mvc\Router\Http\RouteMatch,
-    Zend\Stdlib\RequestInterface as Request;
+use Laminas\Mvc\Router\Http\Regex as LaminasRegex,
+    Laminas\Mvc\Router\Http\RouteMatch,
+    Laminas\Stdlib\RequestInterface as Request;
 
-class Regex extends ZendRegex
+class Regex extends LaminasRegex
 {
     /**
      * match(): defined by Route interface.

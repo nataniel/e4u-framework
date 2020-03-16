@@ -2,8 +2,8 @@
 namespace E4u\Application\View;
 
 use E4u\Exception\LogicException;
-use Zend\View\Helper\AbstractHelper;
-use Zend\View\HelperPluginManager;
+use Laminas\View\Helper\AbstractHelper;
+use Laminas\View\HelperPluginManager;
 
 trait Plugins
 {
@@ -14,7 +14,7 @@ trait Plugins
      * Set helper plugin manager instance
      *
      * @param  string|HelperPluginManager $helpers
-     * @return Pluggable
+     * @return Plugins
      * @throws \E4u\Exception\LogicException
      */
     public function setHelperPluginManager($helpers)
@@ -31,7 +31,7 @@ trait Plugins
         
         if (!$helpers instanceof HelperPluginManager) {
             throw new LogicException(sprintf(
-                'Helper helpers must extend Zend\View\HelperPluginManager; got type "%s" instead',
+                'Helper helpers must extend Laminas\View\HelperPluginManager; got type "%s" instead',
                 (is_object($helpers) ? get_class($helpers) : gettype($helpers))
             ));
         }

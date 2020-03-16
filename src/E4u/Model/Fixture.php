@@ -2,7 +2,7 @@
 namespace E4u\Model;
 
 use E4u\Exception\LogicException;
-use Zend\Config\Config;
+use Laminas\Config\Config;
 
 class Fixture
 {

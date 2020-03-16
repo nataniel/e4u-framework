@@ -3,8 +3,8 @@ namespace E4u\Application\Helper;
 
 use E4u\Application\View;
 use E4u\Exception\LogicException;
-use Zend\View\Helper\HelperInterface,
-    Zend\View\Renderer\RendererInterface as Renderer;
+use Laminas\View\Helper\HelperInterface,
+    Laminas\View\Renderer\RendererInterface as Renderer;
 
 abstract class ViewHelper implements HelperInterface
 {

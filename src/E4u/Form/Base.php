@@ -19,7 +19,7 @@ class Base
         ENCTYPE_MULTIPART = 'multipart/form-data',
         ENCTYPE_TEXT = 'text/plain';
 
-    const VALID_EMAIL = \Zend\Validator\EmailAddress::class;
+    const VALID_EMAIL = \Laminas\Validator\EmailAddress::class;
 
     protected $method = self::HTTP_POST;
     protected $name;

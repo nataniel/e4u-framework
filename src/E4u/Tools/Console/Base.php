@@ -4,7 +4,7 @@ namespace E4u\Tools\Console;
 use E4u\Application\Helper\Url;
 use E4u\Request\Request;
 use E4u\Tools\Console;
-use Zend\Console\Getopt;
+use Laminas\Console\Getopt;
 
 abstract class Base implements Command
 {

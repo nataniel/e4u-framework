@@ -1,7 +1,7 @@
 <?php
 namespace E4u\Response;
 
-use Zend\Stdlib\ResponseInterface;
+use Laminas\Stdlib\ResponseInterface;
 
 interface Response extends ResponseInterface
 {

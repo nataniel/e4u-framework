@@ -8,6 +8,6 @@ class Url extends TextField
     public function __construct($name, $options = null)
     {
         parent::__construct($name, $options);
-        $this->addValidator('Zend\Validator\Uri', 'Nieprawidłowy adres www.');
+        $this->addValidator('Laminas\Validator\Uri', 'Nieprawidłowy adres www.');
     }
 }

@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManager,
     Doctrine\DBAL\Types\Type,
     Doctrine\Common\Collections\ArrayCollection,
     Doctrine\Common\Util\Debug,
-    Zend\Stdlib\ArrayUtils;
+    Laminas\Stdlib\ArrayUtils;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\PersistentCollection;
 use E4u\Common\Variable;

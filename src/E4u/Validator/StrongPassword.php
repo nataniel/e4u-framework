@@ -1,13 +1,11 @@
 <?php
 namespace E4u\Validator;
 
-use Zend\Validator\AbstractValidator;
+use Laminas\Validator\AbstractValidator;
 
 class StrongPassword extends AbstractValidator
 {
     /**
-     * Defined by Zend_Validate_Interface
-     *
      * Returns true if and only if $value is a strong password
      * 
      * @param  string $value

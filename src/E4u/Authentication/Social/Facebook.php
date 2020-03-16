@@ -5,7 +5,7 @@ use E4u\Application\Helper\Url;
 use E4u\Authentication\Exception\AuthenticationException;
 use E4u\Exception\ConfigException;
 use E4u\Request\Request;
-use Zend\Config\Config;
+use Laminas\Config\Config;
 
 /**
  * Class Facebook

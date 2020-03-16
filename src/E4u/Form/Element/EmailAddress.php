@@ -8,6 +8,6 @@ class EmailAddress extends TextField
     public function __construct($name, $options = null)
     {
         parent::__construct($name, $options);
-        $this->addValidator(\Zend\Validator\EmailAddress::class, 'Nieprawidłowy adres e-mail.');
+        $this->addValidator(\Laminas\Validator\EmailAddress::class, 'Nieprawidłowy adres e-mail.');
     }
 }

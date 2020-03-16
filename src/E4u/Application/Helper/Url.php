@@ -2,7 +2,7 @@
 namespace E4u\Application\Helper;
 
 use E4u\Request;
-use Zend\Uri\Uri;
+use Laminas\Uri\Uri;
 
 trait Url
 {

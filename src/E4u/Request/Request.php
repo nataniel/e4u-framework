@@ -1,10 +1,10 @@
 <?php
 namespace E4u\Request;
 
-use Zend\Mvc\Router\RouteStackInterface,
-    Zend\Mvc\Router\RouteMatch,
-    Zend\Stdlib\RequestInterface,
-    Zend\Stdlib\ParametersInterface;
+use Laminas\Mvc\Router\RouteStackInterface,
+    Laminas\Mvc\Router\RouteMatch,
+    Laminas\Stdlib\RequestInterface,
+    Laminas\Stdlib\ParametersInterface;
 
 interface Request extends RequestInterface
 {

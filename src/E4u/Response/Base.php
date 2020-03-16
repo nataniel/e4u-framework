@@ -1,9 +1,9 @@
 <?php
 namespace E4u\Response;
 
-use Zend\Stdlib\Response as ZendResponse;
+use Laminas\Stdlib\Response as LaminasResponse;
 
-abstract class Base extends ZendResponse implements Response
+abstract class Base extends LaminasResponse implements Response
 {
     protected $status = self::STATUS_OK;
 

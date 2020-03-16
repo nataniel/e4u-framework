@@ -2,12 +2,9 @@
 namespace E4u\Application;
 
 use E4u\Exception\LogicException;
-use E4u\Application\Exception;
 
-use Zend\Stdlib\RequestInterface,
-    Zend\Stdlib\ResponseInterface,
-    Zend\Config\Config,
-    Zend\Stdlib\Message;
+use Laminas\Config\Config,
+    Laminas\Stdlib\Message;
 
 use E4u\Authentication,
     E4u\Common\StringTools,

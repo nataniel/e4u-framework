@@ -6,7 +6,7 @@ use E4u\Common\Variable;
 use E4u\Exception\LogicException;
 use E4u\Model\Entity;
 use E4u\Model\Validatable;
-use Zend\Validator;
+use Laminas\Validator;
 
 abstract class Element
 {

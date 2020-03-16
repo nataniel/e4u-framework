@@ -1,7 +1,7 @@
 <?php
 namespace E4u\Request;
 
-use Zend\Stdlib\Parameters;
+use Laminas\Stdlib\Parameters;
 
 class Test extends Cli
 {
@@ -24,7 +24,7 @@ class Test extends Cli
      *
      * @param string|null           $name            Parameter name to retrieve, or null to get the whole container.
      * @param mixed|null            $default         Default value to use when the parameter is missing.
-     * @return \Zend\Stdlib\ParametersInterface
+     * @return \Laminas\Stdlib\ParametersInterface
      */
     public function getPost($name = null, $default = null)
     {
@@ -44,7 +44,7 @@ class Test extends Cli
      *
      * @param string|null           $name            Parameter name to retrieve, or null to get the whole container.
      * @param mixed|null            $default         Default value to use when the parameter is missing.
-     * @return \Zend\Stdlib\ParametersInterface
+     * @return \Laminas\Stdlib\ParametersInterface
      */
     public function getQuery($name = null, $default = null)
     {

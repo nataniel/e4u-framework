@@ -1,9 +1,9 @@
 <?php
 namespace E4u\I18n\Translator;
 
-use Zend\I18n\Exception;
-use Zend\I18n\Translator\Loader\AbstractFileLoader;
-use Zend\I18n\Translator\TextDomain;
+use Laminas\I18n\Exception;
+use Laminas\I18n\Translator\Loader\AbstractFileLoader;
+use Laminas\I18n\Translator\TextDomain;
 
 class ArrayLoader extends AbstractFileLoader
 {

@@ -5,7 +5,7 @@ use E4u\Application\View,
     E4u\Application\Helper,
     E4u\Common\File\Image,
     E4u\Common\Collection\Paginable;
-use Zend\View\Helper as ZendHelper;
+use Laminas\View\Helper as LaminasHelper;
 
 /**
  * Class Html
@@ -18,7 +18,7 @@ use Zend\View\Helper as ZendHelper;
  * @method Helper\Breadcrumbs|string breadcrumbs($crumbs, $options = [])
  * @method Helper\Flaticon|string icon($icon, $title = null)
  * @method Helper\BackUrl|string back()
- * @method ZendHelper\Doctype|string doctype($doctype = null)
+ * @method LaminasHelper\Doctype|string doctype($doctype = null)
  */
 class Html extends View
 {
@@ -46,7 +46,7 @@ class Html extends View
 
     public function __construct()
     {
-        $this->doctype()->setDoctype(ZendHelper\Doctype::HTML5);
+        $this->doctype()->setDoctype(LaminasHelper\Doctype::HTML5);
         $this->registerHelpers();
     }
 

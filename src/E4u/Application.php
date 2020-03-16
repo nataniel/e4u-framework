@@ -6,9 +6,9 @@ use E4u\Exception\LogicException;
 use E4u\Request\Request,
     E4u\Response\Response,
     E4u\Application\Exception,
-    Zend\Config\Config,
-    Zend\Mvc\Router\RouteStackInterface,
-    Zend\Mvc\Router\RouteMatch;
+    Laminas\Config\Config,
+    Laminas\Mvc\Router\RouteStackInterface,
+    Laminas\Mvc\Router\RouteMatch;
 
 class Application
 {

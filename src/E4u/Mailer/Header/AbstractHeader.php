@@ -2,8 +2,8 @@
 namespace E4u\Mailer\Header;
 
 use E4u\Exception\LogicException;
-use Zend\Mail\Header,
-    Zend\Mail\Mime;
+use Laminas\Mail\Header,
+    Laminas\Mail\Mime;
 
 class AbstractHeader implements Header\HeaderInterface
 {

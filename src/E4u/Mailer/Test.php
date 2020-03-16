@@ -1,7 +1,7 @@
 <?php
 namespace E4u\Mailer;
 
-use Zend\Mail;
+use Laminas\Mail;
 
 class Test implements Mail\Transport\TransportInterface
 {

@@ -1,7 +1,7 @@
 <?php
 namespace E4u;
 
-use Zend\Config\Config;
+use Laminas\Config\Config;
 
 abstract class Configuration
 {

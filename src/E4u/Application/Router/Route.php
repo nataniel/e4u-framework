@@ -1,9 +1,9 @@
 <?php
 namespace E4u\Application\Router;
 
-use Zend\Mvc\Router\Http\Segment,
-    Zend\Mvc\Router\Http\RouteMatch,
-    Zend\Stdlib\RequestInterface as Request;
+use Laminas\Mvc\Router\Http\Segment,
+    Laminas\Mvc\Router\Http\RouteMatch,
+    Laminas\Stdlib\RequestInterface as Request;
 
 class Route extends Segment
 {

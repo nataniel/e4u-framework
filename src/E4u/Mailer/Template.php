@@ -2,8 +2,8 @@
 namespace E4u\Mailer;
 
 use E4u\Model\Entity;
-use Zend\Mail;
-use Zend\Mime;
+use Laminas\Mail;
+use Laminas\Mime;
 
 class Template
 {

@@ -5,8 +5,8 @@ use E4u\Common\Variable;
 use E4u\Exception\LogicException;
 use E4u\Loader;
 use Interop\Container\ContainerInterface;
-use Zend\View\Renderer\RendererInterface as Renderer,
-    Zend\View\Resolver\ResolverInterface as Resolver,
+use Laminas\View\Renderer\RendererInterface as Renderer,
+    Laminas\View\Resolver\ResolverInterface as Resolver,
     ArrayObject, ArrayAccess;
 
 /**

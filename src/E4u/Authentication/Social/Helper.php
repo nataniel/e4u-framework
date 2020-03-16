@@ -2,7 +2,7 @@
 namespace E4u\Authentication\Social;
 
 use E4u\Request\Request;
-use Zend\Config\Config;
+use Laminas\Config\Config;
 
 interface Helper
 {

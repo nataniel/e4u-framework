@@ -2,7 +2,7 @@
 namespace E4u\Tools\Console\Routes;
 
 use E4u\Tools\Console\Base;
-use Zend\Mvc\Router\RouteMatch;
+use Laminas\Mvc\Router\RouteMatch;
 
 class Test extends Base
 {

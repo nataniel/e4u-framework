@@ -3,7 +3,7 @@ namespace E4uTest\Tools;
 
 use PHPUnit\Framework\TestCase;
 use E4u\Tools\Console;
-use Zend\Config\Config;
+use Laminas\Config\Config;
 
 class ConsoleTest extends TestCase
 {

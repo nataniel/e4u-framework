@@ -2,7 +2,7 @@
 namespace E4u\Mailer;
 
 use E4u\Exception\LogicException;
-use Zend\Mail\Transport;
+use Laminas\Mail\Transport;
 
 class Factory
 {

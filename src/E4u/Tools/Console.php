@@ -3,8 +3,8 @@ namespace E4u\Tools;
 
 use E4u\Common\Variable;
 use E4u\Exception\LogicException;
-use Zend\Console\Getopt,
-    Zend\Config\Config,
+use Laminas\Console\Getopt,
+    Laminas\Config\Config,
     E4u\Tools\Console\Command;
 
 class Console

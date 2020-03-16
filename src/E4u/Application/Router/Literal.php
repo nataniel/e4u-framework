@@ -1,11 +1,11 @@
 <?php
 namespace E4u\Application\Router;
 
-use Zend\Mvc\Router\Http\Literal as ZendLiteral,
-    Zend\Mvc\Router\Http\RouteMatch,
-    Zend\Stdlib\RequestInterface as Request;
+use Laminas\Mvc\Router\Http\Literal as LaminasLiteral,
+    Laminas\Mvc\Router\Http\RouteMatch,
+    Laminas\Stdlib\RequestInterface as Request;
 
-class Literal extends ZendLiteral
+class Literal extends LaminasLiteral
 {
     /**
      * match(): defined by Route interface.

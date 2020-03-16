@@ -1,7 +1,7 @@
 <?php
 namespace E4u\Validator;
 
-use Zend\Validator\ValidatorInterface;
+use Laminas\Validator\ValidatorInterface;
 
 class NumerIdentyfikacjiPodatkowej implements ValidatorInterface
 {

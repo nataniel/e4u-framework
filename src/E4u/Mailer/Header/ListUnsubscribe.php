@@ -2,9 +2,9 @@
 namespace E4u\Mailer\Header;
 
 use E4u\Exception\LogicException;
-use Zend\Mail\Header\GenericHeader,
-    Zend\Mail\Header\HeaderWrap,
-    Zend\Mail\Header\HeaderValue;
+use Laminas\Mail\Header\GenericHeader,
+    Laminas\Mail\Header\HeaderWrap,
+    Laminas\Mail\Header\HeaderValue;
 
 class ListUnsubscribe extends AsciiHeader
 {

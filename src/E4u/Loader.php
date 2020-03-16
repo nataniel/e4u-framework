@@ -25,11 +25,6 @@
  *     views/
  *         layout/
  *         ...
- * library/
- *     Doctrine/
- *     E4u/
- *     Symfony/
- *     Zend/
  * public/
  * tools/
  * vendor/
@@ -44,11 +39,9 @@
 
 namespace E4u;
 
-use Doctrine\ORM;
-use Zend\Config\Config,
-    Zend\Loader\StandardAutoloader,
-    Doctrine\Common\Proxy,
-    Doctrine\Common\Proxy\Autoloader;
+use Doctrine\ORM,
+    Doctrine\Common\Proxy;
+use Laminas\Config\Config;
 
 #mb_internal_encoding('utf-8');
 
@@ -128,7 +121,7 @@ class Loader
     }
 
     /**
-     * @return \Zend\I18n\Translator\Translator
+     * @return \Laminas\I18n\Translator\Translator
      */
     public static function getTranslator()
     {
@@ -137,7 +130,7 @@ class Loader
         }
 
         $config = self::getConfig();
-        $translator = new \Zend\I18n\Translator\Translator();
+        $translator = new \Laminas\I18n\Translator\Translator();
         $translator->setFallbackLocale($config->get('default_locale'));
 
         if (!empty($config->translator)) {
@@ -157,7 +150,7 @@ class Loader
     }
 
     /**
-     * @return \Zend\Mail\Transport\TransportInterface
+     * @return \Laminas\Mail\Transport\TransportInterface
      */
     public static function getMailer()
     {

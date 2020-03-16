@@ -7,7 +7,7 @@ use E4u\Form\Base,
     E4u\Form\Element,
     E4u\Common\Html,
     E4u\Application\View\Html as HtmlView,
-    Zend\Config\Config;
+    Laminas\Config\Config;
 
 class Bootstrap3 implements BuilderInterface
 {

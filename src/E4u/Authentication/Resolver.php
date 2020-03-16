@@ -1,10 +1,9 @@
 <?php
 namespace E4u\Authentication;
 
-use E4u\Authentication\Identity,
-    E4u\Request\Request,
-    Zend\Config\Config;
-use E4u\Exception\LogicException;
+use Laminas\Config\Config;
+use E4u\Request\Request,
+    E4u\Exception\LogicException;
 
 class Resolver
 {
