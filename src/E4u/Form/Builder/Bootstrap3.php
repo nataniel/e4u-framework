@@ -271,7 +271,7 @@ class Bootstrap3 implements BuilderInterface
 
         ]);
 
-        $value = htmlentities($field->getValue(), ENT_COMPAT, 'UTF-8');
+        $value = htmlspecialchars($field->getValue(), ENT_COMPAT | ENT_HTML5, 'UTF-8');
         $content = Html::tag('textarea', $attributes, $value);
         return $this->field($field, $options, $content);
     }

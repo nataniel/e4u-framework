@@ -506,7 +506,7 @@ class Bootstrap4 implements BuilderInterface
             'rows' => $options->get('rows', 15),
         ]);
 
-        $value = htmlentities($field->getValue(), ENT_COMPAT, 'UTF-8');
+        $value = htmlspecialchars($field->getValue(), ENT_COMPAT | ENT_HTML5, 'UTF-8');
         return $this->view->tag('textarea', $attributes, $value);
     }
 
