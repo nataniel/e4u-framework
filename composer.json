@@ -36,7 +36,8 @@
     "ext-fileinfo": "*",
     "ext-intl": "*",
     "ext-json": "*",
-    "ext-curl": "*"
+    "ext-curl": "*",
+    "laminas/laminas-crypt": "^3.3"
   },
   "autoload": {
     "psr-4": {
