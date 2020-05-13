@@ -15,6 +15,10 @@ class Http extends HttpRequest implements RequestDescription
     /** @var RouteMatch */
     protected $currentRoute;
 
+    /**
+     * @param  RouteStackInterface $router
+     * @return $this|Request
+     */
     public function setRouter(RouteStackInterface $router)
     {
         $this->router = $router;
@@ -34,6 +38,10 @@ class Http extends HttpRequest implements RequestDescription
         return $this->router;
     }
 
+    /**
+     * @param  RouteMatch $route
+     * @return $this|Request
+     */
     public function setCurrentRoute(RouteMatch $route)
     {
         $this->currentRoute = $route;
@@ -48,10 +56,18 @@ class Http extends HttpRequest implements RequestDescription
         return $this->currentRoute;
     }
 
+    /**
+     * @return string
+     */
     public function getCurrentPath()
     {
-        $uri = $this->getUri()->getPath();
-        return substr($uri, strlen($this->getBaseUrl()));
+        $route = $this->getQuery('route');
+        if (is_null($route)) {
+            $uri = $this->getUri()->getPath();
+            return substr($uri, strlen($this->getBaseUrl()));
+        }
+
+        return $route;
     }
 
     /**
@@ -67,6 +83,9 @@ class Http extends HttpRequest implements RequestDescription
             . $this->getBaseUrl();
     }
 
+    /**
+     * @return string|null
+     */
     public function getQueryString()
     {
         return $this->getUri()->getQuery();

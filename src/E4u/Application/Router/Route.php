@@ -34,11 +34,11 @@ class Route extends Segment
 
         $params = array();
         foreach ($this->paramMap as $index => $name) {
-            if (isset($matches[$index])) {
-                $params[$name] = urldecode($matches[$index]);
+            if (isset($matches[ $index ])) {
+                $params[ $name ] = urldecode($matches[ $index ]);
             }
         }
-        
+
         $matchedLength = strlen($request->getCurrentPath());
         return new RouteMatch(array_merge($this->defaults, $params), $matchedLength);
     }

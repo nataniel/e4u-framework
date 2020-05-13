@@ -57,7 +57,7 @@ trait Url
             return $current;
         }
 
-        $query = $this->getRequest()->getQueryString();
+        $query = $this->getRequest()->mergeQuery([ 'route' => null, ]);
         return empty($query) ? $current : $current . '?' . $query;
     }
 
