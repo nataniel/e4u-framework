@@ -39,7 +39,7 @@ interface Helper
     public function getPicture();
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getEmail();
 

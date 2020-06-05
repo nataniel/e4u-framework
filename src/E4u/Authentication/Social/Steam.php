@@ -71,7 +71,7 @@ class Steam implements Helper
                 $url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?'
                     . http_build_query([
                         'key' => $this->config->get('api_key'),
-                        'steamids' => str_replace('http://steamcommunity.com/openid/id/', '', $this->getClient()->identity),
+                        'steamids' => $this->getClient()->identity,
                 ]);
 
                 $json = file_get_contents($url);
@@ -122,8 +122,7 @@ class Steam implements Helper
      */
     public function getEmail()
     {
-        $username = trim(str_replace('https://steamcommunity.com/id/', '', $this->me->profileurl), '/');
-        return $username . '@steamcommunity.com';
+        return null;
     }
 
     /**
