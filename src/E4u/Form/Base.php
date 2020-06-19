@@ -394,6 +394,11 @@ class Base
             return $this;
         }
 
+        $this->setFieldsValues();
+    }
+
+    protected function setFieldsValues()
+    {
         foreach ($this->fields as $key => $element) {
             if (!$element->isDisabled()) {
                 $element->setValue(isset($this->values[ $key ])
