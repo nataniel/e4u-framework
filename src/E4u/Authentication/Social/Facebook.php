@@ -77,11 +77,6 @@ class Facebook implements Helper
         $helper = $this->getClient()->getRedirectLoginHelper();
 
         $callback = $this->getRequest()->getCurrentPath();
-        if ($this->getRequest() instanceof \E4u\Request\Http) {
-            $query = $this->getRequest()->getQueryString();
-            $callback = $callback . '?' . $query;
-        }
-
         return $helper->getLoginUrl($this->urlTo($callback, true), $permissions);
     }
 
