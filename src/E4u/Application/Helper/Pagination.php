@@ -2,7 +2,7 @@
 namespace E4u\Application\Helper;
 
 use E4u\Common\Collection\Paginable;
-use E4u\Application\View;
+use E4u\Request\Http;
 
 /**
  * Usage:
@@ -140,7 +140,7 @@ class Pagination extends ViewHelper
         /** @var Http $request */
         $request = $this->view->getRequest();
         $href = $this->view->urlTo($request->getCurrentPath())
-            . '?' . $request->mergeQuery([ 'page' => $page ]);
+            . '?' . $request->mergeQuery([ 'page' => $page, 'route' => null ]);
 
         return $this->view->tag('a', [
             'href' => $href,
