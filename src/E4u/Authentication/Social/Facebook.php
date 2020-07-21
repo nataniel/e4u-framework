@@ -86,13 +86,13 @@ class Facebook implements Helper
     public function loginFromRedirect()
     {
         $helper = $this->getClient()->getRedirectLoginHelper();
-        $accessToken = $helper->getAccessToken();
-
-        if (empty($accessToken)) {
-            return false;
-        }
-
         try {
+
+            $accessToken = $helper->getAccessToken();
+
+            if (empty($accessToken)) {
+                return false;
+            }
 
             $response = $this->getClient()->sendRequest('GET', '/me', [
                 'type' => 'Facebook\GraphUser',

@@ -83,7 +83,7 @@ class Microsoft implements Helper
         $state = $this->request->getQuery('state');
         if (empty($state) || ($state !== $_SESSION['oauth2state'])) {
             unset($_SESSION['oauth2state']);
-            throw new AuthenticationException('Invalid state.', null, $e);
+            throw new AuthenticationException('Invalid state.');
         }
 
         $client = $this->getClient();
