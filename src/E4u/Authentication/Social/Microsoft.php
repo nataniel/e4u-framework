@@ -177,4 +177,9 @@ class Microsoft implements Helper
     {
         return $this->request;
     }
+
+    public function hasId(): bool
+    {
+        return !empty($this->me);
+    }
 }

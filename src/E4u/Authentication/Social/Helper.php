@@ -18,6 +18,8 @@ interface Helper
      */
     public function loginFromRedirect();
 
+    public function hasId(): bool;
+
     /**
      * @return string
      */

@@ -158,4 +158,9 @@ class Steam implements Helper
         // "loccountrycode": "PL",
         return strtolower($this->me->loccountrycode);
     }
+
+    public function hasId(): bool
+    {
+        return !empty($this->me);
+    }
 }

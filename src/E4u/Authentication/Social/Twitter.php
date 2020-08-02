@@ -213,4 +213,9 @@ class Twitter implements Helper
         // ["lang"] => string(2) "pl"
         return $this->me->lang;
     }
+
+    public function hasId(): bool
+    {
+        return !empty($this->me);
+    }
 }

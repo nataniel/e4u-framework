@@ -192,4 +192,9 @@ class Google implements Helper
         // ["locale"] => string(2) "pl"
         return $this->me->getLocale();
     }
+
+    public function hasId(): bool
+    {
+        return !empty($this->me);
+    }
 }
