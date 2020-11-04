@@ -94,9 +94,10 @@ class Application
     /**
      * 404 Not Found
      * @param  \Exception $e
+     * @param  int $status
      * @return Response
      */
-    protected function notFoundException(\Exception $e)
+    protected function notFoundException(\Exception $e, $status = 404)
     {
         if ($this->getConfig()->show_errors) {
             echo '<pre>'; echo $e;
@@ -109,15 +110,16 @@ class Application
             'action' => 'not-found',
         ]);
 
-        return $response->setStatus(404);
+        return $response->setStatus($status);
     }
 
     /**
      * 500 Internal Server Error
      * @param  \Exception $e
+     * @param  int $status
      * @return Response
      */
-    protected function invalidException(\Exception $e)
+    protected function invalidException(\Exception $e, $status = 500)
     {
         if ($this->getConfig()->show_errors) {
             echo '<pre>'; echo $e;
@@ -130,7 +132,7 @@ class Application
             'action' => 'invalid',
         ]);
 
-        return $response->setStatus(500);
+        return $response->setStatus($status);
     }
 
     /**
