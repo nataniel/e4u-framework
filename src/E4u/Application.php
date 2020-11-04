@@ -98,11 +98,18 @@ class Application
      */
     protected function notFoundException(\Exception $e)
     {
+        if ($this->getConfig()->show_errors) {
+            echo '<pre>'; echo $e;
+            exit();
+        }
+
         $this->addToLog($e, 'not-found.log');
-        return $this->dispatch([
+        $response = $this->dispatch([
             'controller' => 'errors',
             'action' => 'not-found',
         ]);
+
+        return $response->setStatus(404);
     }
 
     /**
@@ -118,10 +125,12 @@ class Application
         }
 
         $this->addToLog($e, 'invalid.log');
-        return $this->dispatch([
+        $response = $this->dispatch([
             'controller' => 'errors',
             'action' => 'invalid',
         ]);
+
+        return $response->setStatus(500);
     }
 
     /**
