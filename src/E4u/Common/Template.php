@@ -25,8 +25,30 @@ class Template
     public static function pln($vars, $options = null)
     {
         if (is_array($vars) || $vars instanceof \ArrayAccess) {
-            if (isset($vars[$options])) {
-                return number_format($vars[$options], 2, ',', ' ') . ' zł';
+            if (isset($vars[ $options ])) {
+                return number_format($vars[ $options ], 2, ',', ' ') . ' zł';
+            }
+        }
+
+        return '';
+    }
+
+    public static function date($vars, $options = null)
+    {
+        if (is_array($vars) || $vars instanceof \ArrayAccess) {
+            if (isset($vars[ $options ]) && $vars[ $options ] instanceof \DateTime) {
+                return $vars[ $options ]->format('d.m.Y');
+            }
+        }
+
+        return '';
+    }
+
+    public static function datetime($vars, $options = null)
+    {
+        if (is_array($vars) || $vars instanceof \ArrayAccess) {
+            if (isset($vars[ $options ]) && $vars[ $options ] instanceof \DateTime) {
+                return $vars[ $options ]->format('d.m.Y H:i');
             }
         }
 
