@@ -39,6 +39,7 @@ class Template
     public function __construct($vars = [])
     {
         $this->addToHeaders('Date', gmdate('r'));
+        $this->addToHeaders(new Mail\Header\MessageId());
         $this->vars = $vars;
         $this->init();
     }
@@ -186,12 +187,17 @@ class Template
     }
 
     /**
-     * @param  string $name
-     * @param  string $value
+     * @param  string|Mail\Header\HeaderInterface $name
+     * @param  ?string $value
      * @return $this
      */
-    public function addToHeaders($name, $value)
+    public function addToHeaders($name, $value = null)
     {
+        if ($name instanceof Mail\Header\HeaderInterface) {
+            $this->headers[] = $name;
+            return $this;
+        }
+
         if ($value instanceof Entity) {
             $value = $value->getId();
         }
