@@ -10,7 +10,7 @@ class Progress
         // if we go over our bound, just ignore it
         if ($done > $total) return;
 
-        if (empty($start_time)) $start_time = time();
+        if (empty($start_time) || $done == 1) $start_time = time();
         $now = time();
 
         $perc = (double)($done / $total);
