@@ -3,14 +3,15 @@ namespace E4u\Tools\Console;
 
 class Progress
 {
+    static $start_time;
+
     public static function show($done, $total, $size = 30)
     {
-        static $start_time;
 
         // if we go over our bound, just ignore it
         if ($done > $total) return;
 
-        if (empty($start_time) || $done == 1) $start_time = time();
+        if (empty(self::$start_time)) self::start();
         $now = time();
 
         $perc = (double)($done / $total);
@@ -26,10 +27,10 @@ class Progress
         $disp = number_format($perc * 100, 0);
         $status_bar .= "] $disp%  $done/$total";
 
-        $rate = $done > 0 ? ($now - $start_time) / $done : 0;
+        $rate = $done > 0 ? ($now - self::$start_time) / $done : 0;
         $left = $total - $done;
         $eta = round($rate * $left, 2);
-        $elapsed = $now - $start_time;
+        $elapsed = $now - self::$start_time;
 
         $status_bar .= " remaining: " . self::seconds($eta)."  elapsed: " . self::seconds($elapsed);
         echo "\r$status_bar - ";
@@ -38,8 +39,14 @@ class Progress
 
         // when done, send a newline
         if ($done == $total) {
+            self::$start_time = null;
             echo "\n";
         }
+    }
+
+    public static function start()
+    {
+        self::$start_time = time();
     }
 
     public static function seconds($x)
