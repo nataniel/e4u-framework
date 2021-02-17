@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityRepository,
 
 class Repository extends EntityRepository
 {
-    const PATTERN_PHRASE_ID = '/^(ID:|#) ?(\d+)$/i';
+    const PATTERN_PHRASE_ID = '/^(ID:|#)([\d ,]+)$/i';
     const PATTERN_FIELD_ID = '/^\w+\.id$/i';
 
     /**
@@ -70,7 +70,7 @@ class Repository extends EntityRepository
         // and we have id in field list, we narrow the search to id-only
         if (preg_match(self::PATTERN_PHRASE_ID, $phrase, $regs)
             && ($alias = $this->_getIDField($fields))) {
-            return $ex->eq($alias, $regs[2]);
+            return $ex->in($alias, $regs[2]);
         }
 
         $phrase = $ex->literal($this->preparePhrase($phrase));
