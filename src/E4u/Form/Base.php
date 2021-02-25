@@ -436,6 +436,16 @@ class Base
         return $this;
     }
 
+    public function removeField(string $name)
+    {
+        if (!isset($this->fields[ $name ])) {
+            throw new LogicException(
+                'Invalid form field: '.$name);
+        }
+
+        unset($this->fields[ $name ]);
+    }
+
     /**
      *
      * @param  string $message
@@ -470,7 +480,7 @@ class Base
             throw new LogicException(
                 'Invalid form field: '.$name);
         }
-        
+
         return $this->fields[ $name ];
     }
 
