@@ -25,6 +25,7 @@
     "laminas/laminas-mail": "^2.6",
     "laminas/laminas-crypt": "^3.3",
     "symfony/console": "^3.0",
+    "doctrine/cache": "^1.11.3",
     "doctrine/orm": "^2.5",
     "doctrine/migrations": "^1.3",
     "google/apiclient": "^2.0",
