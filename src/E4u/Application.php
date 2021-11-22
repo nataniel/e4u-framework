@@ -121,7 +121,7 @@ class Application
      */
     protected function invalidException(\Exception $e, $status = 500)
     {
-        if ($this->getConfig()->show_errors) {
+        if ($this->getConfig()->get('show_errors', false)) {
             echo '<pre>'; echo $e;
             exit();
         }
