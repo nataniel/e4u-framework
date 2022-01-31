@@ -9,7 +9,7 @@ trait ArrayAccess
         return method_exists($this, $method);
     }
 
-    public function offsetGet($offset): mixed
+    public function offsetGet($offset)
     {
         $method = Variable::propertyGetMethod($offset);
         return method_exists($this, $method)
