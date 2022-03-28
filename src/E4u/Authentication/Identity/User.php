@@ -15,6 +15,8 @@ use E4u\Model\Entity;
  */
 abstract class User extends Entity implements Identity
 {
+    const MAX_PASSWORD_LENGTH = 48;
+
     /** @Column(type="string", unique=true, nullable=true) */
     protected $login;
 
@@ -39,6 +41,10 @@ abstract class User extends Entity implements Identity
      */
     public function setPassword($password)
     {
+        if (strlen($password) > self::MAX_PASSWORD_LENGTH) {
+            throw new Exception\PasswordTooLongException(sprintf('Maximum password length is %d characters.', self::MAX_PASSWORD_LENGTH));
+        }
+
         if (!empty($password)) {
             $this->encrypted_password = password_hash($password, PASSWORD_DEFAULT);
         }
@@ -65,7 +71,7 @@ abstract class User extends Entity implements Identity
     }
 
     /**
-     * @param string $login
+     * @param  string $login
      * @return $this
      */
     public function setLogin($login)
