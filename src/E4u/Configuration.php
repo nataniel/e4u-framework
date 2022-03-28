@@ -8,38 +8,28 @@ abstract class Configuration
     /** @var Config */
     private static $_config;
 
-    /**
-     * @return bool
-     */
-    public static function isSSLRequired()
+    public static function isSSLRequired(): bool
     {
-        return (bool)self::getConfigValue('ssl_required', false);
+        return (bool)self::getConfigValue('ssl_required', false) ?: false;
     }
 
-    /**
-     * @return string http://myhost.com/my/path
-     */
-    public static function baseUrl()
+    public static function baseUrl(): string
     {
         $url = self::getConfigValue('base_url');
         return rtrim($url, '/');
     }
 
-    /**
-     * @return string http://myhost.com/my/path
-     */
-    public static function resourcesUrl()
+    public static function resourcesUrl(): string
     {
         $url = self::getConfigValue('resources_url', false) ?: self::getConfigValue('base_url');
         return rtrim($url, '/');
     }
 
     /**
-     * @param  string $key
      * @return mixed
      * @throws \E4u\Exception\ConfigException
      */
-    protected static function getConfigValue($key, $exceptionIfEmpty = true)
+    protected static function getConfigValue(string $key, bool $exceptionIfEmpty = true)
     {
         $value = self::getConfig()->get($key);
         if (empty($value) && $exceptionIfEmpty) {
@@ -50,10 +40,7 @@ abstract class Configuration
         return $value;
     }
 
-    /**
-     * @return Config
-     */
-    protected static function getConfig()
+    protected static function getConfig(): Config
     {
         if (null === self::$_config) {
             self::$_config = Loader::getConfig();
