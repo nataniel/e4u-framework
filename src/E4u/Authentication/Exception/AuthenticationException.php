@@ -8,10 +8,16 @@ class AuthenticationException extends RuntimeException
 {
     protected $user;
 
-    public function __construct(?Identity $user = null, $message = "", $code = 0, Throwable $previous = null)
+    public function __construct($message = "", $code = 0, Throwable $previous = null, ?Identity $user = null)
+    {
+        parent::__construct($message, $code, $previous);
+        $this->user = $user;
+    }
+
+    public function setUser(?Identity $user): self
     {
         $this->user = $user;
-        parent::__construct($message, $code, $previous);
+        return $this;
     }
 
     public function getUser(): ?Identity
