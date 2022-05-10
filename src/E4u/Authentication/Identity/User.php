@@ -205,11 +205,11 @@ abstract class User extends Entity implements Identity
         }
 
         if (!$user->verifyPassword($password)) {
-            throw new Exception\InvalidPasswordException();
+            throw new Exception\InvalidPasswordException($user);
         }
 
         if (!$user->isActive()) {
-            throw new Exception\UserNotActiveException();
+            throw new Exception\UserNotActiveException($user);
         }
 
         return $user;
