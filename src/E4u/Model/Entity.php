@@ -255,11 +255,14 @@ class Entity extends Base
      * @TODO: powinno usuwać element z asocjacji (np. user->preferences)
      * Destroys entire entity.
      */
-    public function destroy()
+    public function destroy($now = true)
     {
-        if ($this->id()) {
+        if (empty($this->getId())) {
+            return;
+        }
 
-            self::getEM()->remove($this);
+        self::getEM()->remove($this);
+        if ($now) {
             self::getEM()->flush();
         }
     }
