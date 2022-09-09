@@ -323,7 +323,10 @@ class Entity extends Base
             $this->$property->clear();
 
             $method = self::propertyAddToMethod($property);
-            $this->$method($value, $keepConsistency);
+            foreach ($value as $item) {
+                $this->$method($item, $keepConsistency);
+            }
+
             return $this;
         }
 
