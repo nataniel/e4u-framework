@@ -7,9 +7,8 @@ class Progress
 
     public static function show($done, $total, $size = 30)
     {
-
         // if we go over our bound, just ignore it
-        if ($done > $total) return;
+        if (($done > $total) || ($total == 0)) return;
 
         if (empty(self::$start_time)) self::start();
         $now = time();
