@@ -35,10 +35,7 @@ class Console
         $this->addDefaultCommands();
     }
 
-    /**
-     * @return Console  Current instance
-     */
-    public function run(): self
+    public function run()
     {
         // default Getopt rules
         $rules = [
