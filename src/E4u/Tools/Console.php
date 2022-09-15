@@ -36,10 +36,9 @@ class Console
     }
 
     /**
-     * @todo Obsługa --help|-h
      * @return Console  Current instance
      */
-    public function run()
+    public function run(): self
     {
         // default Getopt rules
         $rules = [
@@ -49,7 +48,7 @@ class Console
             'test' => 'Set TEST environment for the command.',
         ];
 
-        $getopt = new Getopt($rules, null, [ 'freeformFlags' => true ]);
+        $getopt = new Getopt($rules, null, [ Getopt::CONFIG_FREEFORM_FLAGS => true ]);
         $arguments = array_slice($getopt->getRemainingArgs(), 1);
 
         // setup ENVIRONMENT for the application
@@ -86,7 +85,7 @@ class Console
      * @param  string $name
      * @return Console  Current instance
      */
-    public function addCommand($command, $name)
+    public function addCommand($command, string $name): self
     {
         if (is_string($command)) {
             $command = new $command;
@@ -99,7 +98,7 @@ class Console
         }
 
         $command->setConsole($this);
-        $this->commands[$name] = $command;
+        $this->commands[ $name ] = $command;
         return $this;
     }
 
@@ -112,7 +111,7 @@ class Console
             $command = array_search($command, $this->commands);
         }
 
-        $help = $this->commands[$command]->help();
+        $help = $this->commands[ $command ]->help();
         if (null === $help) {
             return;
         }
@@ -133,17 +132,14 @@ class Console
 
     /**
      *
-     * @return array of Command instances
+     * @return Command[]
      */
-    public function getCommands()
+    public function getCommands(): array
     {
         return $this->commands;
     }
 
-    /**
-     * @return Console  Current instance
-     */
-    protected function addDefaultCommands()
+    protected function addDefaultCommands(): self
     {
         $commands = $this->config->get('console');
         $defaultCommands = array_merge(
@@ -165,31 +161,21 @@ class Console
         return $this;
     }
 
-    /**
-     * @param  bool $force
-     * @return Command
-     */
-    public function getCurrentCommand($force = false)
+    public function getCurrentCommand(bool $force = false): Command
     {
         if ((null === $this->currentCommand) || $force) {
             $command = $this->serverCommand();
-            if (empty($command)) {
-                $command = 'help';
-            }
-            elseif (!isset($this->commands[$command])) {
+            if (empty($command) || !isset($this->commands[ $command ])) {
                 $command = 'help';
             }
 
-            $this->currentCommand = $this->commands[$command];
+            $this->currentCommand = $this->commands[ $command ];
         }
 
         return $this->currentCommand;
     }
 
-    /**
-     * @return string
-     */
-    protected function serverCommand()
+    protected function serverCommand(): ?string
     {
         if (!isset($_SERVER['argv'])) {
             $errorDescription = (ini_get('register_argc_argv') == false)
@@ -209,10 +195,7 @@ class Console
         return null;
     }
 
-    /**
-     * @return Config
-     */
-    public function getConfig()
+    public function getConfig(): Config
     {
         return $this->config;
     }
