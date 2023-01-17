@@ -617,7 +617,7 @@ class Bootstrap41 implements BuilderInterface
             'id' => $this->fieldId($name),
             'type' => $options->get('button_type', 'submit'),
             'class' => trim('btn btn-primary ' . $options->get('button_class')),
-            'disabled' => $options->get('disabled'),
+            'disabled' => $options->get('disabled', $field->isDisabled()) ? 'disabled' : null,
 
         ]);
 

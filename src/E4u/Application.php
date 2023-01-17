@@ -104,7 +104,7 @@ class Application
             exit();
         }
 
-        $this->addToLog($e, 'not-found.log');
+        $this->addToLog($e, 'not-found-%s.log');
         $response = $this->dispatch([
             'controller' => 'errors',
             'action' => 'not-found',
@@ -121,12 +121,12 @@ class Application
      */
     protected function invalidException(\Exception $e, $status = 500)
     {
-        if ($this->getConfig()->show_errors) {
+        if ($this->getConfig()->get('show_errors', false)) {
             echo '<pre>'; echo $e;
             exit();
         }
 
-        $this->addToLog($e, 'invalid.log');
+        $this->addToLog($e, 'invalid-%s.log');
         $response = $this->dispatch([
             'controller' => 'errors',
             'action' => 'invalid',
@@ -140,14 +140,16 @@ class Application
      * @param  string $filename
      * @return $this
      */
-    protected function addToLog($e, $filename = 'application.log')
+    protected function addToLog($e, $filename = 'application-%s.log')
     {
-        $message = sprintf("%s %s:\nREFERER: %s\nUSER_AGENT: %s\nREMOTE_ADDR: %s\nERROR %s\n%s\n\n",
+        $filename = sprintf($filename, date('Y-m-d'));
+        $message = sprintf("%s %s:\nREFERER: %s\nUSER_AGENT: %s\nREMOTE_ADDR: %s\nERROR: %s - %s\n%s\n\n",
             date('d.m.Y H:i:s'),
             $this->getRequest()->getCurrentPath(),
             isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '',
             isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '',
             isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '',
+            get_class($e),
             $e->getMessage(),
             $e->getTraceAsString());
         file_put_contents('logs/' . $filename, $message, FILE_APPEND);

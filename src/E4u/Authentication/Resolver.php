@@ -136,11 +136,13 @@ class Resolver
     /**
      * @return Resolver
      */
-    public function logout()
+    public function logout($removeSession = true)
     {
         $this->authenticate();
-        session_regenerate_id(true);
         unset($_SESSION['current_user']);
+
+        if ($removeSession)
+            session_regenerate_id(true);
 
         $this->currentUser = null;
         $this->setCookie('', -3600);

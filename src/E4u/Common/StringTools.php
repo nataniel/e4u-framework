@@ -179,10 +179,10 @@ class StringTools
             )
         );
 
-        $firstname = trim(strtolower(strtok($name, ' ')));
+        $firstname = trim(mb_strtolower(strtok($name, ' ')));
 
         $vocative = $firstname;
-        if ($branch = @$vocativeRules[substr($firstname, -1)])
+        if ($branch = @$vocativeRules[mb_substr($firstname, -1)])
         {
             while ($suffix = current($branch))
             {

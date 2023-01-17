@@ -233,6 +233,10 @@ abstract class View implements Renderer, Resolver, ContainerInterface
             return ob_get_clean();
         }
         catch (LogicException $e) {
+            if (!Loader::getConfig()->get('show_errors', false)) {
+                return null;
+            }
+
             return '<pre><h3>'.$e->getMessage()."</h3>\n".$e->getTraceAsString().'</pre>';
         }
     }

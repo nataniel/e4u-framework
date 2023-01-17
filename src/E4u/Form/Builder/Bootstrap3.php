@@ -446,6 +446,8 @@ class Bootstrap3 implements BuilderInterface
         }
 
         $attributes = $this->getTextAttributes($field, $date, $options);
+        $attributes['min'] = $options->get('min', isset($attributes['min']) ? $attributes['min'] : null);
+        $attributes['max'] = $options->get('max', isset($attributes['max']) ? $attributes['max'] : null);
 
         $content = Html::tag('input', $attributes);
         return $this->field($field, $options, $content);

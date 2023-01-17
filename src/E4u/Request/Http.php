@@ -15,6 +15,12 @@ class Http extends HttpRequest implements RequestDescription
     /** @var RouteMatch */
     protected $currentRoute;
 
+    protected function detectBaseUrl()
+    {
+        $baseUrl = parent::detectBaseUrl();
+        return preg_replace('/index.php$/', '', $baseUrl);
+    }
+
     /**
      * @param  RouteStackInterface $router
      * @return $this|Request

@@ -6,6 +6,7 @@ use E4u\Common\Variable;
 use E4u\Exception\LogicException;
 use E4u\Model\Entity;
 use E4u\Model\Validatable;
+use FacebookAds\Object\Product;
 use Laminas\Validator;
 
 abstract class Element
@@ -187,16 +188,16 @@ abstract class Element
     }
 
     /**
-     * @param  boolean $flag
+     * @param  bool|string $flag
      * @return $this
      */
     public function setAutocomplete($flag = true)
     {
-        if ($flag == true) {
-            $this->attributes['autocomplete'] = 'autocomplete';
+        if (is_bool($flag)) {
+            $this->attributes['autocomplete'] = $flag ? 'autocomplete' : null;
         }
-        elseif (isset($this->attributes['autocomplete'])) {
-            unset($this->attributes['autocomplete']);
+        else {
+            $this->attributes['autocomplete'] = $flag;
         }
 
         return $this;
@@ -213,7 +214,7 @@ abstract class Element
         // $element = new Element([ 'model' => 'somename' ])
         // because element knows nothing about
         // the models defined in parent form
-        
+
         $this->model = $model;
         $this->model_field = $model_field;
         return $this;
