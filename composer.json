@@ -14,6 +14,11 @@
   },
   "require": {
     "php": "^7.2",
+    "ext-mbstring": "*",
+    "ext-fileinfo": "*",
+    "ext-intl": "*",
+    "ext-json": "*",
+    "ext-curl": "*",
     "composer/package-versions-deprecated": "1.11.99.5",
     "laminas/laminas-mvc": "^2.6",
     "laminas/laminas-http": "^2.5",
@@ -25,21 +30,16 @@
     "laminas/laminas-validator": "^2.6",
     "laminas/laminas-mail": "^2.6",
     "laminas/laminas-crypt": "^3.3",
-    "symfony/console": "^3.0",
     "symfony/cache": "^5.4",
     "doctrine/orm": "^2.5",
-    "doctrine/migrations": "^1.3",
+    "doctrine/migrations": "^1.0",
+    "doctrine/annotations": "^2.0",
     "google/apiclient": "^2.0",
     "abraham/twitteroauth": "^0.6.4",
     "facebook/graph-sdk": "^5.3",
     "stevenmaguire/oauth2-microsoft": "^2.2",
     "iignatov/lightopenid": "^1.0",
-    "jdorn/sql-formatter": "^1.2",
-    "ext-mbstring": "*",
-    "ext-fileinfo": "*",
-    "ext-intl": "*",
-    "ext-json": "*",
-    "ext-curl": "*"
+    "jdorn/sql-formatter": "^1.2"
   },
   "autoload": {
     "psr-4": {
