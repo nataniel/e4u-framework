@@ -1,6 +1,7 @@
 <?php
 namespace E4u\Authentication\Identity;
 
+use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\EntityRepository;
 use E4u\Authentication\Exception;
 use E4u\Authentication\Identity;
@@ -11,25 +12,25 @@ use E4u\Model\Entity;
 /**
  * Abstract class for database-based Identity implementation.
  *
- * @MappedSuperclass
+ * @ORM\MappedSuperclass
  */
 abstract class User extends Entity implements Identity
 {
     const MAX_PASSWORD_LENGTH = 48;
 
-    /** @Column(type="string", unique=true, nullable=true) */
+    /** @ORM\Column(type="string", unique=true, nullable=true) */
     protected $login;
 
-    /** @Column(type="string", length=255, nullable=true) */
+    /** @ORM\Column(type="string", length=255, nullable=true) */
     protected $encrypted_password;
 
-    /** @Column(type="boolean") */
+    /** @ORM\Column(type="boolean") */
     protected $active = true;
 
-    /** @Column(type="datetime") */
+    /** @ORM\Column(type="datetime") */
     protected $created_at;
 
-    /** @Column(type="datetime", nullable=true) */
+    /** @ORM\Column(type="datetime", nullable=true) */
     protected $updated_at;
 
     /**
@@ -236,7 +237,7 @@ abstract class User extends Entity implements Identity
     /**
      * @return Repository|EntityRepository
      */
-    public static function getRepository()
+    public static function getRepository(): EntityRepository
     {
         return self::getEM()->getRepository(get_called_class());
     }
