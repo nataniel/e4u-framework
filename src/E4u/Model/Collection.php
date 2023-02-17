@@ -158,7 +158,7 @@ class Collection implements Countable, IteratorAggregate, ArrayAccess
     /**
      * @param  int $offset
      * @param  int $length
-     * @return array|IteratorAggregate
+     * @return array|ArrayIterator
      */
     public function slice($offset, $length = null)
     {
@@ -167,7 +167,7 @@ class Collection implements Countable, IteratorAggregate, ArrayAccess
             $this->getQuery()
                 ->setFirstResult($offset)
                 ->setMaxResults($length);
-            $paginator = new DoctrinePaginator($this->query);
+            $paginator = new DoctrinePaginator($this->query, false);
             return $paginator->getIterator();
 
         }
