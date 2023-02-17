@@ -177,6 +177,10 @@ class Paginator implements Countable, IteratorAggregate, Paginable
             return iterator_to_array($this->_elements->getIterator());
         }
 
+        if ($this->_elements instanceof \ArrayIterator) {
+            return $this->_elements->getArrayCopy();
+        }
+
         return $this->_elements->toArray();
     }
     

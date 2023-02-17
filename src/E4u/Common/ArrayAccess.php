@@ -3,7 +3,7 @@ namespace E4u\Common;
 
 trait ArrayAccess
 {
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         $method = Variable::propertyGetMethod($offset);
         return method_exists($this, $method);
@@ -17,19 +17,19 @@ trait ArrayAccess
             : null;
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $method = Variable::propertySetMethod($offset);
-        return method_exists($this, $method)
-            ? $this->$method($value)
-            : null;
+        if (method_exists($this, $method)) {
+            $this->$method($value);
+        }
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $method = Variable::propertySetMethod($offset);
-        return method_exists($this, $method)
-            ? $this->$method(null)
-            : null;
+        if (method_exists($this, $method)) {
+            $this->$method(null);
+        }
     }
 }

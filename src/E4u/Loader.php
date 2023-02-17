@@ -39,9 +39,13 @@
 
 namespace E4u;
 
-use Doctrine\ORM,
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\DBAL,
+    Doctrine\ORM,
     Doctrine\Common\Proxy;
 use Laminas\Config\Config;
+use Laminas\I18n\Translator\Translator;
+use Laminas\Mail\Transport\TransportInterface;
 
 #mb_internal_encoding('utf-8');
 
@@ -59,18 +63,14 @@ class Loader
     /**
      * Bootstrap E4u Application
      * There's no autoloader available at this point yet
-     *
-     * @param  string $namespace
-     * @param  string $environment
-     * @return \E4u\Application
      */
-    public static function get($namespace = 'My', $environment = null)
+    public static function get(string $namespace = 'My', ?string $environment = null): Application
     {
         // load configuration
         $config = class_exists(Registry::class)
-               && Registry::isRegistered('application/config')
-                ? Registry::get('application/config')
-                : self::configureApplication($namespace, $environment);
+        && Registry::isRegistered('application/config')
+            ? Registry::get('application/config')
+            : self::configureApplication($namespace, $environment);
         $config->setReadOnly();
 
         $appClass = "$namespace\\Application";
@@ -80,18 +80,12 @@ class Loader
         return $app;
     }
 
-    /**
-     * @return \E4u\Application
-     */
-    public static function getApplication()
+    public static function getApplication(): Application
     {
         return Registry::get('application/instance');
     }
 
-    /**
-     * @return Config
-     */
-    public static function getConfig()
+    public static function getConfig(): Config
     {
         if (Registry::isRegistered('application/instance')) {
             return Registry::get('application/instance')->getConfig();
@@ -104,26 +98,17 @@ class Loader
         return new Config([]);
     }
 
-    /**
-     * @return string
-     */
-    public static function getEnvironment()
+    public static function getEnvironment(): string
     {
         return self::getConfig()->get('environment');
     }
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    public static function getConnection()
+    public static function getConnection(): DBAL\Connection
     {
         return self::getDoctrine()->getConnection();
     }
 
-    /**
-     * @return \Laminas\I18n\Translator\Translator
-     */
-    public static function getTranslator()
+    public static function getTranslator(): Translator
     {
         if (Registry::isRegistered('application/translator')) {
             return Registry::get('application/translator');
@@ -149,10 +134,7 @@ class Loader
         return $translator;
     }
 
-    /**
-     * @return \Laminas\Mail\Transport\TransportInterface
-     */
-    public static function getMailer()
+    public static function getMailer(): TransportInterface
     {
         if (Registry::isRegistered('application/mailer')) {
             return Registry::get('application/mailer');
@@ -176,54 +158,32 @@ class Loader
         return $mailer;
     }
 
-    /**
-     * @param Config $config
-     * @return \Doctrine\ORM\Configuration
-     */
-    protected static function configureDoctrine(Config $config)
+    protected static function configureDoctrine(Config $config): ORM\Configuration
     {
         if (empty($config->doctrine)) {
             throw new \E4u\Exception\ConfigException('Config passed to E4u\Loader::getDoctrine() must have "doctrine" key set');
         }
 
-        $ormConfig = new ORM\Configuration();
-
-        $ormConfig->setProxyDir($config->doctrine->get('proxy_dir', self::DEFAULT_PROXY_DIR));
-        $ormConfig->setProxyNamespace($config->doctrine->get('proxy_namespace', $config->namespace . '\Proxies'));
-        $ormConfig->setAutoGenerateProxyClasses($config->doctrine->get('auto_generate_proxies', true));
+        $isDevMode = self::getEnvironment() === self::DEFAULT_ENVIRONMENT;
+        $proxyDir = getcwd() . DIRECTORY_SEPARATOR . $config->doctrine->get('proxy_dir', self::DEFAULT_PROXY_DIR);
 
         if ($entities_xml = $config->doctrine->get('entities_xml')) {
-            if ($entities_xml instanceof Config) { $entities_xml = $entities_xml->toArray(); }
-            $driverImpl = new ORM\Mapping\Driver\XmlDriver($entities_xml);
+            $paths = [ $entities_xml ];
+            $ormConfig = ORM\ORMSetup::createXMLMetadataConfiguration($paths, $isDevMode, $proxyDir);
         }
         else {
             $entities_dir = $config->doctrine->get('entities_dir', [ self::DEFAULT_MODELS_DIR ]);
-            if ($entities_dir instanceof Config) { $entities_dir = $entities_dir->toArray(); }
-            $driverImpl = $ormConfig->newDefaultAnnotationDriver($entities_dir);
+            $ormConfig = ORM\ORMSetup::createAnnotationMetadataConfiguration($entities_dir, $isDevMode, $proxyDir);
         }
+
+        AnnotationReader::addGlobalIgnoredName('assert');
+        $ormConfig->setAutoGenerateProxyClasses($config->doctrine->get('auto_generate_proxies', $isDevMode));
 
         if ($sqlLogger = $config->doctrine->get('sql_logger')) {
             $ormConfig->setSQLLogger(new $sqlLogger());
         }
 
-        $cacheClass = $config->doctrine->get('cache_class', self::DEFAULT_CACHE_CLASS);
-        $cacheNamespace = $config->doctrine->get('cache_namespace', self::DEFAULT_CACHE_NAMESPACE);
-
-        $cache = new $cacheClass();
-        if ($cache instanceof \Doctrine\Common\Cache\CacheProvider) {
-            $cache->setNamespace($cacheNamespace);
-        }
-
-        $cacheConfig = new ORM\Cache\RegionsConfiguration();
-        $factory = new ORM\Cache\DefaultCacheFactory($cacheConfig, $cache);
-
-        $ormConfig->setSecondLevelCacheEnabled();
-        $ormConfig->getSecondLevelCacheConfiguration()
-            ->setCacheFactory($factory);
-
-        $ormConfig->setMetadataDriverImpl($driverImpl);
-        $ormConfig->setMetadataCacheImpl($cache);
-        $ormConfig->setQueryCacheImpl($cache);
+        // $ormConfig->setSecondLevelCacheEnabled();
         return $ormConfig;
     }
 
@@ -255,10 +215,7 @@ class Loader
         return $migrationsConfig;
     }
 
-    /**
-     * @return ORM\EntityManager
-     */
-    public static function getDoctrine()
+    public static function getDoctrine(): ORM\EntityManager
     {
         if (Registry::isRegistered('doctrine/em')) {
             return Registry::get('doctrine/em');
@@ -276,13 +233,7 @@ class Loader
         return $em;
     }
 
-    /**
-     *
-     * @param  string $file
-     * @param  string $path
-     * @return array
-     */
-    public static function load($file, $path = 'application/config')
+    public static function load(string $file, string $path = 'application/config'): array
     {
         if (is_file("$path/$file.php")) {
             return include("$path/$file.php");
@@ -291,10 +242,7 @@ class Loader
         return [];
     }
 
-    /**
-     * @return string
-     */
-    protected static function discoverEnvironment()
+    protected static function discoverEnvironment(): string
     {
         $environment = self::DEFAULT_ENVIRONMENT;
         if (is_file('.environment')) {
@@ -318,22 +266,13 @@ class Loader
         return $environment;
     }
 
-    /**
-     * @param  string $environment
-     * @return Config
-     */
-    protected static function configureEnvironment($environment)
+    protected static function configureEnvironment(string $environment): Config
     {
         $config = self::load("environment/$environment");
         return new Config($config);
     }
 
-    /**
-     * @param  string $namespace
-     * @param  string $environment
-     * @return Config
-     */
-    public static function configureApplication($namespace = 'My', $environment = null)
+    public static function configureApplication(string $namespace = 'My', ?string $environment = null): Config
     {
         // load main configuration
         $config = self::load('application');

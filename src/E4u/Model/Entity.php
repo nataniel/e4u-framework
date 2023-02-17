@@ -1,6 +1,7 @@
 <?php
 namespace E4u\Model;
 
+use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\EntityManager,
     Doctrine\ORM\Event,
     Doctrine\ORM\Mapping\ClassMetadata,
@@ -14,12 +15,17 @@ use E4u\Common\Variable;
 use E4u\Exception\LogicException;
 
 /**
- * @MappedSuperclass
- * @HasLifecycleCallbacks
+ * @Annotation
+ * @ORM\MappedSuperclass
+ * @ORM\HasLifecycleCallbacks
  */
 class Entity extends Base
 {
-    /** @Id @Column(type="integer") @GeneratedValue */
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue
+     */
     protected $id;
 
     /** @var EntityManager */
@@ -247,19 +253,22 @@ class Entity extends Base
     public function dump($property = null)
     {
         return is_null($property)
-             ? Debug::dump($this)
-             : Debug::dump($this->$property);
+            ? Debug::dump($this)
+            : Debug::dump($this->$property);
     }
 
     /**
-     * @TODO: powinno usuwać element z asocjacji (np. user->preferences)
+     * @todo: powinno usuwać element z asocjacji (np. user->preferences)
      * Destroys entire entity.
      */
-    public function destroy()
+    public function destroy($now = true)
     {
-        if ($this->id()) {
+        if (empty($this->getId())) {
+            return;
+        }
 
-            self::getEM()->remove($this);
+        self::getEM()->remove($this);
+        if ($now) {
             self::getEM()->flush();
         }
     }
@@ -312,7 +321,7 @@ class Entity extends Base
             if (!is_array($value)) {
                 throw new LogicException(
                     sprintf('Value of %s::$%s is collection value association, thus it must be set to array, %s given.',
-                    get_class($this), $property, Variable::getType($value)));
+                        get_class($this), $property, Variable::getType($value)));
             }
 
             // TODO: remove reference from associated objects?
@@ -320,7 +329,10 @@ class Entity extends Base
             $this->$property->clear();
 
             $method = self::propertyAddToMethod($property);
-            $this->$method($value, $keepConsistency);
+            foreach ($value as $item) {
+                $this->$method($item, $keepConsistency);
+            }
+
             return $this;
         }
 
@@ -340,7 +352,7 @@ class Entity extends Base
         if (!$meta->isCollectionValuedAssociation($property)) {
             throw new LogicException(
                 sprintf('Undefined property %s::$%s.',
-                get_class($this), $property));
+                    get_class($this), $property));
         }
 
         // multiple values support: $user->addToGroups([1, 2, 3])
@@ -385,7 +397,7 @@ class Entity extends Base
         if (!$meta->isCollectionValuedAssociation($property)) {
             throw new LogicException(
                 sprintf('You can run _delFrom() only for collection value associations, %s::%s is not.',
-                get_class($this), $property));
+                    get_class($this), $property));
         }
 
         // multiple values support: $user->delFromGroups([1, 2, 3])
@@ -431,8 +443,8 @@ class Entity extends Base
             $meta = $this->getClassMetadata();
             $association = $meta->getAssociationMapping($property);
             $referencedProperty = $meta->isAssociationInverseSide($property)
-                                ? $association['mappedBy']
-                                : $association['inversedBy'];
+                ? $association['mappedBy']
+                : $association['inversedBy'];
 
             if (!empty($referencedProperty)) {
                 switch ($association['type'])
@@ -440,8 +452,8 @@ class Entity extends Base
                     case ClassMetadata::MANY_TO_MANY:
                     case ClassMetadata::MANY_TO_ONE:
                         $method = ($operation == 'add')
-                                ? self::propertyAddToMethod($referencedProperty)
-                                : self::propertyDelFromMethod($referencedProperty);
+                            ? self::propertyAddToMethod($referencedProperty)
+                            : self::propertyDelFromMethod($referencedProperty);
                         $value->$method($this, false);
                         break;
                     case ClassMetadata::ONE_TO_MANY:
@@ -528,7 +540,7 @@ class Entity extends Base
 
         throw new LogicException(
             sprintf("%s expected, %s given.",
-            $targetEntity, Variable::getType($value)));
+                $targetEntity, Variable::getType($value)));
     }
 
     /**
@@ -549,7 +561,7 @@ class Entity extends Base
             else {
                 throw new LogicException(
                     sprintf('%s::$%s must be null, array or ArrayCollection, %s given.',
-                    get_class($this), $property, Variable::getType($this->$property)));
+                        get_class($this), $property, Variable::getType($this->$property)));
             }
         }
 
@@ -590,7 +602,7 @@ class Entity extends Base
         return $this;
     }
 
-    /** @PrePersist */
+    /** @ORM\PrePersist */
     public function prePersist()
     {
         if ($this->isReadOnly()) {
@@ -604,7 +616,7 @@ class Entity extends Base
     }
 
     /**
-     * @PreUpdate
+     * @ORM\PreUpdate
      * @param Event\PreUpdateEventArgs $event
      */
     public function preUpdate(Event\PreUpdateEventArgs $event)
@@ -627,7 +639,7 @@ class Entity extends Base
         $this->validate();
     }
 
-    /** @PreRemove */
+    /** @ORM\PreRemove */
     public function preRemove()
     {
         if ($this->isReadOnly()) {
@@ -637,17 +649,17 @@ class Entity extends Base
         }
     }
 
-    /** @PostLoad */
+    /** @ORM\PostLoad */
     public function postLoad() {}
 
-    /** @PostPersist */
+    /** @ORM\PostPersist */
     public function postPersist() {}
 
-    /** @PostRemove */
+    /** @ORM\PostRemove */
     public function postRemove() {}
 
     /**
-     * @PostUpdate
+     * @ORM\PostUpdate
      * @param Event\LifecycleEventArgs $event
      */
     public function postUpdate(Event\LifecycleEventArgs $event) {}
@@ -779,8 +791,8 @@ class Entity extends Base
                 }
                 elseif ($meta->isCollectionValuedAssociation($property)) {
                     if (!$this->$property instanceof PersistentCollection
-                      || $this->$property->isDirty()
-                      || $this->$property->isInitialized()) {
+                        || $this->$property->isDirty()
+                        || $this->$property->isInitialized()) {
 
                         foreach ($this->$property as $key => $value) {
                             if ($value instanceof Entity) {
@@ -918,7 +930,7 @@ class Entity extends Base
             if (!is_null($v) && $v instanceof Entity) {
                 $collection[ $key ]->cascadeMerge($visited);
                 if ($v->id()) {
-                   $collection[ $key ] = self::getEM()->merge($v);
+                    $collection[ $key ] = self::getEM()->merge($v);
                 }
 
             }
