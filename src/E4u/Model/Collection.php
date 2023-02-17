@@ -140,7 +140,7 @@ class Collection implements Countable, IteratorAggregate, ArrayAccess
         if (null === $this->_count) {
             if (null === $this->_result) {
 
-                $paginator = new DoctrinePaginator($this->query);
+                $paginator = new DoctrinePaginator($this->query, false);
                 $this->_count = $paginator->count();
 
             }
