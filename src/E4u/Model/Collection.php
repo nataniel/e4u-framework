@@ -167,7 +167,7 @@ class Collection implements Countable, IteratorAggregate, ArrayAccess
             $this->getQuery()
                 ->setFirstResult($offset)
                 ->setMaxResults($length);
-            $paginator = new DoctrinePaginator($this->query, false);
+            $paginator = new DoctrinePaginator($this->query, true);
             return $paginator->getIterator();
 
         }
