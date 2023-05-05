@@ -164,10 +164,12 @@ class Collection implements Countable, IteratorAggregate, ArrayAccess
     {
         if (null === $this->_result) {
 
-            $this->getQuery()
+            $this->query
                 ->setFirstResult($offset)
                 ->setMaxResults($length);
-            $paginator = new DoctrinePaginator($this->query, true);
+
+            $fetchJoinCollection = is_null($this->query->getAST()->groupByClause);
+            $paginator = new DoctrinePaginator($this->query, $fetchJoinCollection);
             return $paginator->getIterator();
 
         }
