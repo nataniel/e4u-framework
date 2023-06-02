@@ -71,7 +71,7 @@ class Console
         $command->configure($arguments, $getopt);
 
         $title = sprintf("E4u command line tool - version %s (%s).", \E4u\Version::VERSION, \E4u\Loader::getEnvironment());
-        cli_set_process_title($title);
+        cli_set_process_title('console ' . $this->serverCommand());
         echo $title."\n\n";
 
         return $command->execute();
