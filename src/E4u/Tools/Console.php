@@ -196,4 +196,14 @@ class Console
     {
         return $this->config;
     }
+
+    protected function countProcesses(string $name): ?int
+    {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            return null;
+        }
+
+        exec(sprintf("pgrep -f '%s' | grep -v pgrep"), $pids);
+        return count($pids);
+    }
 }
