@@ -56,9 +56,7 @@ class Loader
         DEFAULT_MIGRATIONS_TABLE = 'doctrine_migrations',
         DEFAULT_MIGRATIONS_DIR   = 'application/src/Migrations',
         DEFAULT_PROXY_DIR        = 'application/src/Proxies',
-        DEFAULT_MODELS_DIR       = 'application/src/Model',
-        DEFAULT_CACHE_CLASS      = 'Doctrine\Common\Cache\ArrayCache',
-        DEFAULT_CACHE_NAMESPACE  = 'E4u';
+        DEFAULT_MODELS_DIR       = 'application/src/Model';
 
     /**
      * Bootstrap E4u Application
