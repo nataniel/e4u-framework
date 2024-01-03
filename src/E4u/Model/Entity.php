@@ -49,7 +49,7 @@ class Entity extends Base
 
         parent::__construct($attributes);
         if ($meta->hasField('created_at') && is_null($this->_get('created_at'))) {
-            $this->_set('created_at', new \DateTime());
+            $this->setCreatedNow();
         }
     }
 
@@ -671,6 +671,18 @@ class Entity extends Base
     {
         if (property_exists($this, 'updated_at')) {
             $this->updated_at = new \DateTime();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setCreatedNow()
+    {
+        if (property_exists($this, 'created_at')) {
+            $this->created_at = new \DateTime();
         }
 
         return $this;
