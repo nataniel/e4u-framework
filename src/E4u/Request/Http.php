@@ -54,7 +54,7 @@ class Http extends HttpRequest implements RequestDescription
         return $this;
     }
 
-     /**
+    /**
      * @return RouteMatch
      */
     public function getCurrentRoute()
@@ -85,7 +85,7 @@ class Http extends HttpRequest implements RequestDescription
         $port = $uri->getPort();
         return $uri->getScheme().'://'
             . $uri->getHost()
-            . ($port == $this->defaultPort() ? '' : ':' . $port)
+            . ($this->isDefaultPort($port) ? '' : ':' . $port)
             . $this->getBaseUrl();
     }
 
@@ -108,9 +108,9 @@ class Http extends HttpRequest implements RequestDescription
         return str_replace('+', '%20', http_build_query($query));
     }
 
-    protected function defaultPort()
+    protected function isDefaultPort(int $port): bool
     {
-        return $this->isSSL() ? 443 : 80;
+        return in_array($port, [ 80, 443 ]);
     }
 
     /**
