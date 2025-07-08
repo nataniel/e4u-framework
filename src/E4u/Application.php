@@ -146,9 +146,9 @@ class Application
         $message = sprintf("%s %s:\nREFERER: %s\nUSER_AGENT: %s\nREMOTE_ADDR: %s\nERROR: %s - %s\n%s\n\n",
             date('d.m.Y H:i:s'),
             $this->getRequest()->getCurrentPath(),
-            isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '',
-            isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '',
-            isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '',
+            $_SERVER['HTTP_REFERER'] ?? '',
+            $_SERVER['HTTP_USER_AGENT'] ?? '',
+            $_SERVER['HTTP_TRUE_CLIENT_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '',
             get_class($e),
             $e->getMessage(),
             $e->getTraceAsString());
