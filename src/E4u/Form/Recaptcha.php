@@ -3,11 +3,11 @@ namespace E4u\Form;
 
 class Recaptcha
 {
-    const VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
-    const FIELD_NAME = 'g-recaptcha-response';
+    const string VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
+    const string FIELD_NAME = 'g-recaptcha-response';
 
-    private $sitekey;
-    private $secret;
+    private ?string $sitekey;
+    private string $secret;
 
     public function __construct(string $secret, ?string $sitekey = null)
     {
@@ -17,7 +17,7 @@ class Recaptcha
 
     public function verifyResponse($response): Recaptcha\Response
     {
-        $result = $this->httpPost(self::VERIFY_URL, [
+        $result = $this->httpPost([
             'secret' => $this->secret,
             'response' => $response,
             'remoteip' => $_SERVER['REMOTE_ADDR'],
@@ -26,9 +26,9 @@ class Recaptcha
         return new Recaptcha\Response($result);
     }
 
-    private function httpPost($url, $data)
+    private function httpPost(array|object $data): bool|string
     {
-        $curl = curl_init($url);
+        $curl = curl_init(self::VERIFY_URL);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

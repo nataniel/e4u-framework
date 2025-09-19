@@ -6,6 +6,8 @@ use E4u\Authentication\Exception\AuthenticationException;
 use E4u\Exception\ConfigException;
 use E4u\Request\Request;
 use Laminas\Config\Config;
+use Stevenmaguire\OAuth2\Client\Provider\Microsoft as MicrosoftProvider;
+use Stevenmaguire\OAuth2\Client\Provider\MicrosoftResourceOwner;
 
 /**
  * Class Google
@@ -16,25 +18,13 @@ class Microsoft implements Helper
 {
     use Url;
 
-    /**
-     * @var Config
-     */
-    private $config;
+    private Config $config;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private Request $request;
 
-    /**
-     * @var \Stevenmaguire\OAuth2\Client\Provider\Microsoft
-     */
-    private $client;
+    private MicrosoftProvider $client;
 
-    /**
-     * @var \Stevenmaguire\OAuth2\Client\Provider\MicrosoftResourceOwner
-     */
-    private $me;
+    private MicrosoftResourceOwner $me;
 
     public function __construct(Config $config, Request $request)
     {
@@ -42,24 +32,16 @@ class Microsoft implements Helper
         $this->request = $request;
     }
 
-    /**
-     * @param  Config $config
-     * @return $this
-     */
-    protected function setConfig(Config $config)
+    protected function setConfig(Config $config): void
     {
         if (!$config->get('clientId') || !$config->get('clientSecret')) {
             throw new ConfigException('Microsoft config must have "clientId" and "clientSecret" keys set.');
         }
 
         $this->config = $config;
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLoginUrl()
+    public function getLoginUrl(): string
     {
         $client = $this->getClient();
         $authUrl = $client->getAuthorizationUrl([
@@ -70,10 +52,7 @@ class Microsoft implements Helper
         return $authUrl;
     }
 
-    /**
-     * @return bool
-     */
-    public function loginFromRedirect()
+    public function loginFromRedirect(): bool
     {
         $code = $this->request->getQuery('code');
         if (empty($code)) {
@@ -93,73 +72,55 @@ class Microsoft implements Helper
                 'code' => $code,
             ]);
 
-            $this->me = $client->getResourceOwner($token);
+            $me = $client->getResourceOwner($token);
+            if (!$me instanceof MicrosoftResourceOwner) {
+                throw new AuthenticationException('Invalid resource owner.');
+            }
+
+            $this->me = $me;
             return true;
 
         }
         catch (\RuntimeException $e) {
-
             throw new AuthenticationException($e->getMessage(), null, $e);
-
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         return $this->me->getId();
     }
 
-    /**
-     * @return string
-     */
-    public function getFirstName()
+    public function getFirstName(): ?string
     {
         return $this->me->getFirstname();
     }
 
-    /**
-     * @return string
-     */
-    public function getLastName()
+    public function getLastName(): ?string
     {
         return $this->me->getLastname();
     }
 
-    /**
-     * @return string
-     */
-    public function getPicture()
+    public function getPicture(): null
     {
         return null;
     }
 
-    /**
-     * @return string
-     */
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->me->getEmail();
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): null
     {
         return null;
     }
 
-    /**
-     * @return \Stevenmaguire\OAuth2\Client\Provider\Microsoft
-     */
-    public function getClient()
+    public function getClient(): MicrosoftProvider
     {
-        if (null === $this->client) {
+        if (!isset($this->client)) {
             $callback = $this->getRequest()->getCurrentPath();
-            $this->client = new \Stevenmaguire\OAuth2\Client\Provider\Microsoft([
+            $this->client = new MicrosoftProvider([
                 'clientId' => $this->config->get('clientId'),
                 'clientSecret' => $this->config->get('clientSecret'),
                 'redirectUri' => $this->urlTo($callback, true),
@@ -171,9 +132,8 @@ class Microsoft implements Helper
 
     /**
      * Implements Helper\Url
-     * @return Request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }

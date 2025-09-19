@@ -17,116 +17,78 @@ abstract class Controller
 {
     use Helper\Url;
 
-    const ACCESS_ADMIN = 1;
-    const ACCESS_USER  = 2;
-    const ACCESS_ALL = 255;
+    const int
+        ACCESS_ADMIN = 1,
+        ACCESS_USER  = 2,
+        ACCESS_ALL = 255;
 
-    protected $requiredPrivileges = [];
+    protected array $requiredPrivileges = [];
 
-    /**
-     * @var Config
-     */
-    protected $_config;
+    protected Config $_config;
 
-    /**
-     * Authentication resolver.
-     * @var Authentication\Resolver
-     */
-    protected $_authentication;
+    protected Authentication\Resolver $_authentication;
 
     /**
      * Should be populated via dispatch()
-     * @var Request\Request
      */
-    protected $_request;
+    protected Request\Request $_request;
 
-    /**
-     * @var string
-     */
-    protected $_locale;
+    protected string $_locale;
 
-    /**
-     * @var View
-     */
-    protected $_view;
-    protected $viewClass = View\Html::class;
+    protected View $_view;
+    protected string $viewClass = View\Html::class;
 
-    /**
-     * @var string
-     */
-    protected $currentLayout;
-    protected $defaultLayout =  'layout/default';
+    protected string $currentLayout;
+    protected string $defaultLayout =  'layout/default';
 
-    /**
-     * Is layout enabled?
-     * @var boolean
-     */
-    protected $layoutEnabled;
+    protected bool $layoutEnabled;
 
     /**
      * To render the action view or not?
      * If renderView is false, the default response object
      * will be E4u\Response\Debug populated with the action result.
-     *
-     * @var boolean
      */
-    protected $renderView = true;
+    protected bool $renderView = true;
 
     public function __construct(Config $config)
     {
         $this->_config = $config;
     }
 
-    /**
-     * @return Config
-     */
-    public function getConfig()
+    public function getConfig(): Config
     {
         return $this->_config;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isXhr()
+    public function isXhr(): bool
     {
         return $this->getRequest() instanceof \E4u\Request\Xhr;
     }
 
     /**
      * @deprecated Use new Response\Xhr instead
-     * @param  mixed $content
-     * @param  array  $data
-     * @return Response\Xhr|Message
      */
-    protected function sendXhrResponse($content, $data = null)
+    protected function sendXhrResponse(mixed $content, ?array $data = null): Response\Xhr
     {
         return new Response\Xhr($content, $data);
     }
 
     /**
-     * @param  array|string $target
-     * @param  string $message
-     * @param  string $type
-     * @return Response\Redirect
+     * @throws Controller\Redirect
      */
-    protected function redirectBackOrTo($target, $message = null, $type = View::FLASH_MESSAGE)
+    protected function redirectBackOrTo(mixed $target, null|string|array $message = null, string $type = View::FLASH_MESSAGE): void
     {
         if ($back = $this->getRequest()->getQuery('back')) {
             $target = $back;
         }
 
-        return $this->redirectTo($target, $message, $type);
+        $this->redirectTo($target, $message, $type);
     }
 
     /**
-     * @param  array|string $target
-     * @param  array|string $message
-     * @param  string $type
-     * @return Response\Redirect
      * @throws Controller\Redirect
      */
-    protected function redirectTo($target, $message = null, $type = View::FLASH_MESSAGE)
+    protected function redirectTo(mixed $target, null|string|array $message = null, string $type = View::FLASH_MESSAGE): void
     {
         if (!empty($message)) {
             $this->getView()->addFlash($message, $type);
@@ -137,62 +99,40 @@ abstract class Controller
     }
 
     /**
-     * @param  array|string $message
-     * @param  string $type
-     * @return Response\Redirect
      * @throws Controller\Redirect
      */
-    protected function redirectToSelf($message = null, $type = View::FLASH_MESSAGE)
+    protected function redirectToSelf(null|string|array $message = null, string $type = View::FLASH_MESSAGE): void
     {
-        return $this->redirectTo($this->currentUrl(), $message, $type);
+        $this->redirectTo($this->currentUrl(), $message, $type);
     }
 
-    /**
-     * @return array
-     */
-    public function getParams()
+    public function getParams(): array
     {
         return $this->getRequest()->getCurrentRoute()->getParams();
     }
 
-    /**
-     * @param  string $name
-     * @param  mixed  $default
-     * @return mixed
-     */
-    public function getParam($name, $default = null)
+    public function getParam(string $name, mixed $default = null): mixed
     {
         $params = $this->getParams();
-        return isset($params[$name])
-               ? $params[$name]
-               : $default;
+        return $params[$name] ?? $default;
     }
 
-    /**
-     * @return Authentication\Identity
-     */
-    public function getCurrentUser()
+    public function getCurrentUser(): ?Authentication\Identity
     {
         return $this->getAuthentication()->getCurrentUser();
     }
 
     /**
      * @todo   Use interface instead of actual resolver class
-     * @param  Authentication\Resolver $authentication
-     * @return $this
      */
-    public function setAuthentication(Authentication\Resolver $authentication)
+    public function setAuthentication(Authentication\Resolver $authentication): void
     {
         $this->_authentication = $authentication;
-        return $this;
     }
 
-    /**
-     * @return Authentication\Resolver
-     */
-    public function getAuthentication()
+    public function getAuthentication(): Authentication\Resolver
     {
-        if (null == $this->_authentication) {
+        if (!isset($this->_authentication)) {
             $resolver = new Authentication\Resolver($this->getRequest(), $this->getConfig()->get('authentication'));
             $this->setAuthentication($resolver);
         }
@@ -200,12 +140,7 @@ abstract class Controller
         return $this->_authentication;
     }
 
-    /**
-     * @param  string|null $message
-     * @throws Controller\Redirect
-     * @return Response\Redirect
-     */
-    protected function denyAccess($message = null)
+    protected function denyAccess(null|string|array $message = null): void
     {
         if (!empty($message)) {
             $this->getView()->addFlash($message, View::FLASH_ERROR);
@@ -213,16 +148,13 @@ abstract class Controller
 
         $loginPath = $this->getAuthentication()->getLoginPath();
         $url = $loginPath . '?back=' . $this->backUrl();
-        return $this->redirectTo($url);
+        $this->redirectTo($url);
     }
 
     /**
      * Dispatch a request
-     *
-     * @param  Request\Request $request
-     * @return Response\Response
      */
-    public function dispatch(Request\Request $request)
+    public function dispatch(Request\Request $request): Response\Response
     {
         $this->_request = $request;
         $action = $this->getActionName();
@@ -239,7 +171,7 @@ abstract class Controller
             if (false === $authResult) {
 
                 $user = $this->getAuthentication()->getCurrentUser();
-                return $this->denyAccess(!empty($user) ? 'Nie masz uprawnień do wybranego zasobu.' : null);
+                $this->denyAccess(!empty($user) ? 'Nie masz uprawnień do wybranego zasobu.' : null);
 
             }
 
@@ -269,25 +201,18 @@ abstract class Controller
      *
      * If returns Response object, the return value will be passed
      * to the application, otherwise the action result will.
-     *
-     * @return null|Response\Response
      */
-    protected function init($action)
+    protected function init(?string $action = null): ?Response\Response
     {
         return null;
     }
 
     /**
      * Invoke view for an action
-     *
-     * @param  string $action
-     * @param  array|ArrayAccess $vars
-     * @return Response\Response
      */
-    protected function renderView($action, $vars = null)
+    protected function renderView(string $action, null|array|ArrayAccess $vars = null): Response\Response
     {
-        if ($view = $this->getView())
-        {
+        if ($view = $this->getView()) {
             // render a view for selected action
             // and place it into the "content" partial
             $view->setAction($action);
@@ -302,9 +227,8 @@ abstract class Controller
                 $content = $view->render($layout, $vars);
             }
         }
-        else
-        {
-            // If no view defined ($this->renderView == false),
+        else {
+            // If no view defined ($this->renderView === false),
             // just pass the action result to the response.
             $content = (($vars instanceof ArrayAccess) && isset($vars['content']))
                 ? $vars['content']
@@ -320,18 +244,14 @@ abstract class Controller
 
     /**
      * Invoke view for an action
-     *
      * @deprecated Use renderView instead
      */
-    protected function render($action, $vars = null)
+    protected function render(string $action, null|array|ArrayAccess $vars = null): Response\Response
     {
         return $this->renderView($action, $vars);
     }
 
-    /**
-     * @return string
-     */
-    protected function detectCurrentLocale()
+    protected function detectCurrentLocale(): string
     {
         if (!empty($_REQUEST['locale'])) {
             return $_REQUEST['locale'];
@@ -351,23 +271,16 @@ abstract class Controller
             ?: strtok(\E4u\Loader::getTranslator()->getLocale(), '_');
     }
 
-    /**
-     * @return string
-     */
-    public function getCurrentLocale()
+    public function getCurrentLocale(): string
     {
-        if (null === $this->_locale) {
+        if (!isset($this->_locale)) {
             $this->_locale = $this->detectCurrentLocale();
         }
 
         return $this->_locale;
     }
 
-    /**
-     * @param  View $view
-     * @return $this
-     */
-    public function setView(View $view)
+    public function setView(View $view): static
     {
         $view->setController($this)
              ->setLocale($this->getCurrentLocale());
@@ -378,36 +291,26 @@ abstract class Controller
 
     /**
      * Get the view object
-     *
-     * @return View
      */
-    public function getView()
+    public function getView(): View
     {
-        if (!($this->_view instanceof View)
-           && $this->renderView)
-        {
+        if (!isset($this->_view) && $this->renderView) {
             $this->setView(new $this->viewClass);
         }
+        
         return $this->_view;
     }
 
-    /**
-     * @return string
-     */
-    public function getCurrentLayout()
+    public function getCurrentLayout(): string
     {
-        if (null === $this->currentLayout) {
+        if (!isset($this->currentLayout)) {
             $this->currentLayout = $this->defaultLayout;
         }
 
         return $this->currentLayout;
     }
 
-    /**
-     * @param  string $layout
-     * @return $this
-     */
-    public function setLayout($layout)
+    public function setLayout(string $layout): static
     {
         $this->currentLayout = $layout;
         return $this;
@@ -416,39 +319,29 @@ abstract class Controller
     /**
      * @return boolean
      */
-    public function isLayoutEnabled()
+    public function isLayoutEnabled(): bool
     {
-        if (null === $this->layoutEnabled) {
-            $this->layoutEnabled = $this->isXhr() ? false : true;
+        if (!isset($this->layoutEnabled)) {
+            $this->layoutEnabled = !$this->isXhr();
         }
 
         return $this->layoutEnabled;
     }
 
-    /**
-     * @return $this
-     */
-    public function disableLayout()
+    public function disableLayout(): static
     {
         $this->layoutEnabled = false;
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function disableView()
+    public function disableView(): static
     {
         $this->disableLayout();
         $this->renderView = false;
         return $this;
     }
 
-    /**
-     * @param  string $action
-     * @return string
-     */
-    protected function getActionPath($action)
+    protected function getActionPath(string $action): string
     {
         $route = $this->getRequest()->getCurrentRoute();
         $segments = array
@@ -463,10 +356,8 @@ abstract class Controller
 
     /**
      * Pulls action name from current request.
-     *
-     * @return string
      */
-    public function getActionName()
+    public function getActionName(): string
     {
         $routeMatch = $this->getRequest()->getCurrentRoute();
         return $routeMatch->getParam('action', 'index');
@@ -474,22 +365,18 @@ abstract class Controller
 
     /**
      * Default action if none provided
-     *
-     * @return array
      */
-    public function indexAction()
+    public function indexAction(): array
     {
         return [ 'content' => 'It works!' ];
     }
 
     /**
      * Get the request object
-     *
-     * @return Request\Http|Request\Request
      */
-    public function getRequest()
+    public function getRequest(): Request\Request
     {
-        if (!$this->_request instanceof Request\Request) {
+        if (!isset($this->_request)) {
             throw new LogicException('No valid Request set.');
         }
 
@@ -498,10 +385,8 @@ abstract class Controller
 
     /**
      * Get the response object
-     *
-     * @return Response\Xhr|Response\Http
      */
-    public function getDefaultResponse()
+    public function getDefaultResponse(): Response\Xhr|Response\Http
     {
         return $this->isXhr()
             ? new Response\Xhr()
@@ -510,11 +395,8 @@ abstract class Controller
 
     /**
      * Transform an action name into a method name
-     *
-     * @param  string $action
-     * @return string
      */
-    public static function getMethodFromAction($action)
+    public static function getMethodFromAction(string $action): string
     {
         $method  = StringTools::camelCase($action);
         $method  = lcfirst($method);
@@ -522,23 +404,13 @@ abstract class Controller
         return $method;
     }
 
-    /**
-     * @param  mixed $message
-     * @param  string $locale
-     * @return string
-     */
-    public function translate($message, $locale = null)
+    public function translate(mixed $message, ?string $locale = null): string
     {
         $message = (string)$message;
         return \E4u\Loader::getTranslator()->translate($message, 'default', $locale ?: $this->getCurrentLocale());
     }
 
-    /**
-     * @param  mixed $message
-     * @param  array $parameters
-     * @return string
-     */
-    public function t($message, $parameters = null)
+    public function t(mixed $message, ?array $parameters = null): string
     {
         $txt = $this->translate($message);
         if (!empty($parameters)) {

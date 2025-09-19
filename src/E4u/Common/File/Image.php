@@ -6,20 +6,18 @@ use E4u\Exception\LogicException;
 
 class Image extends File
 {
-    const JPEG_QUALITY = 95;
+    const int JPEG_QUALITY = 95;
 
-    /** @var array */
-    protected $size;
+    protected array $size;
 
-    /** @var array */
-    protected $_thumbnails;
+    protected array $_thumbnails;
 
     /**
      * @return array
      */
-    protected function getImageSize()
+    protected function getImageSize(): array
     {
-        if (null === $this->size) {
+        if (!isset($this->size)) {
             if ($this->isLocal && $this->fileExists()) {
                 $this->size = getimagesize($this->getFullPath());
             }
@@ -31,53 +29,36 @@ class Image extends File
         return $this->size;
     }
 
-    public function isHorizontal()
+    public function isHorizontal(): bool
     {
         return $this->getWidth() > $this->getHeight();
     }
 
-    /**
-     * @return int
-     */
-    public function getWidth()
+    public function getWidth(): ?int
     {
         $size = $this->getImageSize();
         return !empty($size) ? $size[0] : null;
     }
 
-    /**
-     * @return int
-     */
-    public function getHeight()
+    public function getHeight(): ?int
     {
         $size = $this->getImageSize();
         return !empty($size) ? $size[1] : null;
     }
 
-    /**
-     * @return string
-     */
-    public function getHTMLSize()
+    public function getHTMLSize(): ?string
     {
         $size = $this->getImageSize();
         return !empty($size) ? $size[3] : null;
     }
 
-    /**
-     * @return string
-     */
-    public function getMime()
+    public function getMime(): ?string
     {
         $size = $this->getImageSize();
         return !empty($size) ? $size['mime'] : null;
     }
 
-    /**
-     * @param  int $maxWidth
-     * @param  int $maxHeight
-     * @return array
-     */
-    public function resizeTo($maxWidth = 0, $maxHeight = 0)
+    public function resizeTo(?int $maxWidth = null, ?int $maxHeight = null): array
     {
         $width  = $this->getWidth();
         $height = $this->getHeight();
@@ -110,11 +91,7 @@ class Image extends File
         return [ $width, $height ];
     }
 
-    /**
-     * @param int $squareSide
-     * @return Image
-     */
-    public function getThumbnailForSquareCrop($squareSide)
+    public function getThumbnailForSquareCrop(int $squareSide): Image
     {
         if ($this->isHorizontal()) {
             $maxWidth = 0;
@@ -123,16 +100,11 @@ class Image extends File
             $maxWidth = $squareSide;
             $maxHeight = 0;
         }
+        
         return $this->getThumbnail($maxWidth, $maxHeight);
     }
 
-    /**
-     * @param int    $maxWidth
-     * @param int    $maxHeight
-     * @param string $backgroundColor
-     * @return Image
-     */
-    public function getThumbnail($maxWidth = 0, $maxHeight = 0, $backgroundColor = 'ffffff', $forceOverwrite = false)
+    public function getThumbnail(?int $maxWidth = null, ?int $maxHeight = null, string $backgroundColor = 'ffffff', bool $forceOverwrite = false): ?Image
     {
         if (!$this->isLocal) {
             return $this;

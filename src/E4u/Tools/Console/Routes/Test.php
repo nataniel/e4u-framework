@@ -6,19 +6,19 @@ use Laminas\Mvc\Router\RouteMatch;
 
 class Test extends Base
 {
-    public function help()
+    public function help(): array
     {
         return [
             '/show/page'   => 'Show action/controller and other RouteMatch params for a specified path',
         ];
     }
     
-    public function execute()
+    public function execute(): void
     {
         $path = $this->getArgument(0);
         if (empty($path)) {
             $this->showHelp();
-            return false;
+            return;
         }
 
         echo sprintf("Current path set to: %s\n", $path);
@@ -33,8 +33,8 @@ class Test extends Base
         $routeMatch = $router->match($request);
         
         if (!$routeMatch instanceof RouteMatch) {
-            echo sprintf("NO MATCH!\n");
-            return false;
+            echo "NO MATCH!\n";
+            return;
         }
         
         $params = $routeMatch->getParams();
@@ -43,7 +43,5 @@ class Test extends Base
         foreach ($params as $key => $value) {
             echo sprintf("  %s: %s\n", $key, $value);
         }
-
-        return $this;
     }
 }

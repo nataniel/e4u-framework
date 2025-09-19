@@ -5,22 +5,22 @@ use E4u\Tools\Console\Base;
 
 class Generate extends Base
 {
-    public function help()
+    public function help(): array
     {
         return [ APPLICATION.'\Class' => sprintf("Generate test case for %s\\Class", APPLICATION) ];
     }
 
-    public function execute()
+    public function execute(): void
     {
         $srcClass = $this->getArgument(0);
         if (empty($srcClass)) {
             $this->showHelp();
-            return false;
+            return;
         }
 
         if (!class_exists($srcClass)) {
             echo sprintf("ERROR: Class %s not found.\n", $srcClass);
-            return false;
+            return;
         }
 
         $rootNamespace = strtok($srcClass, '\\');
@@ -28,14 +28,14 @@ class Generate extends Base
 
         if (class_exists($testClass)) {
             echo sprintf("ERROR: Class %s already exists.\n", $testClass);
-            return false;
+            return;
         }
 
         $testFile = 'tests' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $testClass) . '.php';
         if (file_exists($testFile) && !$this->getOption('force')) {
             echo sprintf("WARNING: File %s already exists.\n".
                 "         Use --force to overwrite it.\n", $testFile);
-            return false;
+            return;
         }
 
         if (!is_dir(dirname($testFile))) {
@@ -45,11 +45,9 @@ class Generate extends Base
 
         file_put_contents($testFile, $this->testFileContents($srcClass, $testClass));
         echo $testFile. " created.\n";
-
-        return $this;
     }
 
-    private function testFileContents($srcClass, $testClass)
+    private function testFileContents($srcClass, $testClass): string
     {
         $pos = strrpos($srcClass, '\\');
         $srcClassPart = substr($srcClass, $pos + 1);
@@ -71,7 +69,7 @@ use %1$s;
  */
 class %3$s extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
     }
 

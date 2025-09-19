@@ -5,6 +5,7 @@ use Laminas\Validator\AbstractValidator;
 
 class StrongPassword extends AbstractValidator
 {
+    const int MIN_LENGTH = 8;
     /**
      * Returns true if and only if $value is a strong password
      * 
@@ -18,7 +19,7 @@ class StrongPassword extends AbstractValidator
             return false;
         }
 
-        if (strlen($value) < 6) {
+        if (strlen($value) < self::MIN_LENGTH) {
             $this->error('too_short');
             return false;
         }

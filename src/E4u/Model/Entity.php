@@ -7,10 +7,10 @@ use Doctrine\ORM\EntityManager,
     Doctrine\ORM\Mapping\ClassMetadata,
     Doctrine\DBAL\Types\Type,
     Doctrine\Common\Collections\ArrayCollection,
-    Doctrine\Common\Util\Debug,
     Laminas\Stdlib\ArrayUtils;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\Tools\Debug;
 use E4u\Common\Variable;
 use E4u\Exception\LogicException;
 
@@ -207,30 +207,15 @@ class Entity extends Base
         }
 
         $meta = $this->getClassMetadata();
-        switch ($meta->getTypeOfField($field)) {
-            case Type::DATETIME:
-            case Type::DATE:
-                return $value instanceof \DateTime
-                    ? "'".$value->format('Y-m-d H:i:s')."'"
-                    : "'{$value}'";
-
-            case Type::BOOLEAN:
-                return $value ? 'TRUE' : 'FALSE';
-
-            case Type::INTEGER:
-            case Type::DECIMAL:
-            case Type::FLOAT:
-            case Type::BIGINT:
-            case Type::SMALLINT:
-                return $value;
-
-            case Type::STRING:
-            case Type::TEXT:
-                return "'" . mb_strimwidth($value, 0, 50, '...') . "'";
-
-            default:
-                return $meta->getTypeOfField($field);
-        }
+        return match ($meta->getTypeOfField($field)) {
+            Type::DATETIME, Type::DATE => $value instanceof \DateTime
+                ? "'" . $value->format('Y-m-d H:i:s') . "'"
+                : "'{$value}'",
+            Type::BOOLEAN => $value ? 'TRUE' : 'FALSE',
+            Type::INTEGER, Type::DECIMAL, Type::FLOAT, Type::BIGINT, Type::SMALLINT => $value,
+            Type::STRING, Type::TEXT => "'" . mb_strimwidth($value, 0, 50, '...') . "'",
+            default => $meta->getTypeOfField($field),
+        };
     }
 
     /**
@@ -246,11 +231,8 @@ class Entity extends Base
      * using Doctrine\Common\Util\Debug::dump(), instead of normal var_dump()
      * because of very large recursive structure which is impossible
      * to render and read.
-     *
-     * @param  null|string $property
-     * @return string
      */
-    public function dump($property = null)
+    public function dump(?string $property = null): string
     {
         return is_null($property)
             ? Debug::dump($this)
@@ -274,10 +256,10 @@ class Entity extends Base
     }
 
     /**
-     * @param  string $property
+     * @param string $property
      * @return boolean
      */
-    protected function _has($property)
+    protected function _has(string $property): bool
     {
         $meta = $this->getClassMetadata();
         if ($meta->isCollectionValuedAssociation($property)) {
@@ -297,19 +279,15 @@ class Entity extends Base
      * an entity or array of those (only for collections).
      *
      * @see _call()
-     * @param  string  $property        Association name
-     * @param  mixed   $value           Value, entity, id of the entity of array of those
-     * @param  boolean $keepConsistency Keep consistency for both sides of the association
-     * @return static
      */
-    protected function _set($property, $value, $keepConsistency = true)
+    protected function _set(string $property, mixed $value, bool $keepConsistency = true): static
     {
         $meta = $this->getClassMetadata();
         if ($meta->hasAssociation($property)) {
             // *-ToOne
             if ($meta->isSingleValuedAssociation($property)) {
                 self::normalizeValue($value, $meta->getAssociationTargetClass($property));
-                if (true == $keepConsistency) {
+                if ($keepConsistency) {
                     $this->_followAssociation($property, $value, 'add');
                 }
 
@@ -340,13 +318,7 @@ class Entity extends Base
         return $this;
     }
 
-    /**
-     * @param  string $property
-     * @param  mixed $value
-     * @param  bool $keepConsistency
-     * @return static
-     */
-    protected function _addTo($property, $value, $keepConsistency = true)
+    protected function _addTo(string $property, mixed $value, bool $keepConsistency = true): static
     {
         $meta = $this->getClassMetadata();
         if (!$meta->isCollectionValuedAssociation($property)) {
@@ -366,7 +338,7 @@ class Entity extends Base
 
         // deal with the other end of bi-directional association
         self::normalizeValue($value, $meta->getAssociationTargetClass($property));
-        if (true == $keepConsistency) {
+        if ($keepConsistency) {
             $this->_followAssociation($property, $value, 'add');
         }
 
@@ -385,13 +357,7 @@ class Entity extends Base
         return $this;
     }
 
-    /**
-     * @param  string $property
-     * @param  mixed $value
-     * @param  bool $keepConsistency
-     * @return static
-     */
-    protected function _delFrom($property, $value, $keepConsistency = true)
+    protected function _delFrom(string $property, mixed $value, bool $keepConsistency = true): static
     {
         $meta = $this->getClassMetadata();
         if (!$meta->isCollectionValuedAssociation($property)) {
@@ -411,7 +377,7 @@ class Entity extends Base
 
         // deal with the other end of bi-directional association
         self::normalizeValue($value, $meta->getAssociationTargetClass($property));
-        if (true == $keepConsistency) {
+        if ($keepConsistency) {
             $this->_followAssociation($property, $value, 'remove');
         }
 
@@ -431,46 +397,39 @@ class Entity extends Base
      * OneToMany:  $player->addToActions(1)      => $action->setPlayer($player)
      * OneToMany:  $player->removeFromActions(1) => $action->unsetPlayer()
      * OneToOne:   $user->setProfile(1)          => $profile->setUser($user)
-     *
-     * @param  string $property Association name
-     * @param  Base $value
-     * @param  string $operation add|remove
-     * @return static
      */
-    protected function _followAssociation($property, $value, $operation = 'add')
+    protected function _followAssociation(string $property, Base $value, string $operation = 'add'): static
     {
-        if ($value instanceof Base) {
-            $meta = $this->getClassMetadata();
-            $association = $meta->getAssociationMapping($property);
-            $referencedProperty = $meta->isAssociationInverseSide($property)
-                ? $association['mappedBy']
-                : $association['inversedBy'];
+        $meta = $this->getClassMetadata();
+        $association = $meta->getAssociationMapping($property);
+        $referencedProperty = $meta->isAssociationInverseSide($property)
+            ? $association['mappedBy']
+            : $association['inversedBy'];
 
-            if (!empty($referencedProperty)) {
-                switch ($association['type'])
-                {
-                    case ClassMetadata::MANY_TO_MANY:
-                    case ClassMetadata::MANY_TO_ONE:
-                        $method = ($operation == 'add')
-                            ? self::propertyAddToMethod($referencedProperty)
-                            : self::propertyDelFromMethod($referencedProperty);
+        if (!empty($referencedProperty)) {
+            switch ($association['type'])
+            {
+                case ClassMetadata::MANY_TO_MANY:
+                case ClassMetadata::MANY_TO_ONE:
+                    $method = ($operation == 'add')
+                        ? self::propertyAddToMethod($referencedProperty)
+                        : self::propertyDelFromMethod($referencedProperty);
+                    $value->$method($this, false);
+                    break;
+                case ClassMetadata::ONE_TO_MANY:
+                case ClassMetadata::ONE_TO_ONE:
+                    if ($operation == 'add') {
+                        $method = self::propertySetMethod($referencedProperty);
                         $value->$method($this, false);
-                        break;
-                    case ClassMetadata::ONE_TO_MANY:
-                    case ClassMetadata::ONE_TO_ONE:
-                        if ($operation == 'add') {
-                            $method = self::propertySetMethod($referencedProperty);
-                            $value->$method($this, false);
-                        }
-                        else {
-                            $method = self::propertyUnsetMethod($referencedProperty);
-                            $value->$method();
-                        }
+                    }
+                    else {
+                        $method = self::propertyUnsetMethod($referencedProperty);
+                        $value->$method();
+                    }
 
-                        break;
-                }
-
+                    break;
             }
+
         }
 
         return $this;
@@ -481,11 +440,8 @@ class Entity extends Base
      * Useable only if you are *sure* the entity with given ID exists, otherwise
      * the proxy will throw exception upon initialization.
      * @see find()
-     *
-     * @param  int $id
-     * @return static
      */
-    public static function getReference($id)
+    public static function getReference(int $id): static
     {
         return self::getEM()->getReference(static::class, $id);
     }
@@ -545,11 +501,8 @@ class Entity extends Base
 
     /**
      * Normalize property of collection association to ArrayCollection instance.
-     *
-     * @param  string $property Association name
-     * @return static
      */
-    protected function _normalizeProperty($property)
+    protected function _normalizeProperty(string $property): static
     {
         if (!$this->$property instanceof \Doctrine\Common\Collections\Collection) {
             if (is_array($this->$property)) {
@@ -570,10 +523,8 @@ class Entity extends Base
 
     /**
      * Returns the ORM metadata descriptor for a class.
-     *
-     * @return ClassMetadata
      */
-    public function getClassMetadata()
+    public function getClassMetadata(): ClassMetadata
     {
         $className = get_class($this);
         return self::getEM()->getClassMetadata($className);
@@ -582,23 +533,18 @@ class Entity extends Base
     /**
      * Indicates if the entity is allowed to be
      * persisted / updated / removed.
-     *
-     * @return bool
      */
-    public function isReadOnly()
+    public function isReadOnly(): bool
     {
         return $this->_readonly || $this->getClassMetadata()->isReadOnly;
     }
 
     /**
      * Disallow the entity to be persisted / updated / removed.
-     *
-     * @param  bool
-     * @return static
      */
-    public function setReadOnly($flag = true)
+    public function setReadOnly(bool $flag = true): static
     {
-        $this->_readonly = (bool)$flag;
+        $this->_readonly = $flag;
         return $this;
     }
 
@@ -676,10 +622,7 @@ class Entity extends Base
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCreatedNow()
+    public function setCreatedNow(): static
     {
         if (property_exists($this, 'created_at')) {
             $this->created_at = new \DateTime();
@@ -688,10 +631,7 @@ class Entity extends Base
         return $this;
     }
 
-    /**
-     * @return boolean
-     */
-    public function valid()
+    public function valid(): bool
     {
         $this->_errors = [];
         $meta = $this->getClassMetadata();
@@ -707,28 +647,16 @@ class Entity extends Base
         return empty($this->_errors);
     }
 
-    /**
-     * @param  string $field
-     * @return array|string
-     */
-    public function getErrors($field = null)
+    public function getErrors(?string $field = null): array|string|null
     {
         if (!is_null($field)) {
-            return isset($this->_errors[ $field ])
-                ? $this->_errors[ $field ]
-                : null;
+            return $this->_errors[$field] ?? null;
         }
 
         return $this->_errors;
     }
 
-    /**
-     *
-     * @param  string $message
-     * @param  string $field
-     * @return static
-     */
-    public function addError($message, $field = '')
+    public function addError(string $message, ?string $field = null): static
     {
         empty($field) ?
             $this->_errors[] = $message :
@@ -737,24 +665,19 @@ class Entity extends Base
     }
 
     /*
-     * @return static
      * @throws Exception when entity is not valid
      */
-    public function validate()
+    public function validate(): void
     {
         if (!$this->valid()) {
             throw new Exception(join(" \n", $this->_errors));
         }
-
-        return $this;
     }
 
     /**
      * Is current entity managed by Entity Manager?
-     *
-     * @return boolean
      */
-    public function isManaged()
+    public function isManaged(): bool
     {
         return self::getEM()->contains($this);
     }
@@ -762,11 +685,8 @@ class Entity extends Base
     /**
      * Saves the entity (and only it),
      * if it is managed by EM and has ID.
-     *
-     * @return static
-     * @throws Exception when entity is not valid
      */
-    public function update()
+    public function update(): static
     {
         if ($this->isManaged() && $this->id()) {
             self::getEM()->flush($this);
@@ -775,7 +695,7 @@ class Entity extends Base
         return $this;
     }
 
-    public function refresh()
+    public function refresh(): static
     {
         if ($this->isManaged()) {
             self::getEM()->refresh($this);
@@ -914,11 +834,8 @@ class Entity extends Base
      * Finds a record by its id.
      * If you are sure a record with given id exists,
      * you may want to @see getReference() instead.
-     *
-     * @param   int $id
-     * @return  static|object|null
      */
-    public static function find($id)
+    public static function find(int $id): ?static
     {
         return self::getRepository()->find($id);
     }

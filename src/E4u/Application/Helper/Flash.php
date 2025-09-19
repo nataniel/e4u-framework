@@ -2,10 +2,11 @@
 namespace E4u\Application\Helper;
 
 use E4u\Application\View;
+use E4u\Common\Html;
 
 class Flash extends ViewHelper
 {
-    public function show()
+    public function show(): self
     {
         return $this;
     }
@@ -18,12 +19,12 @@ class Flash extends ViewHelper
 
         foreach ($types as $type) {
             if (!empty($flash[ $type ])) {
-                $html .= $this->view->tag('p', [ 'class' => $type ], join('<br />', $flash[ $type ]));
+                $html .= Html::tag('p', [ 'class' => $type ], join('<br />', $flash[ $type ]));
             }
         }
         
         if (!empty($html)) {
-            $html = $this->view->tag('div', [ 'id' => 'flash' ], $html);
+            $html = Html::tag('div', [ 'id' => 'flash' ], $html);
         }
         
         return $html;

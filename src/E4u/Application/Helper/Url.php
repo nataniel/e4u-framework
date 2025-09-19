@@ -8,49 +8,35 @@ trait Url
 {
     /**
      * Class importing this method must declare getRequest() method
-     * @return Request\Request
      */
-    public abstract function getRequest();
+    public abstract function getRequest(): Request\Request;
 
-    /**
-     * @param  string $target
-     * @return bool
-     */
-    public static function isExternalUrl($target)
+    public static function isExternalUrl(mixed $target): bool
     {
         if (!is_string($target)) {
             return false;
         }
 
-        return strpos($target, 'http://') === 0 ||
-               strpos($target, 'https://') === 0 ||
-               strpos($target, '//') === 0;
+        return str_starts_with($target, 'http://') ||
+            str_starts_with($target, 'https://') ||
+            str_starts_with($target, '//');
     }
 
     /**
      * Replace %2F with / for readability
-     *
-     * @param  string $txt
-     * @return string
      */
-    public function urlEncode($txt)
+    public function urlEncode(string $txt): string
     {
         return str_replace('%2F', '/', urlencode($txt));
     }
 
-    /**
-     * @return string
-     */
-    public function backUrl()
+    public function backUrl(): string
     {
         $current = $this->currentUrl();
         return $this->urlEncode($current);
     }
 
-    /**
-     * @return string
-     */
-    public function currentUrl()
+    public function currentUrl(): string
     {
         $current = $this->getRequest()->getCurrentPath();
         if (!$this->getRequest() instanceof Request\Http) {
@@ -76,12 +62,8 @@ trait Url
      * @usage $this->urlTo('site/action/show/15')
      * @usage $this->urlTo([ 'action' => 'show', 'id' => 15 ], 'default')
      * @usage $this->urlTo([ 'action' => 'show', 'id' => 15, 'route' => 'default' ])
-     *
-     * @param  array|string $target
-     * @param  bool $fullUrl Use fully qualified URL or local
-     * @return string URL to the resource
      */
-    public function urlTo($target, $fullUrl = false)
+    public function urlTo(array|string|Uri $target, bool $fullUrl = false): string
     {
         if ($target instanceof Uri) {
             return $target;
@@ -96,9 +78,9 @@ trait Url
         }
 
         if (is_array($target)) {
-            $options['name'] = isset($target['route']) ? $target['route'] : 'default';
-            $options['query'] = isset($target['query']) ? $target['query'] : null;
-            $options['fragment'] = isset($target['fragment']) ? $target['fragment'] : null;
+            $options['name'] = $target['route'] ?? 'default';
+            $options['query'] = $target['query'] ?? null;
+            $options['fragment'] = $target['fragment'] ?? null;
             $options['force_canonical'] = $fullUrl;
 
             $target = $this->getRequest()->getRouter()->assemble($target, $options);
@@ -112,11 +94,7 @@ trait Url
         return rtrim($base, '/') . '/' . str_replace(' ', '%20', $file);
     }
 
-    /**
-     * @param  array $array
-     * @return string
-     */
-    public function buildQuery($array)
+    public function buildQuery(array $array): string
     {
         $query = http_build_query(array_filter($array, function ($x) {
             return !is_null($x);

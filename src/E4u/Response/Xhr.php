@@ -12,10 +12,7 @@ class Xhr extends Base
         }
     }
 
-    /**
-     * @return $this
-     */
-    public function send()
+    public function send(): void
     {
         $result = $this->getMetadata();
         $result['status'] = $this->getStatus();
@@ -26,6 +23,5 @@ class Xhr extends Base
 
         header('Content-Type: application/json; charset=UTF-8');
         echo json_encode($result);
-        return $this;
     }
 }

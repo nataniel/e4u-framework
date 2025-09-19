@@ -3,6 +3,6 @@ namespace E4u\Form\Element;
 
 class Number extends TextField
 {
-    protected $cssClass = 'text_field';
-    protected $inputType = 'number';
+    protected string $cssClass = 'text_field';
+    protected string $inputType = 'number';
 }

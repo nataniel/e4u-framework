@@ -3,36 +3,26 @@ namespace E4u\Common;
 
 class Variable
 {
-    /**
-     * @param  mixed $var
-     * @return string
-     */
-    public static function getType($var)
+    public static function getType(mixed $var): string
     {
         return is_object($var) ? get_class($var) : gettype($var);
     }
 
     /**
      * @assert ('product_name') == 'setProductName'
-     * @param  string $property
-     * @return string
      */
-    public static function propertySetMethod($property)
+    public static function propertySetMethod(string $property): string
     {
         $method  = StringTools::camelCase($property);
-        $method = 'set'.$method;
-        return $method;
+        return 'set'.$method;
     }
 
     /**
      * @assert ('product_name') == 'getProductName'
-     * @param  string $property
-     * @return string
      */
-    public static function propertyGetMethod($property)
+    public static function propertyGetMethod(string $property): string
     {
         $method  = StringTools::camelCase($property);
-        $method = 'get'.$method;
-        return $method;
+        return 'get'.$method;
     }
 }

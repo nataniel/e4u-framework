@@ -3,29 +3,24 @@ namespace E4u\Tools;
 
 use E4u\Common\Variable;
 use E4u\Exception\LogicException;
-use Laminas\Console\Getopt,
-    Laminas\Config\Config,
+use E4u\Loader;
+use E4u\Tools\Console\Getopt;
+use E4u\Version;
+use Laminas\Config\Config,
     E4u\Tools\Console\Command;
 
 class Console
 {
-    protected $commands = [];
+    protected array $commands = [];
 
-    /**
-     * @var Command
-     */
-    protected $currentCommand;
+    protected Command $currentCommand;
 
-    /**
-     * @var Config
-     */
-    protected $config;
+    protected Config $config;
 
     /**
      * @todo  Use config to setup additional commands
-     * @param Config $config
      */
-    public function __construct($config)
+    public function __construct(mixed $config)
     {
         if (!$config instanceof Config) {
             $config = new Config((array)$config);
@@ -35,7 +30,7 @@ class Console
         $this->addDefaultCommands();
     }
 
-    public function run()
+    public function run(): void
     {
         // default Getopt rules
         $rules = [
@@ -55,34 +50,23 @@ class Console
         }
 
         if (!empty($environment)) {
-            $envConfig = \E4u\Loader::load("environment/$environment");
+            $envConfig = Loader::load("environment/$environment");
             $this->config->merge(new Config($envConfig));
             $this->config->environment = $environment;
-        }
-
-        // setup simple SQL logger
-        if ($getopt->getOption('dump-sql')) {
-            $ormConfig = \E4u\Loader::getConnection()->getConfiguration();
-            $ormConfig->setSQLLogger(new \Doctrine\DBAL\Logging\EchoSQLLogger());
         }
 
         // run command
         $command = $this->getCurrentCommand();
         $command->configure($arguments, $getopt);
 
-        $title = sprintf("E4u command line tool - version %s (%s).", \E4u\Version::VERSION, \E4u\Loader::getEnvironment());
+        $title = sprintf("E4u command line tool - version %s (%s).", Version::VERSION, Loader::getEnvironment());
         cli_set_process_title('console ' . $this->serverCommand());
         echo $title."\n\n";
 
-        return $command->execute();
+        $command->execute();
     }
 
-    /**
-     * @param  Command|string $command
-     * @param  string $name
-     * @return Console  Current instance
-     */
-    public function addCommand($command, string $name): self
+    public function addCommand(Command|string $command, string $name): static
     {
         if (is_string($command)) {
             $command = new $command;
@@ -99,10 +83,7 @@ class Console
         return $this;
     }
 
-    /**
-     * @param string|Command $command
-     */
-    public function showHelp($command)
+    public function showHelp(string|Command $command): void
     {
         if ($command instanceof Command) {
             $command = array_search($command, $this->commands);
@@ -136,7 +117,7 @@ class Console
         return $this->commands;
     }
 
-    protected function addDefaultCommands(): self
+    protected function addDefaultCommands(): static
     {
         $commands = $this->config->get('console');
         $defaultCommands = array_merge(
@@ -160,7 +141,7 @@ class Console
 
     public function getCurrentCommand(bool $force = false): Command
     {
-        if ((null === $this->currentCommand) || $force) {
+        if (!isset($this->currentCommand) || $force) {
             $command = $this->serverCommand();
             if (empty($command) || !isset($this->commands[ $command ])) {
                 $command = 'help';
@@ -184,7 +165,7 @@ class Console
         $argv = $_SERVER['argv'];
         $script = array_shift($argv);
         foreach ($argv as $arg) {
-            if (strpos($arg, '-') !== 0) {
+            if (!str_starts_with($arg, '-')) {
                 return $arg;
             }
         }

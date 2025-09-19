@@ -3,16 +3,10 @@ namespace E4u\Common;
 
 class StringTools
 {
-    /**
-     * @param  string $name
-     * @return string
-     */
-    public static function wolacz($name)
+    public static function wolacz(string $name): string
     {
-        $vocativeRules = array
-        (
-            'a' => array
-            (
+        $vocativeRules = [
+            'a' => [
                 'świnia' => 'świnio',
                 'śka' => 'śko',
                 'sia' => 'siu',
@@ -29,13 +23,11 @@ class StringTools
                 'mela' => 'melo',
                 'la' => 'lu',
                 'a' => 'o',
-            ),
-            'b' => array
-            (
+            ],
+            'b' => [
                 'b' => 'bie',
-            ),
-            'c' => array
-            (
+            ],
+            'c' => [
                 'ojciec' => 'ojcze',
                 'starzec' => 'starcze',
                 'ciec' => 'ćcu',
@@ -45,40 +37,33 @@ class StringTools
                 'ziec' => 'źcu',
                 'lec' => 'lcu',
                 'c' => 'cu',
-            ),
-            'ć' => array
-            (
+            ],
+            'ć' => [
                 'gość' => 'gościu',
                 'ść' => 'ściu',
                 'ć' => 'cio',
-            ),
-            'd' => array
-            (
+            ],
+            'd' => [
                 'łąd' => 'łędzie',
                 'ód' => 'odzie',
                 'd' => 'dzie',
-            ),
-            'f' => array
-            (
+            ],
+            'f' => [
                 'f' => 'fie',
-            ),
-            'g' => array
-            (
+            ],
+            'g' => [
                 'bóg' => 'boże',
                 'g' => 'gu',
-            ),
-            'h' => array
-            (
+            ],
+            'h' => [
                 'ph' => 'ph',
                 'h' => 'hu',
-            ),
-            'j' => array
-            (
+            ],
+            'j' => [
                 'ój' => 'oju',
                 'j' => 'ju',
-            ),
-            'k' => array
-            (
+            ],
+            'k' => [
                 'człek' => 'człeku',
                 'ciek' => 'ćku',
                 'liek' => 'łku',
@@ -88,82 +73,69 @@ class StringTools
                 'wiek' => 'wieku',
                 'ek' => 'ku',
                 'k' => 'ku',
-            ),
-            'l' => array
-            (
+            ],
+            'l' => [
                 'kornel' => 'kornelu',
                 'sól' => 'solo',
                 'mól' => 'mole',
                 'awel' => 'awle',
                 'al' => 'ale', // Michal -> Michale
                 'l' => 'lu',
-            ),
-            'ł' => array
-            (
+            ],
+            'ł' => [
                 'zioł' => 'źle',
                 'ół' => 'ole',
                 'eł' => 'le',
                 'ł' => 'le',
-            ),
-            'm' => array
-            (
+            ],
+            'm' => [
                 'miriam' => 'miriam',
                 'm' => 'mie',
-            ),
-            'n' => array
-            (
+            ],
+            'n' => [
                 'nikola' => 'nikolo',
                 'syn' => 'synu',
                 'n' => 'nie',
-            ),
-            'ń' => array
-            (
+            ],
+            'ń' => [
                 'skroń' => 'skronio',
                 'dzień' => 'dniu',
                 'czeń' => 'czniu',
                 'ń' => 'niu',
-            ),
-            'p' => array
-            (
+            ],
+            'p' => [
                 'p' => 'pie',
-            ),
-            'r' => array
-            (
+            ],
+            'r' => [
                 'per' => 'prze',
                 'ór' => 'orze',
                 'r' => 'rze',
-            ),
-            's' => array
-            (
+            ],
+            's' => [
                 'ines' => 'ines',
                 'ies' => 'sie',
                 's' => 'sie',
-            ),
-            'ś' => array
-            (
+            ],
+            'ś' => [
                 'gęś' => 'gęsio',
                 'ś' => 'siu',
-            ),
-            't' => array
-            (
+            ],
+            't' => [
                 'st' => 'ście',
                 't' => 'cie',
-            ),
-            'w' => array
-            (
+            ],
+            'w' => [
                 'konew' => 'konwio',
                 'sław' => 'sławie',
                 'lew' => 'lwie',
                 'łw' => 'łwiu',
                 'ów' => 'owie',
                 'w' => 'wie',
-            ),
-            'x' => array
-            (
+            ],
+            'x' => [
                 'x' => 'ksie',
-            ),
-            'z' => array
-            (
+            ],
+            'z' => [
                 'ksiądz' => 'księże',
                 'dz' => 'dzu',
                 'cz' => 'czu',
@@ -171,13 +143,12 @@ class StringTools
                 'sz' => 'szu',
                 'óz' => 'ozie',
                 'z' => 'zie',
-            ),
-            'ż' => array
-            (
+            ],
+            'ż' => [
                 'ąż' => 'ężu',
                 'ż' => 'żu',
-            )
-        );
+            ],
+        ];
 
         $firstname = trim(mb_strtolower(strtok($name, ' ')));
 
@@ -198,7 +169,7 @@ class StringTools
         return self::ucFirst($vocative);
     }
 
-    public static function ucFirst($txt)
+    public static function ucFirst(string $txt): string
     {
         return mb_strtoupper(mb_substr($txt, 0, 1)) . mb_substr($txt, 1);
     }
@@ -208,7 +179,7 @@ class StringTools
      * @param  string $txt
      * @return string
      */
-    public static function toAscii($txt)
+    public static function toAscii(string $txt): string
     {
         $normalizeChars = [
             'Š'=>'S', 'š'=>'s', 'Ð'=>'Dj','Ž'=>'Z', 'ž'=>'z',
@@ -225,19 +196,10 @@ class StringTools
         return strtr($txt, $normalizeChars);
     }
 
-    public static function lowerCase($txt)
-    {
-        $lowerCase = [
-            'Ą'
-        ];
-    }
-
     /**
      * @assert ('ProductName') == 'product_name'
-     * @param  string $txt
-     * @return string
      */
-    public static function underscore($txt)
+    public static function underscore(string $txt): string
     {
         $txt = preg_replace('/([A-Z\d]+)([A-Z][a-z])/', '$1_$2', $txt);
         $txt = preg_replace('/([a-z\d])([A-Z])/', '$1_$2', $txt);
@@ -250,25 +212,19 @@ class StringTools
 
     /**
      * @assert ('product_name') == 'ProductName'
-     * @param  string $txt
-     * @return string
      */
-    public static function camelCase($txt)
+    public static function camelCase(string $txt): string
     {
         $txt = str_replace(['.', '-', '_'], ' ', $txt);
         $txt = ucwords($txt);
-        $txt = str_replace(' ', '', $txt);
-        return $txt;
+        return str_replace(' ', '', $txt);
     }
 
     /**
      * http://stackoverflow.com/questions/2955251/php-function-to-make-slug-url-string
-     * @assert ('Łodź... bardzo SKOMPLIKOWANE?!') == 'łódź-bardzo-skomplikowane'
-     * @param  string $txt
-     * @param  bool $transliterate
-     * @return string
+     * @assert ('Łodź... bardzo SKOMPLIKOWANE?!') == 'łódź.-bardzo-skomplikowane'
      */
-    public static function toUrl($txt, $transliterate = false)
+    public static function toUrl(string $txt, bool $transliterate = false): string
     {
         // remove tags
         $txt = strip_tags($txt);
@@ -287,7 +243,7 @@ class StringTools
         $txt = preg_replace('~\.+~', '.', $txt);
 
         // remove unwanted characters
-        $txt = preg_replace('~[^-\.\w]+~u', '', $txt);
+        $txt = preg_replace('~[^-.\w]+~u', '', $txt);
 
         $txt = mb_strtolower($txt);
 
@@ -299,7 +255,7 @@ class StringTools
             ? $txt : 'default';
     }
 
-    public static function lineToUl($txt)
+    public static function lineToUl(string $txt): ?string
     {
         if (empty($txt)) {
             return null;
@@ -307,17 +263,10 @@ class StringTools
 
         $txt = trim($txt);
         $txt = str_ireplace("\r\n", "<li>", $txt);
-        $txt = "<ul>\n<li>".$txt."</ul>\n";
-
-        return $txt;
+        return "<ul>\n<li>".$txt."</ul>\n";
     }
 
-    /**
-     * @param  int $txt
-     * @param  int $maxWords
-     * @return string
-     */
-    public static function shortVersion($txt, $maxWords = 20)
+    public static function shortVersion(string $txt, int $maxWords = 20): string
     {
         $content = strip_tags($txt);
         $content = preg_replace('/\[\[.*\]\]/U', '', $content);

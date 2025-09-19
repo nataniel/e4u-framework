@@ -3,7 +3,7 @@ namespace E4u\Common;
 
 class Html
 {
-    public static function attributes($attributes)
+    public static function attributes($attributes): string
     {
         $attr = [];
         foreach ($attributes as $key => $value)
@@ -24,7 +24,7 @@ class Html
         return join(' ', $attr);
     }
 
-    public static function tag($tag, $attributes = null, $content = null)
+    public static function tag(string $tag, mixed $attributes = null, ?string $content = null): string
     {
         $attr = '';
         if (is_null($content) && (is_string($attributes) || is_object($attributes))) {

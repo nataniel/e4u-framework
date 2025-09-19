@@ -7,57 +7,32 @@ use E4u\Request\Request,
 
 class Resolver
 {
-    const DEFAULT_PATH  = 'security/login';
-    const COOKIE_NAME = 'E4uAuthentication';
-    const COOKIE_LIFETIME = 2592000; // 30 days
+    const string DEFAULT_PATH  = 'security/login';
+    const string COOKIE_NAME = 'E4uAuthentication';
+    const int COOKIE_LIFETIME = 2592000; // 30 days
 
-    /**
-     * @var Identity
-     */
-    protected $currentUser;
-
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var Config
-     */
-    protected $config;
+    protected ?Identity $currentUser;
+    protected Request $request;
+    protected Config $config;
 
 
-    public function __construct(Request $request, $config = null)
+    public function __construct(Request $request, ?Config $config = null)
     {
         $this->request = $request;
-        $this->config  = $config;
+        $this->config  = $config ?? new Config([]);
     }
 
-    /**
-     *
-     * @return Config
-     */
-    public function getConfig()
+    public function getConfig(): Config
     {
-        if (null === $this->config) {
-            $this->config = new Config([]);
-        }
-
         return $this->config;
     }
 
-    /**
-     * @return string
-     */
-    public function getLoginPath()
+    public function getLoginPath(): string
     {
         return $this->getConfig()->get('login', self::DEFAULT_PATH);
     }
 
-    /**
-     * @return string|null Class name
-     */
-    public function getIdentityModel()
+    public function getIdentityModel(): ?string
     {
         $class = $this->getConfig()->get('model');
         if (!is_null($class) && !class_exists($class)) {
@@ -68,18 +43,12 @@ class Resolver
         return $class;
     }
 
-    /**
-     * @return string
-     */
-    public function getCookieName()
+    public function getCookieName(): string
     {
         return $this->getConfig()->get('cookie_name', self::COOKIE_NAME);
     }
 
-    /**
-     * @return int
-     */
-    public function getCookieLifetime()
+    public function getCookieLifetime(): int
     {
         return (int)$this->getConfig()->get('cookie_lifetime', self::COOKIE_LIFETIME);
     }
@@ -87,10 +56,8 @@ class Resolver
     /**
      * Read cookies / headers from the request and return
      * authorized user if found in request.
-     *
-     * @return boolean
      */
-    public function authenticate()
+    public function authenticate(): bool
     {
         $class = $this->getIdentityModel();
         if (is_null($class)) {
@@ -118,7 +85,7 @@ class Resolver
         return false;
     }
 
-    private function setCookie($value, $expiration = null)
+    private function setCookie(string $value, ?int $expiration = null): void
     {
         if (null === $expiration) {
             $expiration = $this->getCookieLifetime();
@@ -129,14 +96,9 @@ class Resolver
         if (empty($value) || $expiration < 0) {
             unset($_COOKIE[ $this->getCookieName() ]);
         }
-
-        return $this;
     }
 
-    /**
-     * @return Resolver
-     */
-    public function logout($removeSession = true)
+    public function logout(bool $removeSession = true): void
     {
         $this->authenticate();
         unset($_SESSION['current_user']);
@@ -146,15 +108,9 @@ class Resolver
 
         $this->currentUser = null;
         $this->setCookie('', -3600);
-        return $this;
     }
 
-    /**
-     * @param Identity $user
-     * @param boolean  $remember
-     * @return Resolver
-     */
-    public function loginAs(Identity $user, $remember = false)
+    public function loginAs(Identity $user, bool $remember = false): void
     {
         // add user info to session
         $_SESSION['current_user'] = $user->id();
@@ -166,8 +122,6 @@ class Resolver
         if ($remember && ($cookie = $user->getCookie())) {
             $this->setCookie($cookie);
         }
-
-        return $this;
     }
 
     /**
@@ -176,14 +130,8 @@ class Resolver
      * Return NULL if user not found or FALSE if password is invalid.
      * Set a cookie in user's browser if $remember is TRUE.
      * @link http://fishbowl.pastiche.org/2004/01/19/persistent_login_cookie_best_practice/
-     *
-     * @param  string $login
-     * @param  string $password Open text password
-     * @param  bool   $remember If true, the cookie will be persistent,
-     *                          instead of session-only.
-     * @return Identity|null
      */
-    public function login($login, $password, $remember = false)
+    public function login(string $login, string $password, bool $remember = false): ?Identity
     {
         $class = $this->getIdentityModel();
         $user = $class::login($login, $password);
@@ -195,12 +143,9 @@ class Resolver
         return null;
     }
 
-    /**
-     * @return Identity|null
-     */
-    public function getCurrentUser()
+    public function getCurrentUser(): ?Identity
     {
-        if (null === $this->currentUser) {
+        if (!isset($this->currentUser)) {
             $this->authenticate();
         }
 
@@ -210,14 +155,10 @@ class Resolver
     /**
      * Returns FALSE if the current user does not meet
      * any privileges required by controller for current action.
-     *
-     * @param array|int|boolean $requiredPrivileges
-     * @param string $action
-     * @return boolean
      */
-    public function checkPrivileges($requiredPrivileges, $action = null)
+    public function checkPrivileges(int|bool|iterable $requiredPrivileges, ?string $action = null): bool
     {
-        if (!is_array($requiredPrivileges) && !($requiredPrivileges instanceof \Traversable)) {
+        if (!is_iterable($requiredPrivileges)) {
             $requiredPrivileges = [ $requiredPrivileges ];
         }
 

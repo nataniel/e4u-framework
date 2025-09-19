@@ -11,37 +11,26 @@ use E4u\Form\Element;
  */
 class FileUpload extends Element
 {
-    const
+    const string
         ACCEPT_AUDIO = 'audio/*',
         ACCEPT_VIDEO = 'video/*',
         ACCEPT_IMAGE = 'image/*';
 
-    protected $maxSize = 5242880;  // 5MB
+    protected int $maxSize = 5242880;  // 5MB
 
-    /**
-     * @param  int $size
-     * @return FileUpload
-     */
-    public function setMaxSize($size)
+    public function setMaxSize(int $size): static
     {
         $this->maxSize = $size;
         return $this;
     }
 
-    /**
-     * @return FileUpload
-     */
-    public function acceptImages()
+    public function acceptImages(): static
     {
         $this->setAccept(self::ACCEPT_IMAGE);
         return $this;
     }
 
-    /**
-     * @param  string $mime
-     * @return FileUpload
-     */
-    public function setAccept($mime)
+    public function setAccept(string $mime): static
     {
         if (defined('self::ACCEPT_' . strtoupper($mime))) {
             $mime = constant('self::ACCEPT_' . strtoupper($mime));
@@ -51,11 +40,7 @@ class FileUpload extends Element
         return $this;
     }
 
-    /**
-     * @param  string[] $file
-     * @return bool
-     */
-    protected function checkFile($file)
+    protected function checkFile(array $file): bool
     {
         if (empty($file)) {
             return true;
@@ -74,48 +59,22 @@ class FileUpload extends Element
         return false;
     }
 
-    /**
-     * @param  int $error
-     * @return string
-     */
-    private function uploadErrorMessage($error)
+    private function uploadErrorMessage(int $error): ?string
     {
-        switch ($error) {
-
-            case UPLOAD_ERR_OK:
-                return null;
-
-            case UPLOAD_ERR_INI_SIZE:
-                return 'The uploaded file exceeds the upload_max_filesize directive in php.ini.';
-
-            case UPLOAD_ERR_FORM_SIZE:
-                return 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.';
-
-            case UPLOAD_ERR_PARTIAL:
-                return 'The uploaded file was only partially uploaded.';
-
-            case UPLOAD_ERR_NO_FILE:
-                return 'No file was uploaded.';
-
-            case UPLOAD_ERR_NO_TMP_DIR:
-                return 'Missing a temporary folder.';
-
-            case UPLOAD_ERR_CANT_WRITE:
-                return 'Failed to write file to disk.';
-
-            case UPLOAD_ERR_EXTENSION:
-                return 'File upload stopped by extension.';
-
-            default:
-                return 'Unknown upload error.';
-
-        }
+        return match ($error) {
+            UPLOAD_ERR_OK => null,
+            UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
+            UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
+            UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded.',
+            UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
+            UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
+            UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
+            UPLOAD_ERR_EXTENSION => 'File upload stopped by extension.',
+            default => 'Unknown upload error.',
+        };
     }
 
-    /**
-     * @return boolean
-     */
-    public function isValid()
+    public function isValid(): bool
     {
         $this->checkFile($this->getValue());
         return parent::isValid();

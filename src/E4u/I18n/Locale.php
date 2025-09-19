@@ -3,9 +3,7 @@ namespace E4u\I18n;
 
 class Locale
 {
-    private static $_locales = [ 'pl' => 'Polski', 'en' => 'English' ];
-    
-    private static $_countries = [
+    private static array $_countries = [
           1 => 'Polska',
           2 => 'Afghanistan',
           3 => 'Albania',
@@ -186,7 +184,7 @@ class Locale
         187 => 'Latvia',
     ];
     
-    public static function plural($number, $p1, $p2, $p5 = null)
+    public static function plural(int $number, string $p1, string $p2, ?string $p5 = null): string
     {
         if ($number == 1) {
             return sprintf($p1, $number);
@@ -203,7 +201,7 @@ class Locale
         return !is_null($p5) ? sprintf($p5, $number) : sprintf($p2, $number);
     }
     
-    public static function countries()
+    public static function countries(): array
     {
         return self::$_countries;
     }

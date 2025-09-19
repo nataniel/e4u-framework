@@ -6,18 +6,13 @@ use Laminas\Mail\Transport;
 
 class Factory
 {
-    const
+    const string
         SMTP = 'smtp',
         FILE = 'file',
         TEST = 'test',
         SENDMAIL = 'sendmail';
 
-    /**
-     * @param $type
-     * @param $options
-     * @return Transport\TransportInterface
-     */
-    public static function get($type, $options)
+    public static function get(string $type, ?iterable $options): Transport\TransportInterface
     {
         switch ($type) {
             case self::SMTP:

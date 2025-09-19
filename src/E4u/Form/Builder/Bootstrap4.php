@@ -2,140 +2,14 @@
 namespace E4u\Form\Builder;
 
 use E4u\Common\Variable;
-use E4u\Form\Base,
-    E4u\Form\Element,
+use E4u\Form\Element,
     E4u\Common\Html,
-    E4u\Application\View\Html as HtmlView,
     Laminas\Config\Config;
 use E4u\Form\Exception;
 
-class Bootstrap4 implements BuilderInterface
+class Bootstrap4 extends Bootstrap3
 {
-    /**
-     * @var Base
-     */
-    protected $form;
-
-    /**
-     * @var HtmlView
-     */
-    protected $view;
-
-    /**
-     * @var Config
-     */
-    protected $options;
-
-    public function __construct(Base $form, HtmlView $view, $options = [])
-    {
-        $this->form = $form;
-        $this->view = $view;
-        $this->options = new Config($options);
-    }
-
-    /**
-     * @return Base
-     */
-    public function getForm()
-    {
-        return $this->form;
-    }
-
-    /**
-     * @param  string $text
-     * @return string
-     */
-    protected function t($text)
-    {
-        return $this->view->t($text);
-    }
-
-    public function errors($options = [])
-    {
-        $errors = $this->form->getErrors();
-        if (empty($errors)) {
-            return null;
-        }
-
-        $content = [];
-        foreach ($errors as $key => $error) {
-            if (is_array($error)) {
-                foreach ($error as $type => $message) {
-
-                    $content[] = $this->view->tag('li', [ 'class' => is_string($type) ? $type : null ], $this->t($message));
-
-                }
-            }
-            else {
-
-                $content[] = $this->view->tag('li', $this->t($error));
-            }
-        }
-
-        $attributes = array_merge([
-            'class' => 'form-errors'
-        ], $options);
-        return $this->view->tag('ul', $attributes, join('', $content));
-    }
-
-    public function start($options = [])
-    {
-        $default = [
-            'role' => 'form',
-            'id' => $this->form->getName(),
-            'name' => $this->form->getName(),
-            'method' => $this->form->getMethod(),
-            'enctype' => $this->form->getEnctype(),
-            'novalidate' => $this->options->get('novalidate') ? 'novalidate' : null,
-            'class' => $this->form->isSubmitted() ? 'was-validated' : null,
-            'action' => $this->form->getAction(),
-        ];
-
-        $attributes = array_merge($default, $options);
-        return sprintf('<form %s>', Html::attributes($attributes))
-            . $this->submitToken()
-            . $this->crsfToken();
-    }
-
-    protected function submitToken()
-    {
-        return $this->view->tag('input', [
-            'type' => 'hidden',
-            'name' => $this->form->getName() . '[submit]',
-            'value' => 1,
-        ]);
-    }
-
-    protected function crsfToken()
-    {
-        $token = $this->form->getCrsfTokenValue();
-        if (empty($token)) {
-            return null;
-        }
-
-        return $this->view->tag('input', [
-            'type' => 'hidden',
-            'name' => $this->form->getCrsfTokenName(),
-            'value' => $token,
-        ]);
-    }
-
-    public function end()
-    {
-        return '</form>';
-    }
-
-    public function fieldId($name, $value = null)
-    {
-        return "{$this->form->getName()}_{$name}" . ($value ? '_' . $value : '');
-    }
-
-    public function fieldName($name)
-    {
-        return "{$this->form->getName()}[{$name}]";
-    }
-
-    public function fieldHelp($name)
+    public function fieldHelp(string $name): string
     {
         return "{$this->form->getName()}_{$name}" . 'Help';
     }
@@ -148,12 +22,8 @@ class Bootstrap4 implements BuilderInterface
      * - input_class
      * - input_type
      * - placeholder
-     *
-     * @param  string $name
-     * @param  array $options
-     * @return string
      */
-    public function text($name, $options = [])
+    public function text(string $name, array $options = []): string
     {
         $content = $this->textTag($name, $options);
         $options = new Config($options);
@@ -162,11 +32,6 @@ class Bootstrap4 implements BuilderInterface
         return $this->field($field, $options, $content);
     }
 
-    /**
-     * @param $name
-     * @param $options
-     * @return string
-     */
     public function textTag($name, $options = [])
     {
         $options = new Config($options);
@@ -176,17 +41,11 @@ class Bootstrap4 implements BuilderInterface
         $value = $field->getValue();
         if ($value instanceof \DateTime) {
 
-            switch ($type) {
-                case 'datetime':
-                case 'datetime-local':
-                    $value = $value->format('Y-m-d\TH:i');
-                    break;
-                case 'date':
-                    $value = $value->format('Y-m-d');
-                    break;
-                default:
-                    $value = $value->format('Y-m-d H:i');
-            }
+            $value = match ($type) {
+                'datetime', 'datetime-local' => $value->format('Y-m-d\TH:i'),
+                'date' => $value->format('Y-m-d'),
+                default => $value->format('Y-m-d H:i'),
+            };
 
         } elseif (is_string($value) && $type == 'number') {
 
@@ -203,7 +62,6 @@ class Bootstrap4 implements BuilderInterface
 
             'name' => $this->fieldName($name),
             'id' => $this->fieldId($name),
-            'required' => $field->isRequired() ? 'required' : null,
 
             'required' => $options->get('required', $field->isRequired()) ? 'required' : null,
             'disabled' => $options->get('disabled', $field->isDisabled()) ? 'disabled' : null,
@@ -215,6 +73,7 @@ class Bootstrap4 implements BuilderInterface
             'min' => $options->get('min', $field->getAttribute('min')),
             'max' => $options->get('max', $field->getAttribute('max')),
             'step' => $options->get('step', $field->getAttribute('step')),
+            'list' => $options->get('list'),
 
             'class' => $this->fieldInputClass($field, $options),
             'style' => $options->get('style', null),
@@ -223,14 +82,16 @@ class Bootstrap4 implements BuilderInterface
 
         ]);
 
-        return $this->view->tag('input', $attributes);
+        foreach ($options as $key => $option) {
+            if (str_starts_with($key, 'data-')) {
+                $attributes[ $key ] = $option;
+            }
+        }
+
+        return Html::tag('input', $attributes);
     }
 
-    /**
-     * @param  string $name
-     * @return string
-     */
-    public function hidden($name)
+    public function hidden(string $name): string
     {
         $field = $this->form->getElement($name);
 
@@ -251,40 +112,25 @@ class Bootstrap4 implements BuilderInterface
 
         ]);
 
-        return $this->view->tag('input', $attributes);
+        return Html::tag('input', $attributes);
     }
 
     /**
      * @see text()
-     * @param  string $name
-     * @param  array $options
-     * @return string
      */
-    public function number($name, $options = [])
+    public function number(string $name, array $options = []): string
     {
         $options['input_type'] = 'number';
         return $this->text($name, $options);
     }
 
-    public function numberTag($name, $options = [])
+    public function numberTag(string $name, array $options = []): string
     {
         $options['input_type'] = 'number';
         return $this->textTag($name, $options);
     }
 
-    /**
-     * @see text()
-     * @param  string $name
-     * @param  array $options
-     * @return string
-     */
-    public function password($name, $options = [])
-    {
-        $options['input_type'] = 'password';
-        return $this->text($name, $options);
-    }
-
-    public function passwordTag($name, $options = [])
+    public function passwordTag(string $name, array $options = []): string
     {
         $options['input_type'] = 'password';
         return $this->textTag($name, $options);
@@ -292,11 +138,8 @@ class Bootstrap4 implements BuilderInterface
 
     /**
      * @see text()
-     * @param  string $name
-     * @param  array $options
-     * @return string
      */
-    public function date($name, $options = [])
+    public function date(string $name, array $options = []): string
     {
         $options['input_type'] = 'date';
         return $this->text($name, $options);
@@ -304,17 +147,14 @@ class Bootstrap4 implements BuilderInterface
 
     /**
      * @see text()
-     * @param  string $name
-     * @param  array $options
-     * @return string
      */
-    public function email($name, $options = [])
+    public function email(string $name, array $options = []): string
     {
         $options['input_type'] = 'email';
         return $this->text($name, $options);
     }
 
-    public function emailTag($name, $options = [])
+    public function emailTag(string $name, array $options = []): string
     {
         $options['input_type'] = 'email';
         return $this->textTag($name, $options);
@@ -322,11 +162,8 @@ class Bootstrap4 implements BuilderInterface
 
     /**
      * @see text()
-     * @param  string $name
-     * @param  array $options
-     * @return string
      */
-    public function file($name, $options = [])
+    public function file(string $name, array $options = []): string
     {
         $options = new Config($options);
 
@@ -342,26 +179,31 @@ class Bootstrap4 implements BuilderInterface
 
             'name' => $this->fieldName($name),
             'id' => $this->fieldId($name),
-            'required' => $field->isRequired() ? 'required' : null,
+
+            'required' => $options->get('required', $field->isRequired()) ? 'required' : null,
+            'disabled' => $options->get('disabled', $field->isDisabled()) ? 'disabled' : null,
+            'readonly' => $options->get('readonly', $field->isReadonly()) ? 'readonly' : null,
 
             'type' => 'file',
-            'accept' => $options->get('accept'),
+            'accept' => $options->get('accept', $field->getAttribute('accept')) ?: null,
+            'capture' => $options->get('capture') ?: null,
 
             'class' => $this->fieldInputClass($field, $options),
             'aria-describedby' => $this->fieldHelp($name),
 
         ]);
 
-        $content = $this->view->tag('input', $attributes);
+        foreach ($options as $key => $option) {
+            if (str_starts_with($key, 'data-')) {
+                $attributes[ $key ] = $option;
+            }
+        }
+
+        $content = Html::tag('input', $attributes);
         return $this->field($field, $options, $content);
     }
 
-    /**
-     * @param  string $name
-     * @param  array $options
-     * @return string
-     */
-    public function multifile($name, $options = [])
+    public function multifile(string $name, array $options = []): string
     {
         $options = new Config($options);
 
@@ -377,7 +219,10 @@ class Bootstrap4 implements BuilderInterface
 
             'name' => $this->fieldName($name) . '[]',
             'id' => $this->fieldId($name),
-            'required' => $field->isRequired() ? 'required' : null,
+
+            'required' => $options->get('required', $field->isRequired()) ? 'required' : null,
+            'disabled' => $options->get('disabled', $field->isDisabled()) ? 'disabled' : null,
+            'readonly' => $options->get('readonly', $field->isReadonly()) ? 'readonly' : null,
 
             'type' => 'file',
             'accept' => $options->get('accept'),
@@ -388,7 +233,13 @@ class Bootstrap4 implements BuilderInterface
 
         ]);
 
-        $content = $this->view->tag('input', $attributes);
+        foreach ($options as $key => $option) {
+            if (str_starts_with($key, 'data-')) {
+                $attributes[ $key ] = $option;
+            }
+        }
+
+        $content = Html::tag('input', $attributes);
         return $this->field($field, $options, $content);
     }
 
@@ -396,12 +247,8 @@ class Bootstrap4 implements BuilderInterface
      * Available options:
      * - group_class
      * - input_class
-     *
-     * @param  string $name
-     * @param  array $options
-     * @return string
      */
-    public function checkbox($name, $options = [])
+    public function checkbox(string $name, array $options = []): string
     {
         $options = new Config($options);
         $field = $this->form->getElement($name);
@@ -419,12 +266,12 @@ class Bootstrap4 implements BuilderInterface
         ]);
 
         $content = join('', [
-            $this->view->tag('input', $attributes),
-            $this->view->tag('span', [ 'class' => 'custom-control-indicator' ], ''),
-            $this->view->tag('span', [ 'class' => 'custom-control-description' ], $this->t($field->getLabel())),
+            Html::tag('input', $attributes),
+            Html::tag('span', [ 'class' => 'custom-control-indicator' ], ''),
+            Html::tag('span', [ 'class' => 'custom-control-description' ], $this->t($field->getLabel())),
         ]);
 
-        $label = $this->view->tag('label', [ 'class' => 'custom-control custom-checkbox' ], $content);
+        $label = Html::tag('label', [ 'class' => 'custom-control custom-checkbox' ], $content);
 
         $class = $options->get('group_class');
         if ($field->getErrors()) {
@@ -446,12 +293,8 @@ class Bootstrap4 implements BuilderInterface
      * - button_class
      * - button_type
      * - disabled
-     *
-     * @param  string $name
-     * @param  array $options
-     * @return string
      */
-    public function button($name, $options = [])
+    public function button(string $name, array $options = []): string
     {
         $options = new Config($options);
         $field = $this->form->getElement($name);
@@ -465,8 +308,14 @@ class Bootstrap4 implements BuilderInterface
 
         ]);
 
+        foreach ($options as $key => $option) {
+            if (str_starts_with($key, 'data-')) {
+                $attributes[ $key ] = $option;
+            }
+        }
+
         $label = $this->t($options->get('label', $field->getLabel()));
-        return $this->view->tag('button', $attributes, $label);
+        return Html::tag('button', $attributes, $label);
     }
 
     /**
@@ -475,12 +324,8 @@ class Bootstrap4 implements BuilderInterface
      * - input_class
      * - cols
      * - rows
-     *
-     * @param  string $name
-     * @param  array $options
-     * @return string
      */
-    public function textarea($name, $options = [])
+    public function textarea(string $name, array $options = []): string
     {
         $content = $this->textareaTag($name, $options);
         $options = new Config($options);
@@ -489,7 +334,7 @@ class Bootstrap4 implements BuilderInterface
         return $this->field($field, $options, $content);
     }
 
-    public function textareaTag($name, $options = [])
+    public function textareaTag(string $name, array $options = []): string
     {
         $options = new Config($options);
         $field = $this->form->getElement($name);
@@ -507,28 +352,7 @@ class Bootstrap4 implements BuilderInterface
         ]);
 
         $value = htmlspecialchars($field->getValue(), ENT_COMPAT | ENT_HTML5, 'UTF-8');
-        return $this->view->tag('textarea', $attributes, $value);
-    }
-
-    /**
-     * @param  string $caption
-     * @param  mixed $value
-     * @param  bool $selected
-     * @param  string[] $data
-     * @return string
-     */
-    public function selectOption($caption, $value, $selected = false, $data = [])
-    {
-        $attributes = [
-            'value' => $value,
-            'selected' => $selected,
-        ];
-
-        foreach ($data as $key => $dataValue) {
-            $attributes[ 'data-' . $key ] = $dataValue;
-        }
-
-        return $this->view->tag('option', $attributes, $caption);
+        return Html::tag('textarea', $attributes, $value);
     }
 
     /**
@@ -537,12 +361,8 @@ class Bootstrap4 implements BuilderInterface
      * - input_class
      * - show_label
      * - empty_caption
-     *
-     * @param  string $name
-     * @param  array $options
-     * @return string
      */
-    public function select($name, $options = [])
+    public function select(string $name, array $options = []): string
     {
         $content = $this->selectTag($name, $options);
         $options = new Config($options);
@@ -551,7 +371,7 @@ class Bootstrap4 implements BuilderInterface
         return $this->field($field, $options, $content);
     }
 
-    public function selectTag($name, $options = [])
+    public function selectTag(string $name, array $options = []): string
     {
         $options = new Config($options);
         $field = $this->form->getElement($name);
@@ -579,12 +399,12 @@ class Bootstrap4 implements BuilderInterface
 
         $placeholder = $options->get('placeholder');
         if ($placeholder) {
-            $html .= $this->view->tag('option', [ 'selected' => true, 'disabled' => true, 'hidden' => true ], $placeholder);
+            $html .= Html::tag('option', [ 'selected' => true, 'disabled' => true, 'hidden' => true ], $placeholder);
         }
 
         $emptyCaption = $options->get('empty_caption', '');
         if ($emptyCaption !== false) {
-            $html .= $this->view->tag('option', [ 'value' => '' ], $emptyCaption);
+            $html .= Html::tag('option', [ 'value' => '' ], $emptyCaption);
         }
 
         if ($field->getOptGroups()) {
@@ -597,7 +417,7 @@ class Bootstrap4 implements BuilderInterface
                         $groupHtml .= $this->selectOption($this->t($caption), $value, $field->getValue() == $value, $field->getDataForOption($value));
                     }
 
-                    $html .= $this->view->tag('optgroup', [ 'label' => $this->t($groupName) ], $groupHtml);
+                    $html .= Html::tag('optgroup', [ 'label' => $this->t($groupName) ], $groupHtml);
                 }
             }
         }
@@ -606,7 +426,7 @@ class Bootstrap4 implements BuilderInterface
             $html .= $this->selectOption($this->t($caption), $value, $field->getValue() == $value, $field->getDataForOption($value));
         }
 
-        return $this->view->tag('select', $attributes, $html);
+        return Html::tag('select', $attributes, $html);
     }
 
     /**
@@ -614,12 +434,8 @@ class Bootstrap4 implements BuilderInterface
      * - group_class
      * - input_class
      * - show_label
-     *
-     * @param  string $name
-     * @param  array $options
-     * @return string
      */
-    public function radioGroup($name, $options = [])
+    public function radioGroup(string $name, array $options = []): string
     {
         $options = new Config($options);
         $field = $this->form->getElement($name);
@@ -645,16 +461,16 @@ class Bootstrap4 implements BuilderInterface
                 'class' => trim('form-check-input' . $options->get('input_class')),
             ]);
 
-            $content = $this->view->tag('input', $attributes);
-            $label = $this->view->tag('label', [ 'class' => 'form-check-label' ], $content . ' ' . $this->t($caption));
-            $div .= $this->view->tag('div', [ 'class' => 'form-check' ], $label);
+            $content = Html::tag('input', $attributes);
+            $label = Html::tag('label', [ 'class' => 'form-check-label' ], $content . ' ' . $this->t($caption));
+            $div .= Html::tag('div', [ 'class' => 'form-check' ], $label);
 
         }
 
         return $this->field($field, $options, $div);
     }
 
-    public function checkboxGroup($name, $options = [])
+    public function checkboxGroup(string $name, array $options = []): string
     {
         $options = new Config($options);
         $field = $this->form->getElement($name);
@@ -674,7 +490,7 @@ class Bootstrap4 implements BuilderInterface
         return $this->field($field, $options, $div);
     }
 
-    public function checkboxOption($name, $value, $caption, $options = [])
+    public function checkboxOption(string $name, string $value, string $caption, array $options = []): string
     {
         $options = new Config($options);
         $field = $this->form->getElement($name);
@@ -690,13 +506,13 @@ class Bootstrap4 implements BuilderInterface
             'class' => trim('form-check-input' . $options->get('input_class')),
         ]);
 
-        $content = $this->view->tag('input', $attributes);
-        $label = $this->view->tag('label', [ 'class' => 'form-check-label' ], trim($content . ' ' . $this->t($caption)));
+        $content = Html::tag('input', $attributes);
+        $label = Html::tag('label', [ 'class' => 'form-check-label' ], trim($content . ' ' . $this->t($caption)));
 
-        return $this->view->tag('div', [ 'class' => 'form-check' ], $label);
+        return Html::tag('div', [ 'class' => 'form-check' ], $label);
     }
 
-    protected function fieldInputClass(Element $field, Config $options)
+    protected function fieldInputClass(Element $field, Config $options): string
     {
         return trim(
             'form-control ' .
@@ -705,7 +521,7 @@ class Bootstrap4 implements BuilderInterface
         );
     }
 
-    protected function field(Element $field, Config $options, $content)
+    protected function field(Element $field, Config $options, string $content): string
     {
         $class = $options->get('group_class');
         return $this->formGroup(trim($class), [
@@ -729,7 +545,7 @@ class Bootstrap4 implements BuilderInterface
         ]);
     }
 
-    public function label($name, $showLabels = true, $options = [ ])
+    public function label(string $name, bool $showLabels = true, $options = []): string
     {
         $class = $showLabels ? null : 'sr-only';
         $options = new Config($options);
@@ -738,55 +554,16 @@ class Bootstrap4 implements BuilderInterface
             'for' => $this->fieldId($name),
             'class' => trim($options->get('label_class') . ' ' . $class),
         ];
-        return $this->view->tag('label', $attributes, $this->t($this->form->getElement($name)->getLabel()));
+        return Html::tag('label', $attributes, $this->t($this->form->getElement($name)->getLabel()));
     }
 
-    public function formGroup($class, $elements)
-    {
-        $elements = array_filter($elements);
-        if (empty($elements)) {
-            return '';
-        }
-
-        return $this->view->tag('div', [
-            'class' => trim('form-group ' . $class),
-        ], join(' ', $elements));
-    }
-
-    public function inputGroup($elements)
-    {
-        $elements = array_filter($elements);
-        if (empty($elements)) {
-            return '';
-        }
-
-        if (count($elements) == 1) {
-            return join('', $elements);
-        }
-
-        return $this->view->tag('div', [
-            'class' => 'input-group',
-        ], join('', $elements));
-    }
-
-    public function inputGroupAddon($content)
+    protected function helpBlock(?string $name, ?string $content): string
     {
         if (empty($content)) {
             return '';
         }
 
-        return $this->view->tag('span', [
-            'class' => 'input-group-addon',
-        ], $content);
-    }
-
-    protected function helpBlock($name, $content)
-    {
-        if (empty($content)) {
-            return null;
-        }
-
-        return $this->view->tag('small', [
+        return Html::tag('small', [
             'class' => 'form-text text-muted',
             'id' => $this->fieldHelp($name),
         ], $this->t($content));

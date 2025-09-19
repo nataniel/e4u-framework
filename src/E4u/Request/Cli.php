@@ -7,25 +7,17 @@ use Laminas\Stdlib\Message,
     Laminas\Mvc\Router\SimpleRouteStack,
     Laminas\Mvc\Router\RouteStackInterface,
     Laminas\Mvc\Router\RouteMatch,
-    Laminas\Console\Getopt;
+    E4u\Tools\Console\Getopt;
 
 class Cli extends Message implements RequestDescription
 {
-    /** @var RouteStackInterface */
-    protected $router;
+    protected RouteStackInterface $router;
+    protected RouteMatch $currentRoute;
+    protected Getopt $options;
 
-    /** @var RouteMatch */
-    protected $currentRoute;
-
-    /** @var Getopt */
-    protected $options;
-
-    /**
-     * @return Getopt
-     */
-    public function getOpt()
+    public function getOpt(): Getopt
     {
-        if (null == $this->options)
+        if (!isset($this->options))
         {
             $rules = [
                 'help|h' => 'This help message.',
@@ -59,18 +51,15 @@ class Cli extends Message implements RequestDescription
         throw new LogicException('FILES are not available with CLI Request.');
     }
 
-    public function setRouter(RouteStackInterface $router)
+    public function setRouter(RouteStackInterface $router): static
     {
         $this->router = $router;
         return $this;
     }
 
-    /**
-     * @return RouteStackInterface
-     */
-    public function getRouter()
+    public function getRouter(): RouteStackInterface
     {
-        if (!$this->router instanceof RouteStackInterface)
+        if (!isset($this->router))
         {
             $this->router = new SimpleRouteStack();
         }
@@ -78,21 +67,18 @@ class Cli extends Message implements RequestDescription
         return $this->router;
     }
 
-    public function setCurrentRoute(RouteMatch $route)
+    public function setCurrentRoute(RouteMatch $route): static
     {
         $this->currentRoute = $route;
         return $this;
     }
 
-    /**
-     * @return RouteMatch
-     */
-    public function getCurrentRoute()
+    public function getCurrentRoute(): RouteMatch
     {
         return $this->currentRoute;
     }
 
-    public function getCurrentPath()
+    public function getCurrentPath(): string
     {
         $arguments = $this->getOpt()->getRemainingArgs();
 		if (!empty($arguments[0])) {
@@ -102,13 +88,13 @@ class Cli extends Message implements RequestDescription
         return '/';
     }
 
-    public function getBaseUrl()
+    public function getBaseUrl(): string
     {
         $config = \E4u\Loader::getConfig();
         return $config->get('base_url', '/');
     }
 
-    public function getFullUrl()
+    public function getFullUrl(): string
     {
         return $this->getBaseUrl();
     }

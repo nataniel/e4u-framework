@@ -5,12 +5,7 @@ use E4u\Application\Exception\PageNotFound;
 
 class File extends Stream
 {
-    /**
-     * @param  mixed $value
-     * @param  string $name
-     * @return $this
-     */
-    public function setContent($value, $name = null)
+    public function setContent($value, ?string $name = null)
     {
         if (!$this->fileExists($value)) {
             throw new PageNotFound(sprintf('Plik %s nie istnieje.', basename($value)));
@@ -21,11 +16,7 @@ class File extends Stream
         return $this;
     }
 
-    /**
-     * @param  string $filename
-     * @return bool
-     */
-    private function fileExists($filename)
+    private function fileExists(string $filename): bool
     {
         if (parse_url($filename, PHP_URL_SCHEME) != '') {
             $headers = get_headers($filename);
@@ -35,10 +26,7 @@ class File extends Stream
         return file_exists($filename);
     }
 
-    /**
-     * @return $this
-     */
-    public function sendContent()
+    public function sendContent(): static
     {
         readfile($this->getContent());
         return $this;

@@ -2,22 +2,16 @@
 namespace E4u\Application\View;
 
 use E4u\Exception\LogicException;
-use Laminas\View\Helper\AbstractHelper;
 use Laminas\View\HelperPluginManager;
 
 trait Plugins
 {
-    /** @var HelperPluginManager */
-    protected $__helpers;
+    protected HelperPluginManager $__helpers;
     
     /**
      * Set helper plugin manager instance
-     *
-     * @param  string|HelperPluginManager $helpers
-     * @return Plugins
-     * @throws \E4u\Exception\LogicException
      */
-    public function setHelperPluginManager($helpers)
+    public function setHelperPluginManager(string|HelperPluginManager $helpers): static
     {
         if (is_string($helpers)) {
             if (!class_exists($helpers)) {
@@ -43,12 +37,10 @@ trait Plugins
 
     /**
      * Get helper plugin manager instance
-     *
-     * @return HelperPluginManager
      */
-    protected function getHelperPluginManager()
+    protected function getHelperPluginManager(): HelperPluginManager
     {
-        if (null === $this->__helpers) {
+        if (!isset($this->__helpers)) {
             $this->setHelperPluginManager(new HelperPluginManager($this));
         }
         
@@ -57,32 +49,21 @@ trait Plugins
     
     /**
      * Get helper plugin manager instance
-     *
-     * @return HelperPluginManager
      */
-    protected function plugins()
+    protected function plugins(): HelperPluginManager
     {
         return $this->getHelperPluginManager();
     }
     
     /**
      * Get plugin instance
-     *
-     * @param  string     $name Name of plugin to return
-     * @param  null|array $options Options to pass to plugin constructor (if not already instantiated)
-     * @return AbstractHelper
      */
-    public function plugin($name, array $options = null)
+    public function plugin(string $name, ?array $options = null): object
     {
         return $this->getHelperPluginManager()->get($name, $options);
     }
     
-    /**
-     * @param  string $name Name of plugin to return
-     * @param  mixed  $options Options to pass to plugin __invoke() method
-     * @return AbstractHelper|mixed
-     */
-    public function _($name)
+    public function _(string $name): mixed
     {
         if (!$this->plugins()->has($name)) {
             throw new LogicException(
@@ -93,21 +74,13 @@ trait Plugins
         $plugin = $this->getHelperPluginManager()->get($name);
         $argv = func_get_args();
         array_shift($argv);
-        
-        switch (true) {
-            case empty($argv):
-                return $plugin;
-            case method_exists($plugin, '__invoke'):
-                /* PHP 5.6+ */
-                # return $plugin(...$argv);
-                return call_user_func_array([ $plugin, '__invoke' ], $argv);
-            case method_exists($plugin, 'show'):
-                /* PHP 5.6+ */
-                # return $plugin->show(...$argv);
-                return call_user_func_array([ $plugin, 'show' ], $argv);
-            default:
-                return $plugin;
-        }
+
+        return match (true) {
+            empty($argv) => $plugin,
+            method_exists($plugin, '__invoke') => call_user_func_array([$plugin, '__invoke'], $argv),
+            method_exists($plugin, 'show') => call_user_func_array([$plugin, 'show'], $argv),
+            default => $plugin,
+        };
     }
     
     public function __call($method, $argv)

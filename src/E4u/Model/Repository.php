@@ -7,17 +7,11 @@ use Doctrine\ORM\EntityRepository,
 
 class Repository extends EntityRepository
 {
-    const PATTERN_PHRASE_ID = '/^(ID:|#)([\d ,]+)$/i';
-    const PATTERN_FIELD_ID = '/^\w+\.id$/i';
+    const string 
+        PATTERN_PHRASE_ID = '/^(ID:|#)([\d ,]+)$/i',
+        PATTERN_FIELD_ID = '/^\w+\.id$/i';
 
-    /**
-     *
-     * @param mixed $x
-     * @param mixed $y
-     * @param QueryBuilder $qb
-     * @return Expr\Orx
-     */
-    public function notEqOrNull($x, $y, $qb)
+    public function notEqOrNull(mixed $x, mixed $y, QueryBuilder $qb): Expr\Orx
     {
         $ex = $qb->expr();
         return $ex->orX(
@@ -26,42 +20,22 @@ class Repository extends EntityRepository
         );
     }
 
-    /**
-     * @param string $phrase
-     * @return string
-     */
-    protected function preparePhrase($phrase)
+    protected function preparePhrase(string $phrase): string
     {
         $phrase = '%'.trim($phrase).'%';
         $phrase = str_replace('-', '%', $phrase);
         $phrase = str_replace(' ', '%', $phrase);
         $phrase = str_replace('*', '%', $phrase);
-        $phrase = preg_replace('/%+/', '%', $phrase);
-        return $phrase;
+        return preg_replace('/%+/', '%', $phrase);
     }
 
-    /**
-     * @param  array $fields
-     * @return string|null
-     */
-    private function _getIDField($fields)
+    private function _getIDField(array $fields): ?string
     {
-        foreach ($fields as $field) {
-            if (preg_match(self::PATTERN_FIELD_ID, $field)) {
-                return $field;
-            }
-        }
+        return array_find($fields, fn($field) => preg_match(self::PATTERN_FIELD_ID, $field));
 
-        return null;
     }
 
-    /**
-     * @param string $phrase
-     * @param array $fields
-     * @param QueryBuilder $qb
-     * @return Expr\Orx|Expr\Comparison
-     */
-    protected function wherePhrase($phrase, $fields, $qb)
+    protected function wherePhrase(string $phrase, array $fields, QueryBuilder $qb): Expr\Func|Expr\Orx
     {
         $ex = $qb->expr();
         $phrase = trim($phrase);

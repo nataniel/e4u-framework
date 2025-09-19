@@ -5,7 +5,7 @@ use Laminas\Validator\ValidatorInterface;
 
 class NumerIdentyfikacjiPodatkowej implements ValidatorInterface
 {
-    private static $weights = [ 6, 5, 7, 2, 3, 4, 5, 6, 7 ];
+    private static array $weights = [ 6, 5, 7, 2, 3, 4, 5, 6, 7 ];
 
     /**
      * https://pl.wikipedia.org/wiki/NIP
@@ -26,7 +26,7 @@ class NumerIdentyfikacjiPodatkowej implements ValidatorInterface
         return ($weightedSum % 11) == intval($digits[9]);
     }
 
-    private function getWeightedSumOfDigits($digits)
+    private function getWeightedSumOfDigits($digits): int
     {
         $sum = 0;
         foreach (self::$weights as $i => $weight) {

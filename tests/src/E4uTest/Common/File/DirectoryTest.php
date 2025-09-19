@@ -4,13 +4,14 @@ namespace E4uTest\Common\File;
 use E4u\Common\File;
 use E4u\Common\File\Directory;
 use E4u\Exception\RuntimeException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class DirectoryTest
  * @package E4uTest\Common\File
- * @covers  Directory
  */
+#[CoversClass(Directory::class)]
 class DirectoryTest extends TestCase
 {
     public function testIfConstructorAcceptsPath()
@@ -38,11 +39,7 @@ class DirectoryTest extends TestCase
         return $dir;
     }
 
-    /**
-     * @depends testCountable
-     * @param Directory $dir
-     */
-    public function testIterable($dir)
+    public function testIterable(Directory $dir)
     {
         foreach ($dir as $file) {
             $this->assertInstanceOf(File::class, $file);

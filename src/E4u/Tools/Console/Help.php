@@ -3,12 +3,12 @@ namespace E4u\Tools\Console;
 
 class Help extends Base
 {
-    public function help()
+    public function help(): string
     {
         return "This help message";
     }
     
-    public function execute()
+    public function execute(): void
     {
         echo sprintf("Usage:\n"
                     ."  %s command [options] [arguments]\n"
@@ -30,6 +30,5 @@ class Help extends Base
             ."To extend the functionality in your application, create new\n"
             ."commands (implementations of E4u\Tools\Console\Command) and\n"
             ."add them to the application configuration.\n";
-        return true;
     }
 }

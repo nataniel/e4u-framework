@@ -5,9 +5,9 @@ use E4u\Form\Element;
 
 class TextField extends Element
 {
-    protected $inputType = 'text';
+    protected string $inputType = 'text';
 
-    public function getInputType()
+    public function getInputType(): string
     {
         return $this->inputType;
     }

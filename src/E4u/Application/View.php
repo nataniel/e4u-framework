@@ -1,10 +1,14 @@
 <?php
 namespace E4u\Application;
 
-use E4u\Common\Variable;
+use E4u\Authentication\Identity;
 use E4u\Exception\LogicException;
 use E4u\Loader;
+use E4u\Request\Factory;
+use E4u\Request\Request;
 use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\ConfigInterface;
+use Laminas\ServiceManager\ServiceManager;
 use Laminas\View\Renderer\RendererInterface as Renderer,
     Laminas\View\Resolver\ResolverInterface as Resolver,
     ArrayObject, ArrayAccess;
@@ -14,43 +18,33 @@ use Laminas\View\Renderer\RendererInterface as Renderer,
  * a single file to render, but the rendering context for the set
  * of files, usually rendered during single action.
  */
-abstract class View implements Renderer, Resolver, ContainerInterface
+abstract class View implements Renderer, Resolver, ContainerInterface, ConfigInterface
 {
-    const FLASH_MESSAGE = 'message',
-          FLASH_ERROR   = 'error',
-          FLASH_SUCCESS = 'success';
+    const string
+        FLASH_MESSAGE = 'message',
+        FLASH_ERROR   = 'error',
+        FLASH_SUCCESS = 'success';
 
     use View\Plugins;
     use Helper\Url;
 
-    /**
-     * @var ArrayAccess
-     */
-    private $__vars;
-    private $__partials;
-    private $__controller;
+    private ArrayAccess $__vars;
+    private ArrayAccess $__partials;
+    private ?Controller $__controller;
 
-    protected $_viewPath = 'application/views';
-    protected $_viewSuffix;
+    protected string $_viewPath = 'application/views';
+    protected string $_viewSuffix;
 
-    protected $locale;
+    protected string $locale;
 
-    /**
-     * @var \E4u\Request\Request
-     */
-    protected $request;
+    protected Request $request;
 
-    /**
-     * @var \E4u\Authentication\Identity
-     */
-    protected $current_user;
+    protected ?Identity $current_user;
+    protected ?string $action;
 
-    /**
-     * @return \E4u\Authentication\Identity
-     */
-    public function getCurrentUser()
+    public function getCurrentUser(): ?Identity
     {
-        if (null === $this->current_user) {
+        if (!isset($this->current_user)) {
             $controller = $this->getController();
             if (null !== $controller) {
                 $this->current_user = $controller->getCurrentUser();
@@ -60,49 +54,33 @@ abstract class View implements Renderer, Resolver, ContainerInterface
         return $this->current_user;
     }
 
-    /**
-     * @param  \E4u\Authentication\Identity $user
-     * @return $this
-     */
-    public function setCurrentUser($user)
+    public function configureServiceManager(ServiceManager $serviceManager)
+    {
+        
+    }
+    
+    public function setCurrentUser(?Identity $user): static
     {
         $this->current_user = $user;
         return $this;
     }
 
-    /**
-     * @param  string|array $message
-     * @return $this
-     */
-    public function addSuccessFlash($message)
+    public function addSuccessFlash(string|array $message): static
     {
         return $this->addFlash($message, self::FLASH_SUCCESS);
     }
 
-    /**
-     * @param  string|array $message
-     * @return $this
-     */
-    public function addMessageFlash($message)
+    public function addMessageFlash(string|array $message): static
     {
         return $this->addFlash($message, self::FLASH_MESSAGE);
     }
 
-    /**
-     * @param  string|array $message
-     * @return $this
-     */
-    public function addErrorFlash($message)
+    public function addErrorFlash(string|array $message): static
     {
         return $this->addFlash($message, self::FLASH_ERROR);
     }
 
-    /**
-     * @param  string|array $message
-     * @param  string $type
-     * @return View
-     */
-    public function addFlash($message, $type = self::FLASH_MESSAGE)
+    public function addFlash(string|array $message, string $type = self::FLASH_MESSAGE): static
     {
         if (!isset($_SESSION['flash'][ $type ])) {
             $_SESSION['flash'][ $type ] = [];
@@ -112,10 +90,7 @@ abstract class View implements Renderer, Resolver, ContainerInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFlash()
+    public function getFlash(): array
     {
         if (empty($_SESSION['flash'])) {
             return [];
@@ -128,29 +103,24 @@ abstract class View implements Renderer, Resolver, ContainerInterface
 
     /**
      * Defined by RendererInterface.
-     * @return View
      */
-    public function getEngine()
+    public function getEngine(): static
     {
         return $this;
     }
 
     /**
      * Defined by RendererInterface.
-     * @return View
      */
-    public function setResolver(Resolver $resolver)
+    public function setResolver(Resolver $resolver): static
     {
         return $this;
     }
 
     /**
      * Defined by ResolverInterface.
-     * @param string $name
-     * @param Renderer $renderer
-     * @return string
      */
-    public function resolve($name, Renderer $renderer = null)
+    public function resolve($name, ?Renderer $renderer = null): string
     {
         return $this->renderFile($name);
     }
@@ -158,54 +128,38 @@ abstract class View implements Renderer, Resolver, ContainerInterface
     /**
      * Renders a file and store it in partials table.
      * Defined by RendererInterface.
-     *
-     * @todo  Add variables from $vars instead of replacing
-     * @param  string $name
-     * @param  array $vars
-     * @param  string $partial
-     * @return string
      */
-    public function render($name, $vars = null, $partial = null)
+    public function render($nameOrModel, $values = null, $partial = null): ?string
     {
-        if (is_string($vars)) {
-            $partial = $vars;
-            $vars = null;
+        if (is_string($values)) {
+            $partial = $values;
+            $values = null;
         }
 
         $oldVars = $this->vars();
-        if (!empty($vars)) {
-            $this->registerVars($vars);
+        if (!empty($values)) {
+            $this->registerVars($values);
         }
 
-        $content = $this->renderFile($name);
+        $content = $this->renderFile($nameOrModel);
         if (null !== $partial) {
             $this->setPartial($partial, $content);
         }
 
-        if (!empty($vars)) {
+        if (!empty($values)) {
             $this->__vars = $oldVars;
         }
 
         return $content;
     }
 
-    /**
-     * @param  string $name
-     * @param  string $content
-     * @return $this
-     */
-    public function setPartial($name, $content)
+    public function setPartial(string $name, string $content): static
     {
         $this->__partials[ $name ] = $content;
         return $this;
     }
 
-    /**
-     *
-     * @param  string $name
-     * @return string
-     */
-    public function getPartial($name)
+    public function getPartial(string $name): ?string
     {
         if (!isset($this->__partials[ $name ])) {
             return null;
@@ -216,11 +170,8 @@ abstract class View implements Renderer, Resolver, ContainerInterface
 
     /**
      * Renders a single file
-     *
-     * @param  string $name
-     * @return string
      */
-    protected function renderFile($name)
+    protected function renderFile(string $name): ?string
     {
         try {
             $filename = $this->getFilename($name);
@@ -241,59 +192,41 @@ abstract class View implements Renderer, Resolver, ContainerInterface
         }
     }
 
-    protected function getFilename($viewName)
+    protected function getFilename($viewName): string
     {
         return $this->_viewPath . DIRECTORY_SEPARATOR . $viewName . $this->_viewSuffix;
     }
 
-    /**
-     * @return ArrayAccess
-     */
-    public function vars()
+    public function vars(): ArrayAccess
     {
-        if (null === $this->__vars) {
+        if (!isset($this->__vars)) {
             $this->__vars = new ArrayObject();
         }
 
         return $this->__vars;
     }
-
-    /**
-     * @param string $name
-     * @return mixed
-     */
-    public function get($name)
+    
+    public function get($id): mixed
     {
-        return $this->vars()->offsetExists($name)
-            ? $this->vars()->offsetGet($name)
+        return $this->vars()->offsetExists($id)
+            ? $this->vars()->offsetGet($id)
             : null;
     }
 
-    /**
-     * @param  string $name
-     * @return bool
-     */
-    public function has($name)
+    public function has($id): bool
     {
-        return $this->vars()->offsetExists($name);
+        return $this->vars()->offsetExists($id);
     }
 
-    /**
-     * @param  string $name
-     * @return mixed
-     */
-    public function __get($name)
+    public function __get(string $name): mixed
     {
         return $this->vars()->offsetGet($name);
     }
 
     /**
      * Overloading: proxy to Variables container
-     *
-     * @param  string $name
-     * @return bool
      */
-    public function __isset($name)
+    public function __isset(string $name): bool
     {
         return $this->vars()->offsetExists($name);
     }
@@ -301,22 +234,11 @@ abstract class View implements Renderer, Resolver, ContainerInterface
     /**
      * Set variable storage
      * Expects either an array, or an object implementing ArrayAccess.
-     *
-     * @param  array|ArrayAccess $variables
-     * @return View
-     * @throws LogicException
      */
-    public function registerVars($variables)
+    public function registerVars(array|ArrayAccess $variables): static
     {
-        if (null === $variables) {
+        if (empty($variables)) {
             return $this;
-        }
-
-        if (!is_array($variables) && !$variables instanceof ArrayAccess) {
-            throw new LogicException(sprintf(
-                'Expected array or ArrayAccess object; received "%s"',
-                Variable::getType($variables))
-            );
         }
 
         // Enforce ArrayAccess
@@ -333,54 +255,40 @@ abstract class View implements Renderer, Resolver, ContainerInterface
      * @param  string $action
      * @return View
      */
-    function setAction($action)
+    function setAction(string $action): static
     {
         $this->action = $action;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    function getAction()
+    function getAction(): ?string
     {
         return $this->action;
     }
 
     /*
      * Set application Controller
-     * @param Controller $controller
      */
-    function setController(Controller $controller)
+    function setController(Controller $controller): static
     {
         $this->__controller = $controller;
         return $this;
     }
 
-    /**
-     * @return Controller|null
-     */
-    function getController()
+    function getController(): ?Controller
     {
         return $this->__controller;
     }
 
-    /**
-     * @param  \E4u\Request\Request $request
-     * @return $this
-     */
-    public function setRequest($request)
+    public function setRequest(Request $request): static
     {
         $this->request = $request;
         return $this;
     }
 
-    /**
-     * @return \E4u\Request\Request
-     */
-    public function getRequest()
+    public function getRequest(): Request
     {
-        if (null === $this->request) {
+        if (!isset($this->request)) {
 
             $controller = $this->getController();
             if (!is_null($controller)) {
@@ -388,7 +296,7 @@ abstract class View implements Renderer, Resolver, ContainerInterface
             }
             else {
                 # echo "NO CONTROLLER / REQUEST"; exit();
-                $this->request = \E4u\Request\Factory::create();
+                $this->request = Factory::create();
             }
 
         }
@@ -396,19 +304,13 @@ abstract class View implements Renderer, Resolver, ContainerInterface
         return $this->request;
     }
 
-    /**
-     * @return string
-     */
-    public function getActiveModule()
+    public function getActiveModule(): ?string
     {
         $route = $this->getController()->getRequest()->getCurrentRoute();
         return $route->getParam('module');
     }
 
-    /**
-     * @return string
-     */
-    public function getActiveController()
+    public function getActiveController(): ?string
     {
         $controller = $this->getController();
         if (!$controller) {
@@ -419,41 +321,24 @@ abstract class View implements Renderer, Resolver, ContainerInterface
         return $route->getParam('controller');
     }
 
-    /**
-     * @param  string $locale
-     * @return $this
-     */
-    public function setLocale($locale)
+    public function setLocale(string $locale): static
     {
         $this->locale = $locale;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): ?string
     {
         return $this->locale;
     }
 
-    /**
-     * @param  mixed $message
-     * @param  string $locale
-     * @return string
-     */
-    public function translate($message, $locale = null)
+    public function translate(mixed $message, ?string $locale = null): string
     {
         $message = (string)$message;
         return Loader::getTranslator()->translate($message, 'default', $locale ?: $this->getLocale());
     }
 
-    /**
-     * @param mixed $message
-     * @param array $parameters
-     * @return string
-     */
-    public function t($message, $parameters = null)
+    public function t(mixed $message, ?array $parameters = null): string
     {
         if (is_array($message)) {
             $parameters = $message;

@@ -5,76 +5,56 @@ use E4u\Common\File;
 
 class Csv extends File
 {
-    protected $header;
-    protected $data;
+    protected array $header;
+    protected array $data;
 
-    protected $delimiter = ',';
-    protected $enclosure = '"';
-    protected $escape = '\\';
+    protected string $separator = ',';
+    protected string $enclosure = '"';
+    protected string $escape = '\\';
 
-    /**
-     * @param  string $delimiter
-     * @return $this
-     */
-    public function setDelimiter($delimiter)
+    public function setSeparator(string $separator): static
     {
-        $this->delimiter = $delimiter;
+        $this->separator = $separator;
         return $this;
     }
 
-    /**
-     * @return string[][]
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->getData();
     }
 
-    public function getColumn($key)
+    public function getColumn(string $key): array
     {
         return array_column($this->getData(), $key);
     }
 
-    /**
-     * @return string[][]
-     */
-    public function getData()
+    public function getData(): array
     {
         $this->initialize();
         return $this->data;
     }
 
-    /**
-     * @return string[]
-     */
-    public function getHeader()
+    public function getHeader(): array
     {
         $this->initialize();
         return $this->header;
     }
 
-    /**
-     * @param  string $name Column name
-     * @return bool
-     */
-    public function hasHeader($name)
+    public function hasHeader(string $name): bool
     {
         $this->initialize();
         return in_array($name, $this->header);
     }
 
-    /**
-     * @return int
-     */
-    public function countColumns()
+    public function countColumns(): int
     {
         return count($this->getHeader());
     }
-
-    protected function initialize()
+    
+    protected function initialize(): void
     {
-        if (!is_null($this->header)) {
-            return false;
+        if (isset($this->header)) {
+            return;
         }
 
         $file = fopen($this->getFullPath(), 'r');
@@ -92,16 +72,10 @@ class Csv extends File
         }
 
         fclose($file);
-        return true;
     }
 
-    /**
-     * @param  resource $file
-     * @param  int $length
-     * @return string[]
-     */
-    protected function readLineIntoArray($file, $length = null)
+    protected function readLineIntoArray($file, ?int $length = null): array|false
     {
-        return fgetcsv($file, $length, $this->delimiter, $this->enclosure, $this->escape);
+        return fgetcsv($file, $length, $this->separator, $this->enclosure, $this->escape);
     }
 }

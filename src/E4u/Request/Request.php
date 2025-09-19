@@ -3,58 +3,18 @@ namespace E4u\Request;
 
 use Laminas\Mvc\Router\RouteStackInterface,
     Laminas\Mvc\Router\RouteMatch,
-    Laminas\Stdlib\RequestInterface,
-    Laminas\Stdlib\ParametersInterface;
+    Laminas\Stdlib\RequestInterface;
 
 interface Request extends RequestInterface
 {
-    /**
-     * @param  RouteStackInterface $router
-     * @return Request
-     */
-    public function setRouter(RouteStackInterface $router);
-
-    /**
-     * @return RouteStackInterface
-     */
-    public function getRouter();
-
-    /**
-     * @param  RouteMatch $route
-     * @return Request
-     */
-    public function setCurrentRoute(RouteMatch $route);
-
-    /** @return RouteMatch */
-    public function getCurrentRoute();
-
-    /** @return string */
-    public function getCurrentPath();
-
-    /** @return string */
+    public function setRouter(RouteStackInterface $router): static;
+    public function getRouter(): RouteStackInterface;
+    public function setCurrentRoute(RouteMatch $route): static;
+    public function getCurrentRoute(): RouteMatch;
+    public function getCurrentPath(): string;
     public function getBaseUrl();
-
-    /** @return string */
-    public function getFullUrl();
-
-    /**
-     * @param  string $name
-     * @param  mixed $default
-     * @return ParametersInterface|mixed
-     */
+    public function getFullUrl(): string;
     public function getPost($name = null, $default = null);
-
-    /**
-     * @param  string $name
-     * @param  mixed $default
-     * @return ParametersInterface|mixed
-     */
     public function getQuery($name = null, $default = null);
-
-    /**
-     * @param  string $name
-     * @param  mixed $default
-     * @return ParametersInterface|mixed
-     */
-    public function getFiles($name = null, $default = null);
+    public function getFiles(?string $name = null, mixed $default = null);
 }

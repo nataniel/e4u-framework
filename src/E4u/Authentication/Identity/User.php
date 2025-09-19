@@ -16,31 +16,29 @@ use E4u\Model\Entity;
  */
 abstract class User extends Entity implements Identity
 {
-    const MAX_PASSWORD_LENGTH = 48;
+    const int
+        MAX_PASSWORD_LENGTH = 48;
 
     /** @ORM\Column(type="string", unique=true, nullable=true) */
-    protected $login;
+    protected ?string $login;
 
     /** @ORM\Column(type="string", length=255, nullable=true) */
-    protected $encrypted_password;
+    protected ?string $encrypted_password;
 
     /** @ORM\Column(type="boolean") */
-    protected $active = true;
+    protected bool $active = true;
 
     /** @ORM\Column(type="datetime") */
-    protected $created_at;
+    protected \DateTime $created_at;
 
     /** @ORM\Column(type="datetime", nullable=true) */
-    protected $updated_at;
+    protected ?\DateTime $updated_at;
 
     /**
      * Encrypts password.
      * @link http://pl1.php.net/manual/en/book.password.php
-     *
-     * @param  $password
-     * @return $this
      */
-    public function setPassword($password)
+    public function setPassword(string $password): static
     {
         if (strlen($password) > self::MAX_PASSWORD_LENGTH) {
             throw new Exception\PasswordTooLongException(sprintf('Maximum password length is %d characters.', self::MAX_PASSWORD_LENGTH));
@@ -55,76 +53,57 @@ abstract class User extends Entity implements Identity
 
     /**
      * Security
-     * @return null
      */
-    public function getPassword()
+    public function getPassword(): null
     {
         return null;
     }
 
     /**
      * Security
-     * @return null
      */
-    public function getEncryptedPassword()
+    public function getEncryptedPassword(): null
     {
         return null;
     }
 
-    /**
-     * @param  string $login
-     * @return $this
-     */
-    public function setLogin($login)
+    public function setLogin(?string $login): static
     {
         $this->login = $login;
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isActive()
+    public function isActive(): bool
     {
-        return (bool)$this->active;
+        return $this->active;
     }
 
-    /**
-     * @param  bool $active
-     * @return $this
-     */
-    public function setActive($active)
+    public function setActive(bool $active): static
     {
-        $this->active = (bool)$active;
+        $this->active = $active;
         return $this;
     }
 
     /**
      * Implements Identity
-     *
-     * @return int
      */
-    public function id()
+    public function id(): int
     {
         return $this->id;
     }
 
     /**
      * Implements Identity
-     *
-     * @return string
      */
-    public function getLogin()
+    public function getLogin(): ?string
     {
         return $this->login;
     }
 
     /**
      * Implements Identity
-     *
-     * @return string
      */
-    public function getCookie()
+    public function getCookie(): ?string
     {
         return null;
     }
@@ -133,27 +112,21 @@ abstract class User extends Entity implements Identity
      * Implements Identity. This method should be overwritten by extending
      * class to provide necessary level of access-control (like groups,
      * privileges, etc.).
-     *
-     * @param  int $privilege
-     * @return boolean
      */
-    public function hasPrivilege($privilege)
+    public function hasPrivilege(int $privilege): bool
     {
         return true;
     }
 
     /**
      * Checks plain text password against the encrypted password from database.
-     *
-     * @param  string $password
-     * @return boolean
      */
-    public function verifyPassword($password)
+    public function verifyPassword(string $password): bool
     {
         return password_verify($password, $this->encrypted_password);
     }
 
-    public function valid()
+    public function valid(): bool
     {
         $login = $this->getLogin();
 
@@ -170,10 +143,7 @@ abstract class User extends Entity implements Identity
         return parent::valid();
     }
 
-    /**
-     * @return null
-     */
-    public function getLocale()
+    public function getLocale(): ?string
     {
         return null;
     }
@@ -181,13 +151,8 @@ abstract class User extends Entity implements Identity
     /**
      * Implements Identity
      * Returns instance of a User if login/password match.
-     *
-     * @param  string $login
-     * @param  string $password
-     * @return User
-     * @throws Exception\AuthenticationException
      */
-    public static function login($login, $password)
+    public static function login(string $login, string $password): static
     {
         if (empty($login)) {
             throw new Exception\UserNotFoundException();
@@ -206,11 +171,11 @@ abstract class User extends Entity implements Identity
         }
 
         if (!$user->verifyPassword($password)) {
-            throw (new Exception\InvalidPasswordException())->setUser($user);
+            throw new Exception\InvalidPasswordException()->setUser($user);
         }
 
         if (!$user->isActive()) {
-            throw (new Exception\UserNotActiveException())->setUser($user);
+            throw new Exception\UserNotActiveException()->setUser($user);
         }
 
         return $user;
@@ -218,25 +183,20 @@ abstract class User extends Entity implements Identity
 
     /**
      * Implements Identity
-     * @return User
      */
-    public static function findByID($id)
+    public static function findByID(int $id): ?static
     {
         return self::find($id);
     }
 
     /**
      * Implements Identity
-     * @return null
      */
-    public static function findByCookie($cookie)
+    public static function findByCookie(string $cookie): ?static
     {
         return null;
     }
 
-    /**
-     * @return Repository|EntityRepository
-     */
     public static function getRepository(): EntityRepository
     {
         return self::getEM()->getRepository(get_called_class());

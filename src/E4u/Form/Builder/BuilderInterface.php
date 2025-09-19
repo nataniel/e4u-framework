@@ -6,24 +6,24 @@ use E4u\Form\Base;
 
 interface BuilderInterface
 {
-    public function __construct(Base $form, View\Html $view, $options = []);
-    public function errors();
-    public function start($options = []);
-    public function end();
+    public function __construct(Base $form, View\Html $view, array $options = []);
+    public function errors(): ?string;
+    public function start(array $options = []);
+    public function end(): string;
 
-    public function fieldId($name, $value = null);
-    public function fieldName($name);
+    public function fieldId(string $name, mixed $value = null): string;
+    public function fieldName(string $name): string;
 
-    public function label($name, $showLabels = true);
-    public function checkbox($name, $options = []);
-    public function textarea($name, $options = []);
-    public function file($name, $options = []);
-    public function text($name, $options = []);
-    public function number($name, $options = []);
-    public function password($name, $options = []);
-    public function email($name, $options = []);
-    public function date($name, $options = []);
-    public function select($name, $options = []);
-    public function radioGroup($name, $options = []);
-    public function button($name, $options = []);
+    public function label(string $name, bool $showLabels = true): string;
+    public function checkbox(string $name, array $options = []): string;
+    public function textarea(string $name, array $options = []): string;
+    public function file(string $name, array $options = []): string;
+    public function text(string $name, array $options = []): string;
+    public function number(string $name, array $options = []): string;
+    public function password(string $name, array $options = []): string;
+    public function email(string $name, array $options = []): string;
+    public function date(string $name, array $options = []): string;
+    public function select(string $name, array $options = []): string;
+    public function radioGroup(string $name, array $options = []): string;
+    public function button(string $name, array $options = []): string;
 }

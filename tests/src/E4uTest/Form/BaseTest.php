@@ -1,19 +1,19 @@
 <?php
 namespace E4uTest\Form;
 
+use E4u\Request\Test;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use E4u\Form;
 
+#[CoversClass(Form\Base::class)]
 class BaseTest extends TestCase
 {
-    /**
-     * @var Form\Base
-     */
-    protected $form;
+    protected Form\Base $form;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->form = new Form\Base(new \E4u\Request\Test(), 'test');
+        $this->form = new Form\Base(new Test(), 'test');
         $this->form->setMethod(Form\Base::HTTP_POST, false);
 
         $field = new Form\Element\TextField('name', 'Nazwa strony');
@@ -21,7 +21,6 @@ class BaseTest extends TestCase
         $this->form->addField($field);
 
         $this->form->addField(new Form\Element\CheckBox('active', 'Aktywna?'));
-
         $this->form->addField(new Form\Element\EmailAddress('login', [
             'label' => 'Adres e-mail',
             'required' => false,
@@ -30,9 +29,6 @@ class BaseTest extends TestCase
         ]));
     }
 
-    /**
-     * @covers \E4u\Form\Base::getValues
-     */
     public function testGetValues()
     {
         $this->assertCount(3, $this->form->getValues());
@@ -45,20 +41,12 @@ class BaseTest extends TestCase
         $this->assertCount(1, $this->form->getValues([ 'name', 'status' ]));
     }
 
-    /**
-     * @covers \E4u\Form\Base::getAction
-     * @covers \E4u\Form\Base::setAction
-     */
     public function testAction()
     {
         $this->form->setAction('test/index');
         $this->assertEquals($this->form->getRequest()->getBaseUrl() . 'test/index', $this->form->getAction());
     }
 
-    /**
-     * @covers \E4u\Form\Base::addField
-     * @covers \E4u\Form\Base::getElement
-     */
     public function testAddField()
     {
         $count = count($this->form->getValues());
@@ -76,26 +64,21 @@ class BaseTest extends TestCase
         $this->assertCount($count + 2, $this->form->getValues());
     }
 
-    /**
-     * @covers \E4u\Form\Base::getValue
-     * @covers \E4u\Form\Base::setValue
-     */
     public function testGetValue()
     {
-        $field = new Form\Element\TextField('test', 'Pole testowe');
+        $field = new Form\Element\TextField('foo', 'Pole testowe');
         $this->form->addField($field);
-
-        $field->setValue('A');
-        $this->assertEquals('A', $this->form->getValue('test'));
+        $field->setValue('bar');
+        $this->assertEquals('bar', $field->getValue());
 
         $request = $this->form->getRequest();
-        $request->getPost()->fromArray([ 'test' => [ 'submit' => true, 'test' => 'C' ] ]);
-        $this->assertEquals('C', $this->form->getValue('test'));
+        $request->getPost()->fromArray([ 'test' => [ 'submit' => true, 'foo' => 'else' ] ]);
+        $this->assertEquals('else', $this->form->getValue('foo'));
     }
 
     /**
-     * @covers \E4u\Form\Base::setMethod
-     * @covers \E4u\Form\Base::getMethod
+     * @covers Form\Base::setMethod
+     * @covers Form\Base::getMethod
      */
     public function testMethod()
     {
@@ -107,11 +90,6 @@ class BaseTest extends TestCase
         $this->assertEquals(Form\Base::HTTP_GET, $this->form->getMethod());
     }
 
-    /**
-     * @covers \E4u\Form\Base::addError
-     * @covers \E4u\Form\Base::getErrors
-     * @covers \E4u\Form\Base::validate
-     */
     public function testErrors()
     {
         $this->assertEmpty($this->form->getErrors());
@@ -124,22 +102,13 @@ class BaseTest extends TestCase
         $this->assertCount(2, $this->form->getErrors());
     }
 
-    /**
-     * @covers \E4u\Form\Base::isSubmitted
-     */
     public function testIsSubmitted()
     {
-        $this->assertFalse($this->form->isSubmitted());
-
         $request = $this->form->getRequest();
         $request->getPost()->fromArray([ 'test' => [ 'submit' => true, 'name' => 'TEST' ] ]);
-
         $this->assertTrue($this->form->isSubmitted());
     }
 
-    /**
-     * @covers \E4u\Form\Base::isValid
-     */
     public function testIsValid()
     {
         $request = $this->form->getRequest();

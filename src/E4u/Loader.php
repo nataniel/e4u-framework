@@ -297,7 +297,7 @@ class Loader
         $doctrine = $appConfig->get('doctrine');
         $proxyDir = $doctrine->get('proxy_dir', self::DEFAULT_PROXY_DIR);
         $proxyNamespace = $doctrine->get('proxy_namespace', $namespace . '\Proxies');
-        Proxy\Autoloader::register($proxyDir, $proxyNamespace);
+        # Proxy\Autoloader::register($proxyDir, $proxyNamespace);
 
         Registry::set('application/config', $appConfig);
         return $appConfig;

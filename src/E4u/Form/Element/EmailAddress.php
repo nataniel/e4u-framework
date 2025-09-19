@@ -3,7 +3,7 @@ namespace E4u\Form\Element;
 
 class EmailAddress extends TextField
 {
-    protected $inputType = 'email';
+    protected string $inputType = 'email';
     
     public function __construct($name, $options = null)
     {

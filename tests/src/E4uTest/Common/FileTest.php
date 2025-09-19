@@ -1,84 +1,60 @@
 <?php
 namespace E4uTest\Common;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use E4u\Common\File;
 
 /**
  * Class FileTest
  * @package E4uTest\Common
- * @covers  File
  */
+#[CoversClass(File::class)]
 class FileTest extends TestCase
 {
-    /**
-     * @var File
-     */
-    protected $file;
+    protected File $file;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->file = new File('files/test.pdf', 'tests');
     }
 
-    /**
-     * @covers File::testGetPublicPath
-     */
     public function testGetPublicPath()
     {
         $this->assertEquals('tests/', $this->file->getPublicPath());
     }
 
-    /**
-     * @covers File::getFilename
-     */
     public function testGetFilename()
     {
         $this->assertEquals('files/test.pdf', $this->file->getFilename());
     }
 
-    /**
-     * @covers File::getFullPath
-     */
     public function testGetFullPath()
     {
         $this->assertEquals('tests/files/test.pdf', $this->file->getFullPath());
     }
 
-    /**
-     * @covers File::__toString
-     */
     public function test__toString()
     {
         $this->assertEquals('files/test.pdf', "".$this->file);
     }
 
-    /**
-     * @covers File::getExtension
-     */
     public function testGetExtension()
     {
         $this->assertEquals('pdf', $this->file->getExtension());
     }
 
-    /**
-     * @covers File::getPublicPath()
-     * @covers File::getFullPath()
-     */
     public function testFileWithoutPublicPath()
     {
         $file = new File('tests/files/test.pdf', false);
         $this->assertEquals('tests/files/test.pdf', $file->getFullPath());
     }
 
-    /**
-     * @covers File::getPublicPath()
-     * @covers File::getFullPath()
-     */
     public function testFileWithRootPath()
     {
         $file = new File('/tmp/phpGxfrpN', '/');
@@ -98,25 +74,20 @@ class FileTest extends TestCase
         $this->assertTrue($file->isHidden());
     }
 
-    /**
-     * @dataProvider filesForFactory
-     * @param string $expected
-     * @param string $filename
-     * @covers File::factory
-     */
-    public function testFactory($expected, $filename)
+    #[DataProvider('filesForFactory')]
+    public function testFactory(string $expected, string $filename)
     {
         $this->assertInstanceOf($expected, File::factory($filename, 'tests/'));
     }
 
-    public function filesForFactory()
+    public static function filesForFactory(): array
     {
         return [
             [ File\Directory::class, 'files/directory' ],
             [ File\Directory::class, 'files' ],
             [ File\Image::class, 'files/test.jpg' ],
             [ File::class, 'files/test.pdf' ],
-            [ File::class, 'http://www.test.pl/file.html' ],
+            [ File::class, 'https://www.test.pl/file.html' ],
         ];
     }
 }

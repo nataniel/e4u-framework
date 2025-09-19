@@ -2,33 +2,31 @@
 namespace E4u\Request;
 
 use Laminas\Stdlib\Parameters;
+use Laminas\Stdlib\ParametersInterface;
 
 class Test extends Cli
 {
-    protected $currentPath = '/';
-    protected $postParams;
-    protected $queryParams;
+    protected string $currentPath = '/';
+    protected ParametersInterface $postParams;
+    protected ParametersInterface $queryParams;
 
-    public function setCurrentPath($path)
+    public function setCurrentPath(string $path): void
     {
         $this->currentPath = $path;
     }
 
-    public function getCurrentPath()
+    public function getCurrentPath(): string
     {
         return $this->currentPath;
     }
     
     /**
      * Mock $_POST parameters
-     *
-     * @param string|null           $name            Parameter name to retrieve, or null to get the whole container.
-     * @param mixed|null            $default         Default value to use when the parameter is missing.
-     * @return \Laminas\Stdlib\ParametersInterface
+     * @return ParametersInterface
      */
     public function getPost($name = null, $default = null)
     {
-        if ($this->postParams === null) {
+        if (!isset($this->postParams)) {
             $this->postParams = new Parameters();
         }
 
@@ -41,14 +39,11 @@ class Test extends Cli
     
     /**
      * Mock $_GET parameters
-     *
-     * @param string|null           $name            Parameter name to retrieve, or null to get the whole container.
-     * @param mixed|null            $default         Default value to use when the parameter is missing.
-     * @return \Laminas\Stdlib\ParametersInterface
+     * @return ParametersInterface
      */
-    public function getQuery($name = null, $default = null)
+    public function getQuery($name = null, $default = null) 
     {
-        if ($this->queryParams === null) {
+        if (!isset($this->queryParams)) {
             $this->queryParams = new Parameters();
         }
 

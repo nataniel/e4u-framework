@@ -3,81 +3,51 @@ namespace E4u\Form;
 
 class UploadedFile
 {
-    protected $data;
-
-    public function __construct($data)
+    public function __construct(
+        protected array $data)
     {
-        $this->data = $data;
     }
 
-    /**
-     * @param  string $destination
-     * @return bool
-     */
-    public function moveTo($destination)
+    public function moveTo(string $destination): bool
     {
         return move_uploaded_file($this->data['tmp_name'], $destination);
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return basename($this->data['name']);
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->data['type'];
     }
 
-    /**
-     * @return string
-     */
-    public function getTmpName()
+    public function getTmpName(): string
     {
         return $this->data['tmp_name'];
     }
 
-    /**
-     * @return string
-     */
-    public function getSize()
+    public function getSize(): string
     {
         return $this->data['size'];
     }
 
-    /**
-     * @return string
-     */
-    public function getError()
+    public function getError(): int
     {
         return $this->data['error'];
     }
 
-    /**
-     * @return bool
-     */
-    public function isValid()
+    public function isValid(): bool
     {
-        return $this->data['error'] == UPLOAD_ERR_OK;
+        return $this->data['error'] === UPLOAD_ERR_OK;
     }
 
-    /**
-     * @return string[]
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->data;
     }
 
-    /**
-     * @return string
-     */
     public function __toString()
     {
         return $this->data['name'];

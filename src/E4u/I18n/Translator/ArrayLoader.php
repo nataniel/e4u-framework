@@ -39,24 +39,14 @@ class ArrayLoader extends AbstractFileLoader
         return $this->textDomain($messages);
     }
 
-    /**
-     * @param  array $input
-     * @return TextDomain
-     */
-    private function textDomain($input)
+    private function textDomain(array $input): TextDomain
     {
         $output = new TextDomain();
         $this->mergeInto($input, $output);
         return $output;
     }
 
-    /**
-     * @param  mixed $input
-     * @param  TextDomain$textDomain
-     * @param  string $prefix
-     * @return $this
-     */
-    private function mergeInto($input, $textDomain, $prefix = '')
+    private function mergeInto(mixed $input, TextDomain $textDomain, string $prefix = ''): void
     {
         if (is_array($input)) {
             foreach ($input as $key => $value) {
@@ -67,7 +57,5 @@ class ArrayLoader extends AbstractFileLoader
         else {
             $textDomain[ $prefix ] = $input;
         }
-
-        return $this;
     }
 }

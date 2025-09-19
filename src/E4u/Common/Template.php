@@ -5,7 +5,7 @@ use E4u\Exception\LogicException;
 
 class Template
 {
-    public static function wolacz($vars, $options = null)
+    public static function wolacz($vars, $options = null): string
     {
         $name = null; $locale = 'pl';
         if (is_array($vars) || $vars instanceof \ArrayAccess) {
@@ -22,7 +22,7 @@ class Template
         return $name;
     }
 
-    public static function pln($vars, $options = null)
+    public static function pln($vars, $options = null): string
     {
         if (is_array($vars) || $vars instanceof \ArrayAccess) {
             if (isset($vars[ $options ])) {
@@ -33,7 +33,7 @@ class Template
         return '';
     }
 
-    public static function date($vars, $options = null)
+    public static function date($vars, $options = null): string
     {
         if (is_array($vars) || $vars instanceof \ArrayAccess) {
             if (isset($vars[ $options ]) && $vars[ $options ] instanceof \DateTime) {
@@ -44,7 +44,7 @@ class Template
         return '';
     }
 
-    public static function datetime($vars, $options = null)
+    public static function datetime($vars, $options = null): string
     {
         if (is_array($vars) || $vars instanceof \ArrayAccess) {
             if (isset($vars[ $options ]) && $vars[ $options ] instanceof \DateTime) {

@@ -5,7 +5,7 @@ use Laminas\Stdlib\Response as LaminasResponse;
 
 abstract class Base extends LaminasResponse implements Response
 {
-    protected $status = self::STATUS_OK;
+    protected int $status = self::STATUS_OK;
 
     public function __construct($content = null)
     {
@@ -14,15 +14,14 @@ abstract class Base extends LaminasResponse implements Response
         }
     }
 
-    public abstract function send();
+    public abstract function send(): void;
     
-    public function setStatus($status)
+    public function setStatus(int $status): void
     {
         $this->status = $status;
-        return $this;
     }
     
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }

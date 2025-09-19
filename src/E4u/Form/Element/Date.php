@@ -3,20 +3,12 @@ namespace E4u\Form\Element;
 
 class Date extends TextField
 {
-    protected $cssClass = 'text_field';
-    protected $inputType = 'date';
+    protected string $cssClass = 'text_field';
+    protected string $inputType = 'date';
 
-    /**
-     * Current value of the field
-     * @var \DateTime
-     */
-    protected $value;
+    protected mixed $value;
 
-    /**
-     * @param  mixed $value
-     * @return $this
-     */
-    public function setValue($value)
+    public function setValue(mixed $value): static
     {
         if (is_string($value)) {
             $value = !empty($value)

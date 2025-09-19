@@ -10,18 +10,10 @@ abstract class ViewHelper implements HelperInterface
 {
     /**
      * View object instance
-     *
-     * @var View
      */
-    protected $view = null;
+    protected View|Renderer $view;
 
-    /**
-     * Set the View object
-     *
-     * @param  Renderer|View $view
-     * @return $this
-     */
-    public function setView(Renderer $view)
+    public function setView(Renderer $view): static
     {
         $this->view = $view;
         return $this;
@@ -29,11 +21,13 @@ abstract class ViewHelper implements HelperInterface
 
     /**
      * Get the view object
-     *
-     * @return null|View
      */
-    public function getView()
+    public function getView(): ?View
     {
+        if (!isset($this->view)) {
+            throw new LogicException('View helper has not been set.');
+        }
+        
         return $this->view;
     }
     

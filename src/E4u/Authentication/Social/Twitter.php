@@ -17,25 +17,13 @@ class Twitter implements Helper
 {
     use Url;
 
-    /**
-     * @var Config
-     */
-    private $config;
+    private Config $config;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private Request $request;
 
-    /**
-     * @var TwitterOAuth
-     */
-    protected $connection;
+    protected TwitterOAuth $client;
 
-    /**
-     * @var array
-     */
-    protected $requestToken;
+    protected array $requestToken;
 
     private $me;
 
@@ -45,38 +33,27 @@ class Twitter implements Helper
         $this->request = $request;
     }
 
-    /**
-     * @param  Config $config
-     * @return $this
-     */
-    protected function setConfig(Config $config)
+    protected function setConfig(Config $config): void
     {
         if (!$config->get('consumer_key') || !$config->get('consumer_secret')) {
             throw new ConfigException('Twitter config must have "consumer_key" and "consumer_secret" keys set.');
         }
 
         $this->config = $config;
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLoginUrl()
+    public function getLoginUrl(): string
     {
         $callback = $this->getRequest()->getCurrentPath();
-        $token = $this->getConnection()->oauth('oauth/request_token', [ 'oauth_callback' => $this->urlTo($callback, true) ]);
+        $token = $this->getClient()->oauth('oauth/request_token', [ 'oauth_callback' => $this->urlTo($callback, true) ]);
 
-        $this->setRequestToken($token);
+        $this->requestToken = $token;
         $_SESSION['request_token'] = $token;
 
-        return $this->getConnection()->url('oauth/authorize', [ 'oauth_token' => $token['oauth_token'] ]);
+        return $this->getClient()->url('oauth/authorize', [ 'oauth_token' => $token['oauth_token'] ]);
     }
 
-    /**
-     * @return bool
-     */
-    public function loginFromRedirect()
+    public function loginFromRedirect(): bool
     {
         $oauth_verifier = $this->request->getQuery('oauth_verifier');
         if (empty($oauth_verifier) || empty($_SESSION['request_token'])) {
@@ -92,80 +69,61 @@ class Twitter implements Helper
             throw new AuthenticationException('Nieprawidłowy token w sesji.');
         }
 
-        $this->setRequestToken($token);
-        $token = $this->getConnection()->oauth("oauth/access_token", [ 'oauth_verifier' => $oauth_verifier ]);
+        $this->requestToken = $token;
+        $token = $this->getClient()->oauth("oauth/access_token", [ 'oauth_verifier' => $oauth_verifier ]);
 
-        $this->connection = new TwitterOAuth(
+        $this->client = new TwitterOAuth(
             $this->config->get('consumer_key'),
             $this->config->get('consumer_secret'),
             $token['oauth_token'],
             $token['oauth_token_secret']
         );
 
-        $this->me = $this->getConnection()->get("account/verify_credentials");
+        $this->me = $this->getClient()->get("account/verify_credentials");
         return true;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->me->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getFirstName()
+    public function getFirstName(): string
     {
         return strtok($this->me->name, ' ');
     }
 
-    /**
-     * @return string
-     */
-    public function getLastName()
+    public function getLastName(): string
     {
         strtok($this->me->name, ' ');
         return (string)strtok('');
     }
 
-    /**
-     * @return string
-     */
-    public function getPicture()
+    public function getPicture(): ?string
     {
         return $this->me->profile_image_url;
     }
 
-    /**
-     * @return string
-     */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->me->screen_name . '@twitter.com';
     }
 
     /**
      * Implements Helper\Url
-     * @return Request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
 
-    /**
-     * @return TwitterOAuth
-     */
-    private function getConnection()
+    private function getClient(): TwitterOAuth
     {
-        if (null == $this->connection) {
+        if (!isset($this->client)) {
 
-            if (null === $this->requestToken) {
+            if (!isset($this->requestToken)) {
 
-                $this->connection = new TwitterOAuth(
+                $this->client = new TwitterOAuth(
                     $this->config->get('consumer_key'),
                     $this->config->get('consumer_secret')
                 );
@@ -173,7 +131,7 @@ class Twitter implements Helper
             }
             else {
 
-                $this->connection = new TwitterOAuth(
+                $this->client = new TwitterOAuth(
                     $this->config->get('consumer_key'),
                     $this->config->get('consumer_secret'),
                     $this->requestToken['oauth_token'],
@@ -183,32 +141,10 @@ class Twitter implements Helper
             }
         }
 
-        return $this->connection;
+        return $this->client;
     }
 
-    /**
-     * @return array
-     */
-    private function getRequestToken()
-    {
-        return $this->requestToken;
-    }
-
-    /**
-     *
-     * @param  array $token
-     * @return self
-     */
-    private function setRequestToken($token)
-    {
-        $this->requestToken = $token;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): ?string
     {
         // ["lang"] => string(2) "pl"
         return $this->me->lang;

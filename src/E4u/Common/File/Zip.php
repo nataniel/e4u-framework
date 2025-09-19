@@ -6,18 +6,15 @@ use E4u\Common\File;
 
 class Zip extends File
 {
-    /**
-     * @var \ZipArchive
-     */
-    private $archive;
+    private \ZipArchive $archive;
     
-    public function __construct($filename, $publicPath = 'public/')
+    public function __construct(string $filename, string $publicPath = 'public/')
     {
         parent::__construct($filename, $publicPath);
         $this->createArchive();
     }
 
-    public function addFile(File $file)
+    public function addFile(File $file): void
     {
         if ($file->isLocal()) {
             $this->archive->addFile($file->getFullPath(), $file->getBasename());
@@ -29,12 +26,12 @@ class Zip extends File
         }
     }
     
-    public function close()
+    public function close(): void
     {
         $this->archive->close();
     }
 
-    private function createArchive()
+    private function createArchive(): void
     {
         $this->archive = new \ZipArchive;
         $result = $this->archive->open($this->getFullPath(), \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
@@ -43,7 +40,7 @@ class Zip extends File
         }
     }
 
-    public function addEmptyDir($dirName)
+    public function addEmptyDir(string $dirName): void
     {
         $this->archive->addEmptyDir($dirName);
     }

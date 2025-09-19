@@ -3,7 +3,7 @@ namespace E4u\Response;
 
 class InlineFile extends File
 {
-    protected $type = 'inline';
+    protected string $type = 'inline';
 
     public function __construct($filename = null, $name = null)
     {

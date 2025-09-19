@@ -2,6 +2,8 @@
 namespace E4u\Application\Helper;
 
 use E4u\Common\Collection\Paginable;
+use E4u\Common\Html;
+use E4u\Exception\LogicException;
 use E4u\Request\Http;
 
 /**
@@ -31,12 +33,8 @@ class Pagination extends ViewHelper
           </a>
         </li>
         </ul>
-     *
-     * @param  Paginable $collection
-     * @param  array $options
-     * @return string
      */
-    public function show(Paginable $collection, $options = [])
+    public function show(Paginable $collection, array $options = []): string
     {
         if (isset($options['prev'])) {
             $prevCaption =  $options['prev'];
@@ -90,21 +88,18 @@ class Pagination extends ViewHelper
         }
 
         $li[] = $this->listElement($next = $collection->nextPage(), $nextCaption);
-        return $this->view->tag('ul', $options, join('', $li));
+        return Html::tag('ul', $options, join('', $li));
     }
 
-    protected function listElement($page, $options = [])
+    protected function listElement(?int $page, array|string $options = []): string
     {
         $class = null;
         if (is_string($options)) {
-
             $caption = $options;
-
         }
         else {
 
             $caption = $page;
-
             if (is_array($options)) {
                 if (isset($options['class'])) {
                     $class = $options['class'];
@@ -125,24 +120,22 @@ class Pagination extends ViewHelper
             $class = 'disabled';
         }
 
-        return $this->view->tag('li', [
+        return Html::tag('li', [
             'class' => trim('page-item ' . $class)
         ], $this->linkToPage($page, $caption));
     }
 
-    /**
-     * @param  int $page
-     * @param  string $caption
-     * @return string
-     */
-    protected function linkToPage($page, $caption = null)
+    protected function linkToPage(int $page, ?string $caption = null): string
     {
-        /** @var Http $request */
         $request = $this->view->getRequest();
+        if (!$request instanceof Http) {
+            throw new LogicException('Request must be Http to use BackUrl.');
+        }
+        
         $href = $this->view->urlTo($request->getCurrentPath())
             . '?' . $request->mergeQuery([ 'page' => $page, 'route' => null ]);
 
-        return $this->view->tag('a', [
+        return Html::tag('a', [
             'href' => $href,
             'class' => 'page-link internal',
             'role' => 'button',

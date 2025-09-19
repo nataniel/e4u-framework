@@ -7,46 +7,13 @@ use Laminas\Config\Config;
 interface Helper
 {
     public function __construct(Config $config, Request $request);
-
-    /**
-     * @return string
-     */
-    public function getLoginUrl();
-
-    /**
-     * @return bool
-     */
-    public function loginFromRedirect();
-
+    public function getLoginUrl(): string;
+    public function loginFromRedirect(): bool;
     public function hasId(): bool;
-
-    /**
-     * @return string
-     */
-    public function getId();
-
-    /**
-     * @return string
-     */
-    public function getFirstName();
-
-    /**
-     * @return string
-     */
-    public function getLastName();
-
-    /**
-     * @return string
-     */
-    public function getPicture();
-
-    /**
-     * @return string|null
-     */
-    public function getEmail();
-
-    /**
-     * @return string
-     */
-    public function getLocale();
+    public function getId(): ?string;
+    public function getFirstName(): ?string;
+    public function getLastName(): ?string;
+    public function getPicture(): ?string;
+    public function getEmail(): ?string;
+    public function getLocale(): ?string;
 }

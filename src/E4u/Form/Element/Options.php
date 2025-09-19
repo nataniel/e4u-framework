@@ -5,14 +5,10 @@ use E4u\Form\Element;
 
 abstract class Options extends Element
 {
-    protected $options = [];
-    protected $data = [];
+    protected array $options = [];
+    protected array $data = [];
 
-    /**
-     * @param  array $options
-     * @return Options
-     */
-    public function setOptions($options)
+    public function setOptions(array $options): static
     {
         $this->options = $options;
         return $this;
@@ -24,54 +20,35 @@ abstract class Options extends Element
      * @param array[] $data [ value1 => dataArray1, value2 => dataArray2, ... ]
      * @return Options
      */
-    public function addOptions($options, $data = [])
+    public function addOptions(array $options, array $data = []): static
     {
         foreach ($options as $value => $caption) {
-            $dataForOption = isset($data[$value]) ? $data[$value] : [];
+            $dataForOption = $data[ $value ] ?? [];
             $this->addOption($value, $caption, $dataForOption);
         }
 
         return $this;
     }
 
-    /**
-     * @param  string   $value
-     * @param  string   $caption
-     * @param  string[] $data
-     * @return Options
-     */
-    public function addOption($value, $caption, $data = [])
+    public function addOption(string $value, string $caption, array $data = []): static
     {
         $this->options[ $value ] = $caption;
         $this->data[ $value ] = $data;
         return $this;
     }
 
-    /**
-     * @param  string $value
-     * @return string[]
-     */
-    public function getDataForOption($value)
+    public function getDataForOption(string $value): array
     {
-        return isset($this->data[ $value ])
-            ? $this->data[ $value ]
-            : [];
+        return $this->data[ $value ] ?? [];
     }
 
-    /**
-     * @param  array[] $data
-     * @return $this
-     */
-    public function setData($data)
+    public function setData(array $data): static
     {
         $this->data = $data;
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }

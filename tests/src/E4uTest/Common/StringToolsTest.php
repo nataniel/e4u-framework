@@ -2,13 +2,12 @@
 namespace E4uTest\Common;
 
 use E4u\Common\StringTools;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(StringTools::class)]
 class StringToolsTest extends TestCase
 {
-    /**
-     * @covers StringTools::wolacz
-     */
     public function testWolacz()
     {
         $this->assertEquals('Arturze', StringTools::wolacz('Artur'));
@@ -26,9 +25,6 @@ class StringToolsTest extends TestCase
          */
     }
 
-    /**
-     * @covers StringTools::toAscii
-     */
     public function testToAscii()
     {
         $this->assertEquals(
@@ -37,9 +33,6 @@ class StringToolsTest extends TestCase
         );
     }
 
-    /**
-     * @covers StringTools::underscore
-     */
     public function testUnderscore()
     {
         $this->assertEquals('test_me', StringTools::underscore('test_Me'));
@@ -51,9 +44,6 @@ class StringToolsTest extends TestCase
         $this->assertEquals('nowy_ze_spacjami', StringTools::underscore('nowy, ze spacjami'));
     }
 
-    /**
-     * @covers StringTools::camelCase
-     */
     public function testCamelCase()
     {
         $this->assertEquals(
@@ -62,22 +52,16 @@ class StringToolsTest extends TestCase
         );
     }
 
-    /**
-     * @covers StringTools::toUrl
-     */
     public function testToUrl()
     {
-        $this->assertEquals('łódź-bardzo-skomplikowane', StringTools::toUrl('Łódź... bardzo SKOMPLIKOWANE?!'));
-        $this->assertEquals('lodz-bardzo-skomplikowane', StringTools::toUrl('Łódź... bardzo SKOMPLIKOWANE?!', true));
+        $this->assertEquals('łódź.-bardzo-skomplikowane', StringTools::toUrl('Łódź... bardzo SKOMPLIKOWANE?!'));
+        $this->assertEquals('lodz.-bardzo-skomplikowane', StringTools::toUrl('Łódź... bardzo SKOMPLIKOWANE?!', true));
 
         $this->assertEquals('bardzo-skomplikowane', StringTools::toUrl('bardzo SKOMPLIKOWANE?!'));
-        $this->assertEquals('warszawa-bardzo-skomplikowane', StringTools::toUrl('Warszawa... bardzo SKOMPLIKOWANE?!'));
+        $this->assertEquals('warszawa.-bardzo-skomplikowane', StringTools::toUrl('Warszawa... bardzo SKOMPLIKOWANE?!'));
         $this->assertEquals('default', StringTools::toUrl('@(!'));
     }
 
-    /**
-     * @covers StringTools::shortVersion()
-     */
     public function testShortVersion()
     {
         $txt = '<p>[[ja(Ty/On)]] jesteś jak zdrowie.

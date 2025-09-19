@@ -1,8 +1,7 @@
 <?php
 namespace E4u;
 
-use E4u\Application\Controller;
-use E4u\Exception\LogicException;
+use E4u\Request\Factory;
 use E4u\Request\Request,
     E4u\Response\Response,
     E4u\Application\Exception,
@@ -12,19 +11,14 @@ use E4u\Request\Request,
 
 class Application
 {
-    protected $request;
-    protected $router;
+    protected Request $request;
+    protected RouteStackInterface $router;
 
-    /**
-     * @var Config
-     */
-    protected $config;
+    protected Config $config;
 
-    public function __construct($config = null)
+    public function __construct(Config|array|null $config = null)
     {
-        if ($config) {
-            $this->setConfig($config);
-        }
+        $this->setConfig($config ?: []);
 
         if (PHP_SAPI != 'cli') {
             $name = $this->config->get('session_name', 'E4uSession');
@@ -34,24 +28,16 @@ class Application
         }
     }
 
-    /**
-     * @param  Config|array $config
-     * @return $this
-     */
-    public function setConfig($config)
+    public function setConfig(Config|array $config): void
     {
         $this->config = ($config instanceof Config)
             ? $config
             : new Config((array)$config);
-        return $this;
     }
 
-    /**
-     * @return Config
-     */
-    public function getConfig()
+    public function getConfig(): Config
     {
-        if (null == $this->config) {
+        if (!isset($this->config)) {
             $this->config = new Config([]);
         }
 
@@ -62,15 +48,12 @@ class Application
      * MUST return Application object
      * @return $this
      */
-    protected function init()
+    protected function init(): static
     {
         return $this;
     }
 
-    /**
-     * @return Response
-     */
-    public function run()
+    public function run(): Response
     {
         try {
 
@@ -93,13 +76,10 @@ class Application
 
     /**
      * 404 Not Found
-     * @param  \Exception $e
-     * @param  int $status
-     * @return Response
      */
-    protected function notFoundException(\Exception $e, $status = 404)
+    protected function notFoundException(\Exception $e, int $status = 404): Response
     {
-        if ($this->getConfig()->show_errors) {
+        if ($this->getConfig()->get('show_errors', false)) {
             echo '<pre>'; echo $e;
             exit();
         }
@@ -115,11 +95,8 @@ class Application
 
     /**
      * 500 Internal Server Error
-     * @param  \Exception $e
-     * @param  int $status
-     * @return Response
      */
-    protected function invalidException(\Exception $e, $status = 500)
+    protected function invalidException(\Exception $e, int $status = 500): Response
     {
         if ($this->getConfig()->get('show_errors', false)) {
             echo '<pre>'; echo $e;
@@ -135,12 +112,7 @@ class Application
         return $response->setStatus($status);
     }
 
-    /**
-     * @param  \Exception $e
-     * @param  string $filename
-     * @return $this
-     */
-    protected function addToLog($e, $filename = 'application-%s.log')
+    protected function addToLog(\Exception $e, string $filename = 'application-%s.log'): void
     {
         $filename = sprintf($filename, date('Y-m-d'));
         $message = sprintf("%s %s:\nREFERER: %s\nUSER_AGENT: %s\nREMOTE_ADDR: %s\nERROR: %s - %s\n%s\n\n",
@@ -153,14 +125,9 @@ class Application
             $e->getMessage(),
             $e->getTraceAsString());
         file_put_contents('logs/' . $filename, $message, FILE_APPEND);
-        return $this;
     }
 
-    /**
-     * @param  Request|array $request
-     * @return $this
-     */
-    public function route($request)
+    public function route(Request|array $request): void
     {
         $route = $request instanceof Request
             ? $this->getRouter()->match($request)
@@ -168,8 +135,6 @@ class Application
         if ($route instanceof RouteMatch) {
             $this->getRequest()->setCurrentRoute($route);
         }
-
-        return $this;
     }
 
     /**
@@ -181,11 +146,8 @@ class Application
      * /site/pages  -> My\Controller\Site\PagesController
      * /admin/users -> My\Controller\Admin\UsersController
      * /security    -> My\Controller\SecurityController
-     *
-     * @param  array $params
-     * @return Response
      */
-    public function dispatch($params = null)
+    public function dispatch(?array $params = null): Response
     {
         $request = $this->getRequest();
         if (!empty($params)) {
@@ -193,24 +155,15 @@ class Application
             $this->getRequest()->setCurrentRoute($route);
         }
 
-        $controller = $this->getController();
-        if (!$controller instanceof Controller) {
-            throw new LogicException(
-                sprintf('Controller must be an instance of E4u\Application\Controller, %s given.',
-                Common\Variable::getType($controller)));
-        }
-
-        $response = $controller->dispatch($request);
-        return $response;
+        return $this->getController()->dispatch($request);
     }
 
     /**
      * Convention over configuration.
      *
      * @see    dispatch
-     * @return Application\Controller
      */
-    function getController()
+    function getController(): Application\Controller
     {
         $routeMatch = $this->getRequest()->getCurrentRoute();
         if (!$routeMatch instanceof RouteMatch) {
@@ -235,11 +188,8 @@ class Application
 
     /**
      * Set the request object
-     *
-     * @param  Request $request
-     * @return Application Current instance
      */
-    public function setRequest(Request $request)
+    public function setRequest(Request $request): static
     {
         $this->request = $request;
         return $this;
@@ -248,13 +198,11 @@ class Application
     /**
      * Get the request object. If no object available,
      * then create and configure one.
-     *
-     * @return Request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
-        if (!$this->request instanceof Request) {
-            $this->request = \E4u\Request\Factory::create();
+        if (!isset($this->request)) {
+            $this->request = Factory::create();
             if ($routes = $this->getConfig()->get('routes')) {
                 $this->request->getRouter()->addRoutes($routes->toArray());
             }
@@ -265,22 +213,16 @@ class Application
 
     /**
      * Get the router object from request.
-     *
-     * @return RouteStackInterface
      */
-    public function getRouter()
+    public function getRouter(): RouteStackInterface
     {
         return $this->getRequest()->getRouter();
     }
 
     /**
      * Transform a module/controller name into a class name
-     *
-     * @param  string $controller
-     * @param  string $module
-     * @return string
      */
-    public function getClassFromController($controller, $module = null)
+    public function getClassFromController(string $controller, ?string $module = null): string
     {
         $class  = str_replace(['.', '-', '_'], ' ', $controller);
         $class  = ucwords($class);
@@ -293,9 +235,8 @@ class Application
             $module  = str_replace(' ', '', $module);
         }
 
-        $class = (null !== $module)
-            ? $this->getConfig()->namespace."\\Controller\\$module\\$class"
-            : $this->getConfig()->namespace."\\Controller\\$class";
-        return $class;
+        return (null !== $module)
+            ? $this->getConfig()->get('namespace')."\\Controller\\$module\\$class"
+            : $this->getConfig()->get('namespace')."\\Controller\\$class";
     }
 }

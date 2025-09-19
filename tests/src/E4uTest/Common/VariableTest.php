@@ -1,18 +1,17 @@
 <?php
 namespace E4uTest\Common;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use E4u\Common\Variable;
 
+#[CoversClass(Variable::class)]
 class VariableTest extends TestCase
 {
-    /**
-     * @covers \E4u\Common\Variable::getType
-     */
     public function testGetType()
     {
-        $this->assertEquals(Variable::getType('test string'), 'string');
-        $this->assertEquals(Variable::getType(1234), 'integer');
-        $this->assertEquals(Variable::getType($this), 'E4uTest\Common\VariableTest');
+        $this->assertEquals('string', Variable::getType('test string'));
+        $this->assertEquals('integer', Variable::getType(1234));
+        $this->assertEquals('E4uTest\Common\VariableTest', Variable::getType($this));
     }
 }

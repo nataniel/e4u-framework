@@ -5,18 +5,22 @@ use E4u\Exception\RuntimeException;
 
 class Start extends Base
 {
-    public function help()
+    public function help(): string
     {
         return "Start E4u console";
     }
     
-    public function execute()
+    public function execute(): void
     {
         if (PHP_SAPI != 'cli') {
             throw new RuntimeException(sprintf('The console must be started using cli mode, %s used.', PHP_SAPI));
         }
 
-        $old_error_handler = set_error_handler([ get_class($this), 'errorHandler' ]);
+        set_error_handler(function (int $errno, string $errstr) {
+            echo "ERROR [$errno] $errstr\n";
+            return true;
+        });
+        
         while (true)
         {
             if (!function_exists('readline')) {
@@ -38,7 +42,7 @@ class Start extends Base
         }
     }
 
-    public static function showException(\Exception $e)
+    public static function showException(\Exception $e): void
     {
         echo sprintf("* %s \"%s\"\n* in %s (%d)\n",
                 get_class($e),
@@ -58,11 +62,5 @@ class Start extends Base
                     $trace[$i]['line']);
             $i++;
         }
-    }
-
-    public static function errorHandler($errno, $errstr)
-    {
-        echo "ERROR [$errno] $errstr\n";
-        return true;
     }
 }

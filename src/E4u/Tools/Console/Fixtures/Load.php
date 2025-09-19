@@ -8,7 +8,7 @@ class Load extends Base
 {
     const DEFAULT_PATH = 'application/data/fixtures/';
     
-    public function help()
+    public function help(): array
     {
         return [
             'filename'   => 'Load fixtures file',
@@ -18,22 +18,21 @@ class Load extends Base
         ];
     }
     
-    public function showHelp()
+    public function showHelp(): void
     {
         parent::showHelp();
         $path = \E4u\Loader::getConfig()->get('fixtures_path', self::DEFAULT_PATH);
         echo sprintf("\nFixtures dir: %s\n", $path);
-        return false;
     }
     
-    public function execute()
+    public function execute(): void
     {
         $path = \E4u\Loader::getConfig()->get('fixtures_path', self::DEFAULT_PATH);
         
         $file = $this->getArgument(0);
         if (empty($file)) {
             $this->showHelp();
-            return false;
+            return;
         }
 
         $environment = \E4u\Loader::getEnvironment();
@@ -42,7 +41,7 @@ class Load extends Base
                     "         will be modified by this function!!\n".
                     "         Use --force if you are sure to do it\n".
                     "         or --environment=test to switch to test environment.\n", $environment);
-            return false;
+            return;
         }
 
         $dir = rtrim($path.dirname($file), '/.').'/';
@@ -50,14 +49,12 @@ class Load extends Base
         $files = glob($pattern);
         if (!$files) {
             echo sprintf("No matching fixtures found (using: %s).\n", $pattern);
-            return false;
+            return;
         }
         
         foreach ($files as $filename) {
             $count = Fixture::load($filename);
             echo sprintf("- %-12s %3d entities loaded.\n", str_replace($path, '', $filename).':', $count);
         }
-
-        return $this;
     }
 }

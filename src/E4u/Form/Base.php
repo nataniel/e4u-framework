@@ -10,36 +10,36 @@ class Base
 {
     use Url;
 
-    const
+    const string
         HTTP_GET = 'get',
         HTTP_POST = 'post';
 
-    const
+    const string
         ENCTYPE_DEFAULT = 'application/x-www-form-urlencoded',
         ENCTYPE_MULTIPART = 'multipart/form-data',
         ENCTYPE_TEXT = 'text/plain';
 
-    const VALID_EMAIL = \Laminas\Validator\EmailAddress::class;
+    const string VALID_EMAIL = \Laminas\Validator\EmailAddress::class;
 
-    protected $method = self::HTTP_POST;
-    protected $name;
-    protected $request;
-    protected $action;
-    protected $enctype = self::ENCTYPE_DEFAULT;
+    protected string $method = self::HTTP_POST;
+    protected string $name;
+    protected Request $request;
+    protected ?string $action;
+    protected string $enctype = self::ENCTYPE_DEFAULT;
 
-    protected $models = [];
+    protected array $models = [];
 
     // values submitted via POST or GET
-    protected $values;
-    protected $errors = [];
+    protected array $values;
+    protected array $errors = [];
 
     /* @var Element[] */
-    protected $fields = [];
+    protected array $fields = [];
 
-    private $crsf_protection;
-    protected $crsf_token;
+    private bool $crsf_protection;
+    protected string $crsf_token;
 
-    public function __construct(Request $request, $models = [], $name = null)
+    public function __construct(Request $request, string|array $models = [], ?string $name = null)
     {
         if (is_string($models)) {
             $name = $models;
@@ -47,7 +47,9 @@ class Base
         }
 
         $this->request = $request;
-        $this->name = $name;
+        if (!empty($name)) {
+            $this->name = $name;
+        }
 
         foreach ($models as $key => $model) {
             $this->setModel($key, $model);
@@ -56,32 +58,29 @@ class Base
         $this->init();
     }
 
-    public function setModel($name, $model)
+    public function setModel(string $name, mixed $model): static
     {
         $this->models[ $name ] = $model;
         return $this;
     }
 
-    public function getModel($name)
+    public function getModel(string $name): mixed
     {
         return $this->models[ $name ];
     }
 
-    public function setAction($url)
+    public function setAction(string $url): static
     {
         $this->action = $this->urlTo($url);
         return $this;
     }
 
-    public function getAction()
+    public function getAction(): ?string
     {
         return $this->action;
     }
 
-    /**
-     * @return Request
-     */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
@@ -94,26 +93,17 @@ class Base
 
     }
 
-    /**
-     * @return string
-     */
-    public function getMethod()
+    public function getMethod(): string
     {
         return $this->method;
     }
 
-    /**
-     * @return string
-     */
-    public function getEnctype()
+    public function getEnctype(): string
     {
         return $this->enctype;
     }
 
-    /**
-     * @return bool
-     */
-    public function verifyCrsfToken()
+    public function verifyCrsfToken(): bool
     {
         if (!$this->isCrsfProtectionEnabled()) {
             return true;
@@ -124,39 +114,27 @@ class Base
             ? $this->request->getQuery($crsf_name)
             : $this->request->getPost($crsf_name);
 
-        return isset($_SESSION[ $crsf_name ])
-            ? $_SESSION[ $crsf_name ] == $crsf_token
-            : false;
+        return isset($_SESSION[ $crsf_name ]) && $_SESSION[ $crsf_name ] === $crsf_token;
     }
 
-    /**
-     * @return $this
-     */
-    public function generateCrsfToken($crsf_name)
+    public function generateCrsfToken(string $crsf_name): void
     {
         $this->crsf_token = md5(uniqid(rand(), true));
         $_SESSION[ $crsf_name ] = $this->crsf_token;
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCrsfTokenName()
+    public function getCrsfTokenName(): string
     {
         return $this->getName() . '_crsf';
     }
 
-    /**
-     * @return string
-     */
-    public function getCrsfTokenValue()
+    public function getCrsfTokenValue(): ?string
     {
         if (!$this->isCrsfProtectionEnabled()) {
             return null;
         }
 
-        if (null == $this->crsf_token) {
+        if (!isset($this->crsf_token)) {
             $crsf_name = $this->getCrsfTokenName();
             if (isset($_SESSION[ $crsf_name ])) {
                 $this->crsf_token = $_SESSION[ $crsf_name ];
@@ -172,30 +150,21 @@ class Base
     /**
      * @return bool
      */
-    public function isCrsfProtectionEnabled()
+    public function isCrsfProtectionEnabled(): bool
     {
-        if (!is_null($this->crsf_protection)) {
-            return (bool)$this->crsf_protection;
+        if (isset($this->crsf_protection)) {
+            return $this->crsf_protection;
         }
 
         return $this->method != self::HTTP_GET;
     }
 
-    /**
-     * @param  string $name
-     * @return bool
-     */
-    public function hasField($name)
+    public function hasField(string $name): bool
     {
         return isset($this->fields[ $name ]);
     }
 
-    /**
-     * @param  Element[] $fields
-     * @param  string $model
-     * @return $this
-     */
-    public function addFields($fields, $model = null)
+    public function addFields(array $fields, ?string $model = null): static
     {
         foreach ($fields as $field) {
             $this->addField($field, $model);
@@ -204,13 +173,7 @@ class Base
         return $this;
     }
 
-    /**
-     * @param  Element $field
-     * @param  string $model
-     * @param  string $model_field
-     * @return $this
-     */
-    public function addField(Element $field, $model = null, $model_field = null)
+    public function addField(Element $field, ?string $model = null, ?string $model_field = null): static
     {
         $name = $field->getName();
         if (isset($this->fields[ $name ])) {
@@ -235,12 +198,9 @@ class Base
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
-        if (null == $this->name) {
+        if (!isset($this->name)) {
             // My\Form\Login -> login
             $this->name = strtolower(get_class($this));
             $this->name = preg_replace('/.*\\\\/', '', $this->name);
@@ -249,20 +209,13 @@ class Base
         return $this->name;
     }
 
-    /**
-     * @param  string
-     * @return mixed
-     */
-    public function getValue($name)
+    public function getValue(string $name): mixed
     {
         $this->initValues();
         return $this->fields[ $name ]->getValue();
     }
 
-    /**
-     * @return array
-     */
-    public function getValues($list = null)
+    public function getValues(?array $list = null): array
     {
         $values = [];
         $list = is_null($list)
@@ -280,7 +233,7 @@ class Base
     /**
      * @return UploadedFile[]
      */
-    public function getFiles($name)
+    public function getFiles(string $name): array
     {
         $files = [];
         $value = $this->getValue($name);
@@ -303,24 +256,17 @@ class Base
         return $files;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->getValues();
     }
 
-    /**
-     * @param  array $files
-     * @return $this
-     */
-    protected function processFiles($files)
+    protected function processFiles(?iterable $files): void
     {
-        if (!is_array($files)) {
-            return $this;
+        if (is_null($files)) {
+            return;
         }
-
+        
         foreach ($files as $key => $value) {
 
             array_key_exists('name', $value)
@@ -328,30 +274,16 @@ class Base
                 : $this->processMultipleFiles($value, $key);
 
         }
-
-        return $this;
     }
 
-    /**
-     * @param  string[] $file
-     * @param  string $key
-     * @return $this
-     */
-    protected function processSingleFile($file, $key)
+    protected function processSingleFile(array $file, string $key): void
     {
         if (!empty($file['name']) && is_uploaded_file($file['tmp_name'])) {
             $this->values[ $key ] = $file;
         }
-
-        return $this;
     }
 
-    /**
-     * @param  array $files
-     * @param  string $key
-     * @return $this
-     */
-    protected function processMultipleFiles($files, $key)
+    protected function processMultipleFiles(array $files, string $key): void
     {
         $this->values[ $key ] = [];
         foreach ($files as $file) {
@@ -359,30 +291,25 @@ class Base
                 $this->values[ $key ][] = $file;
             }
         }
-
-        return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function initValues()
+    public function initValues(): void
     {
-        if (null !== $this->values) {
-            return $this;
+        if (isset($this->values)) {
+            return;
         }
 
         $this->values = [];
         if (!$this->verifyCrsfToken()) {
-            return $this;
+            return;
         }
 
         switch ($this->method) {
             case self::HTTP_GET:
-                $this->values = $this->request->getQuery($this->getName());
+                $this->values = $this->request->getQuery($this->getName()) ?? [];
                 break;
             case self::HTTP_POST:
-                $this->values = $this->request->getPost($this->getName());
+                $this->values = $this->request->getPost($this->getName()) ?? [];
                 if ($this->enctype == self::ENCTYPE_MULTIPART) {
                     $this->processFiles($this->request->getFiles($this->getName()));
                 }
@@ -391,41 +318,29 @@ class Base
         }
 
         if (empty($this->values)) {
-            return $this;
+            return;
         }
 
         $this->setFieldsValues();
     }
 
-    protected function setFieldsValues()
+    protected function setFieldsValues(): void
     {
         foreach ($this->fields as $key => $element) {
             if (!$element->isDisabled()) {
-                $element->setValue(isset($this->values[ $key ])
-                    ? $this->values[ $key ]
-                    : null);
+                $element->setValue($this->values[$key] ?? null);
             }
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getDefaults()
+    public function getDefaults(): array
     {
-        $defaults = [];
-        foreach ($this->fields as $key => $element) {
-            $defaults[ $key ] = $element->getDefault();
-        }
-
-        return $defaults;
+        return array_map(function ($element) {
+            return $element->getDefault();
+        }, $this->fields);
     }
 
-    /**
-     * @param  array $defaults
-     * @return $this
-     */
-    public function setDefaults($defaults)
+    public function setDefaults(array $defaults): static
     {
         foreach ($defaults as $name => $value) {
             if (isset($this->fields[ $name ])) {
@@ -436,7 +351,7 @@ class Base
         return $this;
     }
 
-    public function removeField(string $name)
+    public function removeField(string $name): void
     {
         if (!isset($this->fields[ $name ])) {
             throw new LogicException(
@@ -446,13 +361,7 @@ class Base
         unset($this->fields[ $name ]);
     }
 
-    /**
-     *
-     * @param  string $message
-     * @param  string $name
-     * @return $this
-     */
-    public function addError($message, $name = null)
+    public function addError(string $message, ?string $name = null): static
     {
         if (null !== $name) {
             if (!isset($this->fields[ $name ])) {
@@ -470,11 +379,7 @@ class Base
         return $this;
     }
 
-    /**
-     * @param  string $name
-     * @return Element
-     */
-    public function getElement($name)
+    public function getElement(string $name): Element
     {
         if (!isset($this->fields[ $name ])) {
             throw new LogicException(
@@ -484,24 +389,16 @@ class Base
         return $this->fields[ $name ];
     }
 
-    /**
-     * @return $this
-     */
-    public function validate()
+    public function validate(): void
     {
         foreach ($this->fields as $key => $field) {
             if (!$field->isValid()) {
                 $this->errors[ $key ] = $field->getErrors();
             }
         }
-
-        return $this;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isValid()
+    public function isValid(): bool
     {
         if (!$this->isSubmitted()) {
             return false;
@@ -511,39 +408,24 @@ class Base
         return empty($this->errors);
     }
 
-    /**
-     * @return array
-     */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isSubmitted()
+    public function isSubmitted(): bool
     {
         $this->initValues();
         return !empty($this->values['submit']);
     }
 
-    /**
-     * @param  bool $flag
-     * @return $this
-     */
-    public function setCrsfProtection($flag)
+    public function setCrsfProtection(bool $flag = true): static
     {
-        $this->crsf_protection = (bool)$flag;
+        $this->crsf_protection = $flag;
         return $this;
     }
 
-    /**
-     * @param  string $method
-     * @param  bool $crsf_protection
-     * @return $this
-     */
-    public function setMethod($method, $crsf_protection = null)
+    public function setMethod(string $method, ?bool $crsf_protection = null): static
     {
         if (constant('self::HTTP_' . strtoupper($method))) {
             $this->method = $method;
@@ -556,11 +438,7 @@ class Base
         return $this;
     }
 
-    /**
-     * @param  string $enctype
-     * @return $this
-     */
-    public function setEnctype($enctype)
+    public function setEnctype(string $enctype): static
     {
         $this->enctype = $enctype;
         return $this;

@@ -5,13 +5,13 @@ use E4u\Application\View,
     E4u\Application\Helper,
     E4u\Common\File\Image,
     E4u\Common\Collection\Paginable;
+use Laminas\Uri\Uri;
 use Laminas\View\Helper as LaminasHelper;
 
 /**
  * Class Html
  * @package E4u\Application\View
  *
- * @method Helper\GaduGadu|string gg($gg, $description = null)
  * @method Helper\Breadcrumbs|string bc($crumbs, $options = [])
  * @method Helper\Flash|string flash()
  * @method Helper\Pagination|string pagination(Paginable $collection, $options = [])
@@ -22,20 +22,20 @@ use Laminas\View\Helper as LaminasHelper;
  */
 class Html extends View
 {
-    protected $_viewSuffix = '.html';
-    protected $_externalTarget = '_blank';
-    protected $_externalClass = 'external';
-    protected $_mailToClass = 'mailTo';
+    protected string
+        $_viewSuffix = '.html',
+        $_externalTarget = '_blank',
+        $_externalClass = 'external',
+        $_mailToClass = 'mailTo';
 
-    protected $_title = null;
-    protected $_description = null;
-    protected $_keywords = null;
-    protected $_metaProperties = [];
-    protected $_canonicalUrl;
+    protected ?string $_title = null;
+    protected ?string $_description = null;
+    protected ?string $_keywords = null;
+    protected array $_metaProperties = [];
+    protected ?string $_canonicalUrl;
 
     /** @var Helper\ViewHelper[] */
-    protected $_helpers = [
-        'gg'          => Helper\GaduGadu::class,
+    protected array $_helpers = [
         'bc'          => Helper\Breadcrumbs::class,
         'flash'       => Helper\Flash::class,
         'pagination'  => Helper\Pagination::class,
@@ -50,66 +50,43 @@ class Html extends View
         $this->registerHelpers();
     }
 
-    protected function registerHelpers()
+    protected function registerHelpers(): void
     {
         foreach ($this->_helpers as $key => $helper) {
-            /** @var Helper\ViewHelper $x */
             $x = new $helper();
             $x->setView($this);
             $this->plugins()->setService($key, $x);
         }
-
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->_description ?: $this->get('description');
     }
 
-    /**
-     * @return string
-     */
-    public function getKeywords()
+    public function getKeywords(): ?string
     {
         return $this->_keywords ?: $this->get('keywords');
     }
 
-    /**
-     * @param  string $description
-     * @return Html Current instance
-     */
-    public function setDescription($description)
+    public function setDescription(?string $description): static
     {
         $this->_description = $description;
         return $this;
     }
 
-    /**
-     * @param  string $keywords
-     * @return Html Current instance
-     */
-    public function setKeywords($keywords)
+    public function setKeywords(?string $keywords): static
     {
         $this->_keywords = $keywords;
         return $this;
     }
 
-    /**
-     * @return string[]
-     */
-    public function getMetaProperties()
+    public function getMetaProperties(): array
     {
         return array_filter($this->_metaProperties ?: $this->get('metaProperties') ?: [], 'strlen');
     }
 
-    /**
-     * @return string
-     */
-    public function showMetaProperties()
+    public function showMetaProperties(): string
     {
         $html = '';
         foreach ($this->getMetaProperties() as $key => $value) {
@@ -119,50 +96,31 @@ class Html extends View
         return $html;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getCanonicalUrl()
+    public function getCanonicalUrl(): ?string
     {
         return $this->_canonicalUrl ?: $this->get('canonicalUrl');
     }
 
-    /**
-     * @param  mixed $url
-     * @return $this
-     */
-    public function setCanonicalUrl($url)
+    public function setCanonicalUrl(?string $url): static
     {
         $this->_canonicalUrl = $url;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function showCanonicalUrl()
+    public function showCanonicalUrl(): string
     {
         return $url = $this->getCanonicalUrl()
             ? $this->tag('link', [ 'rel' => 'canonical', 'href' => $this->urlTo($this->getCanonicalUrl(), true) ])
             : '';
     }
 
-    /**
-     * @param  string $title
-     * @return $this Current instance
-     */
-    public function setTitle($title)
+    public function setTitle(?string $title): static
     {
         $this->_title = $title;
         return $this;
     }
 
-    /**
-     * @param  string $tag
-     * @param  string $title
-     * @return null|string
-     */
-    public function showTitle($tag = 'h1', $title = null)
+    public function showTitle(string $tag = 'h1', ?string $title = null): string
     {
         if (!is_null($title)) {
             $this->setTitle($title);
@@ -173,13 +131,10 @@ class Html extends View
             return $this->tag($tag, $title);
         }
 
-        return null;
+        return '';
     }
 
-    /**
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         $title = $this->_title ?: $this->get('title');
         if (is_array($title)) {
@@ -200,26 +155,19 @@ class Html extends View
 
     /**
      * @todo   Cache separated files into one big file?
-     * @param  array  $files
-     * @param  string $path
-     * @return string
      */
-    public function stylesheets($files, $path = 'stylesheets')
+    public function stylesheets(array $files, string $path = 'stylesheets'): string
     {
         $html = ''; $ext = 'css';
         foreach ($files as $name) {
 
-            if (!Helper\Url::isExternalUrl($name)) {
-
+            if (!self::isExternalUrl($name)) {
                 $filename = "$path/$name.$ext";
                 $key = '?v=' . filemtime('public/'.$filename);
-
             }
             else {
-
                 $filename = "$name.$ext";
                 $key = null;
-
             }
 
             $html .= $this->tag('link', [
@@ -235,11 +183,8 @@ class Html extends View
 
     /**
      * @todo   Cache separated files into one big file?
-     * @param  array  $files
-     * @param  array  $options
-     * @return string
      */
-    public function scripts($files, $options = [])
+    public function scripts(array $files, array $options = []): string
     {
         $html = ''; $ext = 'js';
         if (is_string($options)) {
@@ -255,17 +200,13 @@ class Html extends View
 
         foreach ($files as $name) {
 
-            if ((0 !== strpos($name, 'http://')) && (0 !== strpos($name, '//'))) {
-
+            if (!self::isExternalUrl($name)) {
                 $filename = "{$options['path']}/$name.{$options['suffix']}";
                 $key = '?v=' . filemtime('public/'.$filename);
-
             }
             else {
-
                 $filename = "$name.{$options['suffix']}";
                 $key = null;
-
             }
 
             $html .= $this->tag('script', [
@@ -280,23 +221,19 @@ class Html extends View
 
     /**
      * Generate expected filename for controller-specific stylesheet
-     * @return string
      */
-    public function controllerCSS()
+    public function controllerCSS(): string
     {
         $module = $this->getActiveModule();
-        $file = empty($module)
+        return empty($module)
             ? $this->getActiveController()
             : $module . '/' . $this->getActiveController();
-
-        return $file;
     }
 
     /**
      * Generate ID for controller-specific HTML element
-     * @return string
      */
-    public function controllerID()
+    public function controllerID(): string
     {
         $module = $this->getActiveModule();
         $class = empty($module)
@@ -307,22 +244,16 @@ class Html extends View
 
     /**
      * Generate ID for action-specific HTML element
-     * @return string
      */
-    public function actionID()
+    public function actionID(): string
     {
         return 'action-'.$this->getAction();
     }
 
     /**
      * Creates HTML anchor: <a href="mailto:$email" ...>$caption</a>
-     *
-     * @param  string $email
-     * @param  string $caption  (defaults to $email)
-     * @param  array  $attributes
-     * @return string
      */
-    public function mailTo($email, $caption = null, $attributes = [])
+    public function mailTo(string $email, null|string|array $caption = null, array $attributes = []): string
     {
         if (empty($email)) {
             return '';
@@ -344,13 +275,8 @@ class Html extends View
 
     /**
      * Creates HTML anchor: <a href="tel:$phone" ...>$caption</a>
-     *
-     * @param  string $phone
-     * @param  string $caption  (defaults to $phone)
-     * @param  array  $attributes
-     * @return string
      */
-    public function telTo($phone, $caption = null, $attributes = [])
+    public function telTo(string $phone, null|string|array $caption = null, array $attributes = []): string
     {
         if (empty($phone)) {
             return '';
@@ -369,13 +295,7 @@ class Html extends View
         return $this->tag('a', $attributes, $caption);
     }
 
-    /**
-     * @param  string $link
-     * @param  array $attributes
-     * @param  string|array $target Target URL or URL specification
-     * @return string
-     */
-    public function linkBackOr($link, $target, $attributes = [])
+    public function linkBackOr(string $link, string|array|Uri $target, array $attributes = []): string
     {
         if ($back = $this->getRequest()->getQuery('back')) {
             $target = $back;
@@ -386,14 +306,9 @@ class Html extends View
 
     /**
      * Creates HTML anchor: <a href="$target" ...>$link</a>
-     *
      * @see \E4u\Application\Helper\Url
-     * @param  string $caption Linked text
-     * @param  string|array $target Target URL or URL specification
-     * @param  array  $attributes HTML attributes of the <a ...>  tag
-     * @return string HTML string
      */
-    public function linkTo($caption, $target, $attributes = [])
+    public function linkTo(string $caption, null|string|array|Uri $target, array $attributes = []): string
     {
         if (is_null($target)) {
             return $caption;
@@ -407,11 +322,11 @@ class Html extends View
             $attributes['class'] = '';
         }
 
-        if (strpos($caption, '<img ') === 0) {
+        if (str_starts_with($caption, '<img ')) {
             $attributes['class'] = trim($attributes['class'].' image');
         }
 
-        if (Helper\Url::isExternalUrl($target)) {
+        if (self::isExternalUrl($target)) {
             $attributes['target'] = $this->_externalTarget;
             $attributes['class'] = trim($attributes['class'] . ' ' . $this->_externalClass);
         }
@@ -422,24 +337,18 @@ class Html extends View
         }
 
         $back = '';
-        if (!empty($attributes['back']) && $attributes['back']) {
+        if (!empty($attributes['back'])) {
             $back = is_bool($attributes['back'])
                 ? $this->backUrl()
                 : $attributes['back'];
             unset($attributes['back']);
         }
 
-        $attributes['href'] = $this->addUrlParam($this->urlTo($target), 'back', $back);
+        $attributes['href'] = $this->addBackParam($this->urlTo($target), $back);
         return $this->tag('a', $attributes, $caption);
     }
 
-    /**
-     * @param  string $url
-     * @param  string $name
-     * @param  string $value
-     * @return string
-     */
-    private function addUrlParam($url, $name, $value)
+    private function addBackParam(string $url, string $value): string
     {
         if (empty($value)) {
             return trim($url, '&?');
@@ -447,10 +356,10 @@ class Html extends View
 
         $url = strtok($url, '#');
         $anchor = strtok('');
-        $separator = strpos($url, '?') === false
+        $separator = !str_contains($url, '?')
             ? '?'
             : '&';
-        return $url . $separator . $name . '=' . $value . ($anchor ? '#' . $anchor : '');
+        return $url . $separator . 'back=' . $value . ($anchor ? '#' . $anchor : '');
     }
 
     /**
@@ -458,12 +367,8 @@ class Html extends View
      * <form action="$target" ...>...</form>
      *
      * @see \E4u\Application\Helper\Url
-     * @param  string $link Linked text
-     * @param  string|array $target Target URL or URL specification
-     * @param  array  $attributes HTML attributes of the <button ...>  tag
-     * @return string HTML string
      */
-    public function buttonTo($link, $target, $attributes = [])
+    public function buttonTo(string $link, string|array $target, array $attributes = []): string
     {
         $formAttributes = [ 'action' => $this->urlTo($target), 'method' => 'post', 'class' => 'buttonTo' ];
         if (!empty($attributes['id'])) {
@@ -490,49 +395,12 @@ class Html extends View
         return $this->tag('form', $formAttributes, $button);
     }
 
-    /**
-     * @param  string $tag
-     * @param  string[] $attributes
-     * @param  string $content
-     * @return string
-     */
-    public function tag($tag, $attributes = null, $content = null)
+    public function tag(string $tag, mixed $attributes = null, ?string $content = null): string
     {
         return \E4u\Common\Html::tag($tag, $attributes, $content);
     }
 
-    /**
-     * @deprecated use Image#getThumbnail instead
-     * @param  string|Image $file
-     * @param  int    $maxWidth
-     * @param  int    $maxHeight
-     * @param  string $alt
-     * @param  array  $attributes
-     * @return string
-     */
-    public function thumbnail($file, $maxWidth, $maxHeight, $alt, $attributes = [])
-    {
-        if (is_null($file)) {
-            return null;
-        }
-        elseif (is_string($file)) {
-            $file = new Image($file);
-        }
-
-        if ($file instanceof Image) {
-            return $this->image($file->getThumbnail($maxWidth, $maxHeight), $alt, $attributes);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param  mixed $file
-     * @param  string $alt
-     * @param  array  $attributes
-     * @return string
-     */
-    public function image($file, $alt, $attributes = [])
+    public function image(mixed $file, mixed $alt, array $attributes = [])
     {
         if (is_null($file)) {
             return null;

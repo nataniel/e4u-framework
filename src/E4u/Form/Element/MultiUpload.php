@@ -11,13 +11,10 @@ use E4u\Form\Element;
  */
 class MultiUpload extends FileUpload
 {
-    protected $value = [];
-    protected $default = [];
+    protected mixed $value = [];
+    protected mixed $default = [];
 
-    /**
-     * @return boolean
-     */
-    public function isValid()
+    public function isValid(): bool
     {
         foreach ($this->getValue() as $file) {
             $this->checkFile($file);

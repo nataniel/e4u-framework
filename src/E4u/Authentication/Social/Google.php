@@ -5,6 +5,7 @@ use E4u\Application\Helper\Url;
 use E4u\Authentication\Exception\AuthenticationException;
 use E4u\Exception\ConfigException;
 use E4u\Request\Request;
+use Google\Service\Oauth2\Userinfo;
 use Laminas\Config\Config;
 
 /**
@@ -16,30 +17,15 @@ class Google implements Helper
 {
     use Url;
 
-    /**
-     * @var Config
-     */
-    private $config;
+    private Config $config;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private Request $request;
 
-    /**
-     * @var \Google_Client
-     */
-    private $client;
+    private \Google_Client $client;
 
-    /**
-     * @var string[]
-     */
-    private $scopes;
+    private array $scopes;
 
-    /**
-     * @var \Google_Service_Oauth2_Userinfoplus
-     */
-    private $me;
+    private Userinfo $me;
 
     public function __construct(Config $config, Request $request)
     {
@@ -48,32 +34,21 @@ class Google implements Helper
         $this->request = $request;
     }
 
-    /**
-     * @param  Config $config
-     * @return $this
-     */
-    protected function setConfig(Config $config)
+    protected function setConfig(Config $config): void
     {
         if (!$config->get('client_id') || !$config->get('client_secret')) {
             throw new ConfigException('Google config must have "client_id" and "client_secret" keys set.');
         }
 
         $this->config = $config;
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLoginUrl()
+    public function getLoginUrl(): string
     {
         return $this->getClient()->createAuthUrl();
     }
 
-    /**
-     * @return bool
-     */
-    public function loginFromRedirect()
+    public function loginFromRedirect(): bool
     {
         $code = $this->request->getQuery('code');
         if (empty($code)) {
@@ -84,83 +59,53 @@ class Google implements Helper
         try {
 
             $client->fetchAccessTokenWithAuthCode($code);
-            $this->me = (new \Google_Service_Oauth2($client))->userinfo->get();
+            $this->me = new \Google_Service_Oauth2($client)->userinfo->get();
             return true;
 
         }
         catch (\RuntimeException $e) {
-
             throw new AuthenticationException($e->getMessage(), null, $e);
-
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->me->getId();
     }
 
-    /**
-     * @return string
-     */
-    public function getFirstName()
+    public function getFirstName(): ?string
     {
         return $this->me->getGivenName();
     }
 
-    /**
-     * @return string
-     */
-    public function getLastName()
+    public function getLastName(): ?string
     {
         return $this->me->getFamilyName();
     }
 
-    /**
-     * @return string
-     */
-    public function getPicture()
+    public function getPicture(): ?string
     {
         return $this->me->getPicture();
     }
 
-    /**
-     * @return string
-     */
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->me->getEmail();
     }
 
-    /**
-     * @param  string[] $scopes
-     * @return $this
-     */
-    public function setScopes($scopes)
+    public function setScopes(array $scopes): void
     {
         $this->scopes = $scopes;
-        return $this;
     }
 
-    /**
-     * @param  string[] $scopes
-     * @return $this
-     */
-    public function addScopes($scopes)
+    public function addScopes(array $scopes): void
     {
         $this->scopes = array_merge($this->scopes, $scopes);
-        return $this;
     }
 
-    /**
-     * @return \Google_Client
-     */
-    public function getClient()
+    public function getClient(): \Google_Client
     {
-        if (null === $this->client) {
+        if (!isset($this->client)) {
             $this->client = new \Google_Client();
             $this->client->setClientId($this->config->get('client_id'));
             $this->client->setClientSecret($this->config->get('client_secret'));
@@ -177,17 +122,13 @@ class Google implements Helper
 
     /**
      * Implements Helper\Url
-     * @return Request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         // ["locale"] => string(2) "pl"
         return $this->me->getLocale();

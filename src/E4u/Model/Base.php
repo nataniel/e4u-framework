@@ -11,12 +11,7 @@ class Base implements \ArrayAccess
         $this->loadArray($attributes);
     }
 
-    /**
-     * @param  array $attributes
-     * @param  array $propertyList
-     * @return static
-     */
-    public function loadArray($attributes, $propertyList = null)
+    public function loadArray(array $attributes, ?array $propertyList = null): static
     {
         foreach ($attributes as $field => $value) {
             if (is_null($propertyList) || in_array($field, $propertyList)) {
@@ -30,11 +25,8 @@ class Base implements \ArrayAccess
 
     /**
      * Defined by ArrayAccess.
-     *
-     * @param  string $offset
-     * @return boolean
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         $method = self::propertyGetMethod($offset);
         return method_exists($this, $method);
@@ -42,11 +34,8 @@ class Base implements \ArrayAccess
 
     /**
      * Defined by ArrayAccess.
-     *
-     * @param  string $offset
-     * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         $method = self::propertyGetMethod($offset);
         return method_exists($this, $method)
@@ -56,11 +45,8 @@ class Base implements \ArrayAccess
 
     /**
      * Defined by ArrayAccess.
-     *
-     * @param string $offset
-     * @param mixed  $value
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $method = self::propertySetMethod($offset);
         method_exists($this, $method)
@@ -70,10 +56,8 @@ class Base implements \ArrayAccess
 
     /**
      * Defined by ArrayAccess.
-     *
-     * @param string $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         $method = self::propertySetMethod($offset);
         method_exists($this, $method)
@@ -84,12 +68,8 @@ class Base implements \ArrayAccess
     /**
      * Automagical getter/setter for all model properties, so you don't have to
      * make all those getFoo(), setFoo() methods all over the model.
-     *
-     * @param  string $name
-     * @param  array  $argv
-     * @return mixed
      */
-    public function __call($name, $argv)
+    public function __call(string $name, array $argv)
     {
         if (preg_match('/^(set|get|addTo|delFrom|has|unset)([A-Z].*)$/', $name, $matches)) {
             $method = '_'.$matches[1];
@@ -111,10 +91,8 @@ class Base implements \ArrayAccess
      * Automagical property getter for fields and associations.
      *
      * @see __call()
-     * @param  string $property
-     * @return mixed
      */
-    protected function _get($property)
+    protected function _get(string $property): mixed
     {
         if (!property_exists($this, $property)) {
             throw new LogicException(
@@ -129,11 +107,8 @@ class Base implements \ArrayAccess
      * Automagical property setter for properties
      *
      * @see _call()
-     * @param  string $property Property name
-     * @param  mixed  $value
-     * @return static
      */
-    protected function _set($property, $value)
+    protected function _set(string $property, mixed $value): static
     {
         if (!property_exists($this, $property)) {
             throw new LogicException(
@@ -148,9 +123,8 @@ class Base implements \ArrayAccess
     /**
      * @see _call()
      * @param  string $property Property name
-     * @return static
      */
-    protected function _unset($property)
+    protected function _unset(string $property): void
     {
         if (!property_exists($this, $property)) {
             throw new LogicException(
@@ -158,15 +132,10 @@ class Base implements \ArrayAccess
                     get_class($this), $property));
         }
 
-        $this->$property = null;
-        return $this;
+        unset($this->$property);
     }
     
-    /**
-     * @param  string $property
-     * @return boolean
-     */
-    protected function _has($property)
+    protected function _has(string $property): bool
     {
         if (!property_exists($this, $property)) {
             throw new LogicException(
@@ -179,61 +148,46 @@ class Base implements \ArrayAccess
 
     /**
      * @assert ('product_name') == 'getProductName'
-     * @param  string $property
-     * @return string
      */
-    public static function propertyGetMethod($property)
+    public static function propertyGetMethod(string $property): string
     {
         $method  = StringTools::camelCase($property);
-        $method = 'get'.$method;
-        return $method;
+        return 'get'.$method;
     }
 
     /**
      * @assert ('products_images') == 'delFromProductsImages'
-     * @param  string $property
-     * @return string
      */
-    public static function propertyDelFromMethod($property)
+    public static function propertyDelFromMethod(string $property): string
     {
         $method  = StringTools::camelCase($property);
-        $method = 'delFrom'.$method;
-        return $method;
+        return 'delFrom'.$method;
     }
 
     /**
      * @assert ('products_images') == 'addToProductsImages'
-     * @param  string $property
-     * @return string
      */
-    public static function propertyAddToMethod($property)
+    public static function propertyAddToMethod(string $property): string
     {
         $method  = StringTools::camelCase($property);
-        $method = 'addTo'.$method;
-        return $method;
+        return 'addTo'.$method;
     }
 
     /**
      * @assert ('product_name') == 'setProductName'
-     * @param  string $property
-     * @return string
      */
-    public static function propertySetMethod($property)
+    public static function propertySetMethod(string $property): string
     {
         $method  = StringTools::camelCase($property);
-        $method = 'set'.$method;
-        return $method;
+        return 'set'.$method;
     }
 
     /**
      * @assert ('product_name') == 'unsetProductName'
-     * @param  string $property
-     * @return string
      */
-    public static function propertyUnsetMethod($property)
+    public static function propertyUnsetMethod(string $property): string
     {
         $method  = StringTools::camelCase($property);
-        $method = 'unset'.$method;
-        return $method;
+        return 'unset'.$method;
     }
 }

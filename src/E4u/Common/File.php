@@ -2,24 +2,26 @@
 namespace E4u\Common;
 
 use E4u\Application\Helper\Url;
+use E4u\Application\View;
 
 class File
 {
-    const B = 1,
+    const int
+        B = 1,
         KB = 1024,
         MB = 1048576;
 
-    protected $publicPath;
-    protected $filename;
-    protected $errors = [];
-    protected $mime;
-    protected $isLocal;
+    protected string $publicPath;
+    protected string $filename;
+    protected array $errors = [];
+    protected string $mime;
+    protected bool $isLocal;
 
     /**
      * @param string $filename
      * @param string $publicPath
      */
-    public function __construct($filename, $publicPath = 'public/')
+    public function __construct(string $filename, string $publicPath = 'public/')
     {
         if ($publicPath == '/') {
             $this->filename = $filename;
@@ -30,74 +32,49 @@ class File
             $this->publicPath = $publicPath ? trim($publicPath, '/') . '/' : '';
         }
 
-        $this->isLocal = !$this->isExternalUrl($filename);
+        $this->isLocal = !View::isExternalUrl($filename);
     }
 
-    /**
-     * @param  string $target
-     * @return bool
-     */
-    private function isExternalUrl($target)
-    {
-        return Url::isExternalUrl($target);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isLocal()
+    public function isLocal(): bool
     {
         return $this->isLocal;
     }
 
     /**
      * Returns public/ directory.
-     * @return string
      */
-    public function getPublicPath()
+    public function getPublicPath(): string
     {
         return $this->isLocal ? $this->publicPath : '';
     }
 
     /**
      * Returns the file name, without public/ part.
-     * @return string
      */
-    public function getFilename()
+    public function getFilename(): string
     {
         return $this->filename;
     }
 
     /**
      * Returns public/filename.ext
-     * @return string
      */
-    public function getFullPath()
+    public function getFullPath(): string
     {
         return $this->getPublicPath() . $this->getFilename();
     }
 
-    /**
-     * @return string
-     */
-    public function getBasename()
+    public function getBasename(): string
     {
         return pathinfo($this->getFilename(), PATHINFO_BASENAME);
     }
 
-    /**
-     * @return string
-     */
-    public function getDirname()
+    public function getDirname(): string
     {
         return pathinfo($this->getFilename(), PATHINFO_DIRNAME);
     }
 
-    /**
-     * @param  int $precision
-     * @return float|null
-     */
-    public function getFilesize($precision = self::KB)
+    public function getFilesize(int $precision = self::KB): ?float
     {
         if (!is_file($this->getFullPath())) {
             return null;
@@ -109,9 +86,9 @@ class File
     /**
      * @return string
      */
-    public function getMimeType()
+    public function getMimeType(): string
     {
-        if (null === $this->mime) {
+        if (!isset($this->mime)) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $this->mime = finfo_file($finfo, $this->getFullPath());
             finfo_close($finfo);
@@ -120,18 +97,12 @@ class File
         return $this->mime;
     }
 
-    /**
-     * @return bool
-     */
-    public function isHidden()
+    public function isHidden(): bool
     {
-        return strpos($this->getBasename(), '.') === 0;
+        return str_starts_with($this->getBasename(), '.');
     }
 
-    /**
-     * @return bool
-     */
-    public function fileExists()
+    public function fileExists(): bool
     {
         return !$this->isLocal || is_file($this->getFullPath());
     }
@@ -144,10 +115,7 @@ class File
         return $this->getFilename();
     }
 
-    /**
-     * @return string
-     */
-    public function toUrl()
+    public function toUrl(): string
     {
         return $this->getFilename();
     }
@@ -157,22 +125,16 @@ class File
      *
      * @return string
      */
-    public function getExtension()
+    public function getExtension(): string
     {
         return pathinfo($this->getFilename(), PATHINFO_EXTENSION);
     }
 
-    /**
-     *
-     * @param  string $filename
-     * @param  string $publicPath
-     * @return File
-     */
-    public static function factory($filename, $publicPath = 'public/')
+    public static function factory(string $filename, string $publicPath = 'public/'): File
     {
         $file = trim(trim($publicPath, '/') . '/' . trim($filename, '/'), '/');
 
-        if (Url::isExternalUrl($filename) || Url::isExternalUrl($file)) {
+        if (View::isExternalUrl($filename) || View::isExternalUrl($file)) {
             return new File($filename, $publicPath);
         }
 

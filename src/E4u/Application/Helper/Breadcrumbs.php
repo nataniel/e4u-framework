@@ -1,36 +1,41 @@
 <?php
 namespace E4u\Application\Helper;
 
+use E4u\Application\View;
+use E4u\Common\Html;
+use E4u\Exception\LogicException;
+
 class Breadcrumbs extends ViewHelper
 {
     /**
      * http://www.paulund.co.uk/breadcrumb-schema-org
-     * 
-     * @param array $crumbs
-     * @return string
-     *
         <ol class="breadcrumb">
           <li><a href="#">Home</a></li>
           <li><a href="#">Library</a></li>
           <li class="active">Data</li>
         </ol>
      */
-    public function show($crumbs, $options = [])
+    public function show(array $crumbs, array $options = []): string
     {
         $li = []; $i = 0; $cnt = count($crumbs);
+        $view = $this->getView();
+        if (!$view instanceof View\Html) {
+            throw new LogicException('This view helper needs to be set with View\Html.');
+        }
+        
         foreach ($crumbs as $caption => $url) {
 
             $i++;
             if ($i < $cnt) {
-                $li[] = $this->view->tag('li',
-                    $this->view->linkTo($caption, $url, [ 'itemprop' => 'url' ]));
+                $li[] = Html::tag('li',
+                    $view->linkTo($caption, $url, [ 'itemprop' => 'url' ]));
             }
             else {
-                $li[] = $this->view->tag('li', [ 'class' => 'active' ], $caption);
+                $li[] = Html::tag('li', [ 'class' => 'active' ], $caption);
             }
         }
 
         $attributes = [ 'itemprop' => 'breadcrumb' ];
-        return $this->view->tag('ol', array_merge($attributes, $options), join('', $li));
+        return Html::tag('ol', array_merge($attributes, $options), join('', $li));
     }
 }

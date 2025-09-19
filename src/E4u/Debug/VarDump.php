@@ -3,7 +3,7 @@ namespace E4u\Debug;
 
 class VarDump
 {
-    public static function toHTML($var)
+    public static function toHTML($var): string
     {
         ob_start();
         var_dump($var);

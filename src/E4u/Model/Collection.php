@@ -7,26 +7,19 @@ use Doctrine\ORM\QueryBuilder,
     Countable, IteratorAggregate, ArrayIterator, ArrayAccess;
 use E4u\Common\Variable;
 use E4u\Exception\LogicException;
+use ReturnTypeWillChange;
 
 class Collection implements Countable, IteratorAggregate, ArrayAccess
 {
-    /** @var Query **/
-    protected $query;
+    protected Query $query;
 
-    /** @var Paginator **/
-    protected $paginator;
+    protected Paginator $paginator;
 
-    /** @var int */
-    private $_count;
+    private int $_count;
 
-    /** @var array */
-    private $_result;
+    private array $_result;
 
-    /**
-     *
-     * @param Query|QueryBuilder|array $input
-     */
-    public function __construct($input)
+    public function __construct(Query|QueryBuilder|array|null $input)
     {
         if (is_object($input)) {
             $this->setQuery($input);
@@ -39,74 +32,44 @@ class Collection implements Countable, IteratorAggregate, ArrayAccess
         }
     }
 
-    /**
-     * @return Collection
-     */
-    protected function initialize()
+    protected function initialize(): void
     {
-        if (null === $this->_result) {
+        if (!isset($this->_result)) {
             $this->_result = $this->getQuery()->getResult();
         }
-
-        return $this;
     }
 
-    /**
-     * @param  array $options
-     * @return Paginator
-     */
-    public function getPaginator($options = [])
+    public function getPaginator(array $options = []): Paginator
     {
-        if (null === $this->paginator) {
+        if (!isset($this->paginator)) {
             $this->paginator = new Paginator($this);
         }
 
-        $this->paginator->setOptions($options);
-        return $this->paginator;
+        return $this->paginator->setOptions($options);
     }
 
     /**
      * @return Collection
      */
-    public function setOrder()
+    public function setOrder(): static
     {
         # NOT IMPLEMENTED
         return $this;
     }
 
-    /**
-     * @param Query|QueryBuilder $query $query
-     * @return Collection
-     */
-    public function setQuery($query)
+    public function setQuery(Query|QueryBuilder $query): void
     {
-        if ($query instanceof QueryBuilder) {
-            $this->query = $query->getQuery();
-        }
-        elseif ($query instanceof Query) {
-            $this->query = $query;
-        }
-        else {
-            throw new LogicException(
-                sprintf('$query must be instance of QueryBuilder or Query, %s given',
-                Variable::getType($query)));
-        }
-
-        return $this;
+        $this->query = $query instanceof QueryBuilder
+            ? $query->getQuery()
+            : $query;
     }
 
-    /**
-     * @return Query
-     */
-    public function getQuery()
+    public function getQuery(): Query
     {
         return $this->query;
     }
 
-    /**
-     * @return Query
-     */
-    protected function cloneQuery()
+    protected function cloneQuery(): Query
     {
         $query = clone $this->query;
         $parameters = clone $this->query->getParameters();
@@ -115,30 +78,21 @@ class Collection implements Countable, IteratorAggregate, ArrayAccess
         return $query;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         $this->initialize();
         return $this->_result;
     }
 
-    /**
-     * @return bool
-     */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
-        return $this->count() == 0;
+        return $this->count() === 0;
     }
 
-    /**
-     * @return int
-     */
-    public function count()
+    public function count(): int
     {
-        if (null === $this->_count) {
-            if (null === $this->_result) {
+        if (!isset($this->_count)) {
+            if (!isset($this->_result)) {
 
                 $paginator = new DoctrinePaginator($this->query, false);
                 $this->_count = $paginator->count();
@@ -155,14 +109,9 @@ class Collection implements Countable, IteratorAggregate, ArrayAccess
         return $this->_count;
     }
 
-    /**
-     * @param  int $offset
-     * @param  int $length
-     * @return array|ArrayIterator
-     */
-    public function slice($offset, $length = null)
+    public function slice(int $offset, ?int $length = null): array|ArrayIterator
     {
-        if (null === $this->_result) {
+        if (!isset($this->_result)) {
 
             $this->query
                 ->setFirstResult($offset)
@@ -180,10 +129,8 @@ class Collection implements Countable, IteratorAggregate, ArrayAccess
     /**
      * Gets an iterator for iterating over the elements in the collection.
      * Defined by IteratorAggregate interface.
-     *
-     * @return ArrayIterator
      */
-    public function getIterator()
+    public function getIterator(): ArrayIterator
     {
         $this->initialize();
         return new ArrayIterator($this->_result);
@@ -192,24 +139,24 @@ class Collection implements Countable, IteratorAggregate, ArrayAccess
     /**
      * Implements \ArrayAccess
      */
-    public function offsetExists($name)
+    public function offsetExists($offset): bool
     {
         $this->initialize();
-        return isset($this->_result[$name]);
+        return isset($this->_result[$offset]);
     }
 
-    public function offsetGet($name)
+    public function offsetGet($offset): mixed
     {
         $this->initialize();
-        return isset($this->_result[$name]) ? $this->_result[$name] : null;
+        return $this->_result[$offset] ?? null;
     }
 
-    public function offsetSet($name, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new LogicException("Collection is read only.");
     }
 
-    public function offsetUnset($name)
+    public function offsetUnset($offset): void
     {
         throw new LogicException("Collection is read only.");
     }

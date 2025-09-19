@@ -3,13 +3,7 @@ namespace E4u\Model;
 
 interface Validatable
 {
-    /**
-     * @return bool
-     */
-    public function valid();
+    public function valid(): bool;
     
-    /**
-     * @return array
-     */
-    public function getErrors($field = null);
+    public function getErrors(?string $field = null): array;
 }

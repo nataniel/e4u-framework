@@ -14,33 +14,26 @@ trait Tree
      **/
     # protected $parent;
 
-    /** @return mixed */
-    abstract public function id();
+    abstract public function id(): mixed;
 
-    /** @return bool */
-    abstract public function isActive();
+    abstract public function isActive(): bool;
 
-    /** @return string */
     abstract public function __toString();
 
-    /** @return Tree */
-    abstract public function getParent();
+    abstract public function getParent(): ?static;
 
     /** @return Tree[] */
-    abstract public function getChildren();
+    abstract public function getChildren(): array;
 
-    /**
-     * @return boolean
-     */
-    public function hasChildren()
+    public function hasChildren(): bool
     {
         return count($this->getChildren()) > 0;
     }
 
     /**
-     * @return self[]
+     * @return static[]
      */
-    public function getActiveChildren()
+    public function getActiveChildren(): array
     {
         $children = [];
         foreach ($this->getChildren() as $child) {
@@ -53,10 +46,9 @@ trait Tree
     }
 
     /**
-     * @param  boolean $onlyActive
-     * @return self[]
+     * @return static[]
      */
-    public function getAllChildren($onlyActive = true)
+    public function getAllChildren(bool $onlyActive = true): array
     {
         $children = [];
         foreach ($this->getChildren() as $child) {
@@ -69,10 +61,7 @@ trait Tree
         return $children;
     }
 
-    /**
-     * @return self
-     */
-    public function getRoot()
+    public function getRoot(): static
     {
         $root = $this;
         while ($parent = $root->getParent()) {
@@ -85,17 +74,12 @@ trait Tree
     /**
      * @return bool
      */
-    public function isRoot()
+    public function isRoot(): bool
     {
         return is_null($this->getParent());
     }
 
-    /**
-     * @param  int $limit
-     * @param  int $offset
-     * @return self[]
-     */
-    public function getPath($limit = null, $offset = 0)
+    public function getPath(?int $limit = null, int $offset = 0): array
     {
         $path = [];
         $root = $this;
@@ -109,13 +93,7 @@ trait Tree
         return array_slice(array_reverse($path), $offset, $limit);
     }
 
-    /**
-     * @param  string $separator
-     * @param  int $limit
-     * @param  int $offset
-     * @return string
-     */
-    public function showPath($separator, $limit = null, $offset = 0)
+    public function showPath(string $separator, ?int $limit = null, int $offset = 0): string
     {
         $path = $this->getPath($limit, $offset);
 
@@ -127,20 +105,15 @@ trait Tree
         return join($separator, $pieces);
     }
 
-    /**
-     * @param  Tree $target
-     * @return bool
-     */
-    public function isChildOf($target)
+    public function isChildOf(self $target): bool
     {
         $parent = $this->getParent();
+        if (empty($parent)) {
+            return false;
+        }
 
         if ($parent === $target) {
             return true;
-        }
-
-        if (empty($parent)) {
-            return false;
         }
 
         return $parent->isChildOf($target);

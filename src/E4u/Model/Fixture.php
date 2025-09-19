@@ -6,12 +6,12 @@ use Laminas\Config\Config;
 
 class Fixture
 {
-    public static function generateID($name, $class)
+    public static function generateID(string $name, string $class): int
     {
         return abs(crc32($class.':'.$name));
     }
     
-    public static function find($name, $class)
+    public static function find(string $name, string $class)
     {
         $id = self::generateID($name, $class);
         return $class::find($id);
@@ -19,10 +19,8 @@ class Fixture
     
     /**
      * @todo Sanitize filename before including
-     * @param  string $filename
-     * @return int
      */
-    public static function load($filename)
+    public static function load(string $filename): int
     {
         $fixtures = include $filename;
         $fixtures = new Config($fixtures, true);

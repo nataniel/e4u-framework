@@ -1,51 +1,36 @@
 <?php
 namespace E4u\Form;
 
+use ArrayAccess;
 use E4u\Common\StringTools;
 use E4u\Common\Variable;
 use E4u\Exception\LogicException;
 use E4u\Model\Entity;
 use E4u\Model\Validatable;
-use FacebookAds\Object\Product;
 use Laminas\Validator;
 
 abstract class Element
 {
-    /**
-     * @var Validator\ValidatorChain
-     */
-    protected $validatorChain;
+    protected Validator\ValidatorChain $validatorChain;
 
-    /**
-     * Current value of the field
-     * @var mixed
-     */
-    protected $value;
+    protected mixed $value;
 
-    /**
-     * Default value of the field
-     * @var mixed
-     */
-    protected $default;
+    protected mixed $default = null;
 
-    /**
-     * Attached model
-     * @var mixed
-     */
-    protected $model;
-    protected $model_field;
+    protected ?ArrayAccess $model;
+    protected ?string $model_field;
 
-    protected $required = false;
-    protected $errors = [];
+    protected bool $required = false;
+    protected array $errors = [];
 
-    protected $name;
-    protected $label;
-    protected $hint;
+    protected string $name;
+    protected ?string $label;
+    protected ?string $hint;
 
     /** @var array HTML attributes for the element **/
-    protected $attributes = array();
+    protected array $attributes = [];
 
-    public function __construct($name, $properties = null)
+    public function __construct(string $name, string|array|null $properties = null)
     {
         $this->setName($name);
         if (is_string($properties)) {
@@ -56,13 +41,9 @@ abstract class Element
         }
     }
 
-    /**
-     * @param  array $properties
-     * @return $this
-     */
-    public function setProperties($properties = [])
+    public function setProperties(array $properties = []): static
     {
-        $properties = array_filter($properties, function ($val) { return !is_null($val); });
+        $properties = array_filter($properties, fn($val) => !is_null($val));
         foreach ($properties as $key => $value) {
             $method  = 'set'.StringTools::camelCase($key);
             if (method_exists($this, $method)) {
@@ -76,11 +57,7 @@ abstract class Element
         return $this;
     }
 
-    /**
-     * @param array $attributes
-     * @return \E4u\Form\Element
-     */
-    public function setAttributes($attributes = [])
+    public function setAttributes(array $attributes = []): static
     {
         $attributes = array_filter($attributes, 'strlen');
         foreach ($attributes as $key => $value) {
@@ -108,13 +85,13 @@ abstract class Element
             get_class($this), $method));
     }
 
-    protected function _set($attr, $value)
+    protected function _set($attr, $value): static
     {
         $this->attributes[$attr] = $value;
         return $this;
     }
 
-    protected function _get($attr)
+    protected function _get($attr): mixed
     {
         if (isset($this->attributes[$attr])) {
             return $this->attributes[$attr];
@@ -123,13 +100,9 @@ abstract class Element
         return null;
     }
 
-    /**
-     * @param  bool $flag
-     * @return $this
-     */
-    public function setReadonly($flag = true)
+    public function setReadonly(bool $flag = true): static
     {
-        if ($flag == true) {
+        if ($flag) {
             $this->attributes['readonly'] = 'readonly';
         }
         elseif (isset($this->attributes['readonly'])) {
@@ -139,21 +112,14 @@ abstract class Element
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isReadonly()
+    public function isReadonly(): bool
     {
         return !empty($this->attributes['readonly']);
     }
 
-    /**
-     * @param  boolean $flag
-     * @return $this
-     */
-    public function setDisabled($flag = true)
+    public function setDisabled(bool $flag = true): static
     {
-        if ($flag == true) {
+        if ($flag) {
             $this->attributes['disabled'] = 'disabled';
         }
         elseif (isset($this->attributes['disabled'])) {
@@ -163,21 +129,14 @@ abstract class Element
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isDisabled()
+    public function isDisabled(): bool
     {
         return !empty($this->attributes['disabled']);
     }
 
-    /**
-     * @param  boolean $flag
-     * @return $this
-     */
-    public function setAutofocus($flag = true)
+    public function setAutofocus(bool $flag = true): static
     {
-        if ($flag == true) {
+        if ($flag) {
             $this->attributes['autofocus'] = 'autofocus';
         }
         elseif (isset($this->attributes['autofocus'])) {
@@ -186,12 +145,13 @@ abstract class Element
 
         return $this;
     }
+    
+    public function isAutofocus(): bool
+    {
+        return isset($this->attributes['autofocus']);
+    }
 
-    /**
-     * @param  bool|string $flag
-     * @return $this
-     */
-    public function setAutocomplete($flag = true)
+    public function setAutocomplete(bool|string $flag = true): static
     {
         if (is_bool($flag)) {
             $this->attributes['autocomplete'] = $flag ? 'autocomplete' : null;
@@ -203,12 +163,7 @@ abstract class Element
         return $this;
     }
 
-    /**
-     * @param  \ArrayAccess   $model to attach
-     * @param  string         $model_field model field name
-     * @return $this  Current instance
-     */
-    public function setModel($model, $model_field = null)
+    public function setModel(ArrayAccess $model, ?string $model_field = null): static
     {
         // we cannot use:
         // $element = new Element([ 'model' => 'somename' ])
@@ -220,127 +175,81 @@ abstract class Element
         return $this;
     }
 
-    /**
-     * @param  string   $model_field model field name
-     * @return $this  Current instance
-     */
-    public function setModelField($model_field)
+    public function setModelField(?string $model_field): static
     {
         $this->model_field = $model_field;
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getModel()
+    public function getModel(): ?ArrayAccess
     {
         return $this->model;
     }
 
-    /**
-     * @return string
-     */
-    public function getModelField()
+    public function getModelField(): string
     {
         return $this->model_field ?: $this->getName();
     }
 
-    /**
-     * @return string[]
-     */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
 
-    /**
-     * @param  string $name
-     * @return string|null
-     */
-    public function getAttribute($name)
+    public function getAttribute(string $name): ?string
     {
-        return isset($this->attributes[ $name ])
-            ? $this->attributes[ $name ]
-            : null;
+        return $this->attributes[$name] ?? null;
     }
 
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->label ?: ucfirst($this->name);
     }
 
-    /**
-     * @param  string $name
-     * @return $this
-     */
-    public function setName($name)
+    public function setName(string $name): static
     {
         $this->name = $name;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         $class = static::class;
         return strtolower(preg_replace('/.*\\\\/', '', $class));
     }
 
-    /**
-     * @param  string $label
-     * @return $this
-     */
-    public function setLabel($label)
+    public function setLabel(?string $label): static
     {
         $this->label = $label;
         return $this;
     }
 
-    /**
-     * @param  string $hint
-     * @return $this
-     */
-    public function setHint($hint)
+    public function setHint(?string $hint): static
     {
         $this->hint = $hint;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getHint()
+    public function getHint(): ?string
     {
         return $this->hint;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getValue()
+    public function getValue(): mixed
     {
-        if (null === $this->model) {
-            return is_null($this->value)
+        if (!isset($this->model)) {
+            return !isset($this->value)
                 ? $this->default
                 : $this->value;
         }
 
         $field = $this->getModelField();
-        if ($this->model instanceof \ArrayAccess) {
+        if ($this->model instanceof ArrayAccess) {
             $value = $this->model[ $field ];
         }
         else {
@@ -354,11 +263,7 @@ abstract class Element
             : $value;
     }
 
-    /**
-     * @param  mixed $value
-     * @return $this
-     */
-    public function setDefault($value)
+    public function setDefault(mixed $value): static
     {
         if (!is_null($this->model)) {
             throw new LogicException(
@@ -372,27 +277,20 @@ abstract class Element
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getDefault()
+    public function getDefault(): mixed
     {
         return $this->default;
     }
 
-    /**
-     * @param  mixed $value
-     * @return $this
-     */
-    public function setValue($value)
+    public function setValue(mixed $value): static
     {
-        if (null === $this->model) {
+        if (!isset($this->model)) {
             $this->value = $value;
             return $this;
         }
 
         $field = $this->getModelField();
-        if ($this->model instanceof \ArrayAccess) {
+        if ($this->model instanceof ArrayAccess) {
             $this->model[ $field ] = $value;
             return $this;
         }
@@ -403,36 +301,23 @@ abstract class Element
         return $this;
     }
 
-    /**
-     * @param  string $message
-     * @return $this
-     */
-    public function addError($message)
+    public function addError(string $message): static
     {
         $this->errors[] = $message;
         return $this;
     }
 
-    /**
-     * @return string[]
-     */
-    public function getErrors()
+    public function getErrors(): array
     {
         return array_merge($this->errors, $this->getValidatorChain()->getMessages());
     }
 
-    /**
-     * @return bool
-     */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
         return count($this->getErrors()) > 0;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isValid()
+    public function isValid(): bool
     {
         $value = $this->getValue();
         if (!$this->isRequired() && empty($value)) {
@@ -443,7 +328,7 @@ abstract class Element
             return false;
         }
 
-        if (!is_null($this->model) && $this->model instanceof Validatable) {
+        if ($this->model instanceof Validatable) {
             if (!$this->model->valid()) {
                 if ($error = $this->model->getErrors($this->getModelField())) {
                     $this->errors[] = $error;
@@ -454,19 +339,12 @@ abstract class Element
         return empty($this->errors);
     }
 
-    /**
-     * @return bool
-     */
-    public function isRequired()
+    public function isRequired(): bool
     {
         return $this->required;
     }
 
-    /**
-     * @param  string $message
-     * @return $this
-     */
-    public function setRequired($message = null)
+    public function setRequired(null|bool|string $message = null): static
     {
         if ($message === false) {
             $this->required = false;
@@ -480,12 +358,7 @@ abstract class Element
         return $this;
     }
 
-    /**
-     * @param  string $pattern
-     * @param  string $message
-     * @return $this
-     */
-    public function setPattern($pattern, $message = null)
+    public function setPattern(string $pattern, ?string $message = null): static
     {
         $this->attributes['pattern'] = $pattern;
         if (empty($message)) {
@@ -496,13 +369,7 @@ abstract class Element
         return $this;
     }
 
-    /**
-     * @param  Validator\ValidatorInterface|string $validator
-     * @param  string $message
-     * @param  bool   $breakChainOnFailure
-     * @return $this
-     */
-    public function addValidator($validator, $message = null, $breakChainOnFailure = true)
+    public function addValidator(Validator\ValidatorInterface|string $validator, ?string $message = null, bool $breakChainOnFailure = true): static
     {
         if (is_string($validator)) {
             $validator = new $validator();
@@ -516,12 +383,9 @@ abstract class Element
         return $this;
     }
 
-    /**
-     * @return Validator\ValidatorChain
-     */
-    protected function getValidatorChain()
+    protected function getValidatorChain(): Validator\ValidatorChain
     {
-        if (null === $this->validatorChain) {
+        if (!isset($this->validatorChain)) {
             $this->validatorChain = new Validator\ValidatorChain();
         }
 

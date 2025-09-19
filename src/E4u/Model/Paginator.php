@@ -5,36 +5,33 @@ use Countable, IteratorAggregate, ArrayIterator;
 use E4u\Common\Collection\Paginable;
 use E4u\Common\Variable;
 use E4u\Exception\LogicException;
+use Iterator;
 
 class Paginator implements Countable, IteratorAggregate, Paginable
 {
-    /**
-     * @var Collection
-     */
-    protected $collection;
+    protected mixed $collection;
     
-    /**
-     * @var int
-     */
-    protected $perPage;
+    protected int $perPage = 20;
     
-    /**
-     * @var int
-     */
-    protected $currentPage;
+    protected int $currentPage = 1;
     
-    private   $_elements;
-    private   $_pageCount;
-    private   $_totalCount;
+    private \Iterator|array $_elements;
+    private int $_pageCount;
+    private int $_totalCount;
 
-    public function __construct($collection, $currentPage = null, $perPage = 20)
+    public function __construct($collection, ?int $currentPage = null, ?int $perPage = null)
     {
         $this->setCollection($collection);
-        $this->setCurrentPage($currentPage);
-        $this->setPerPage($perPage);
+        if (!is_null($currentPage)) {
+            $this->setCurrentPage($currentPage);
+        }
+
+        if (!is_null($perPage)) {
+            $this->setPerPage($perPage);
+        }
     }
 
-    public function setOptions($options)
+    public function setOptions(array $options): static
     {
         if (isset($options['per_page'])) {
             $this->setPerPage((int)$options['per_page']);
@@ -47,11 +44,7 @@ class Paginator implements Countable, IteratorAggregate, Paginable
         return $this;
     }
     
-    /**
-     * @param  mixed $collection
-     * @return $this
-     */
-    public function setCollection($collection)
+    public function setCollection(mixed $collection): static
     {
         if (!is_array($collection)
             && (!$collection instanceof \Traversable)
@@ -66,42 +59,32 @@ class Paginator implements Countable, IteratorAggregate, Paginable
         return $this;
     }
     
-    /**
-     * @param  int $perPage
-     * @return $this
-     */
-    public function setPerPage($perPage)
+    public function setPerPage(int $perPage): static
     {
-        $this->perPage = (int)$perPage ?: 20;
+        $this->perPage = $perPage;
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    protected function initialize()
+    protected function initialize(): void
     {
-        if (null === $this->_elements) {
-            if (method_exists($this->collection, 'slice')) {
-                $this->_elements = $this->collection->slice($this->currentOffset(), $this->perPage);
-            }
-            elseif ($this->collection instanceof \Traversable) {
-                /* @TODO -- TRAVERSE to offset */
-                $this->collection = iterator_to_array($this->collection);
-                $this->_elements = array_slice($this->collection, $this->currentOffset(), $this->perPage);
-            }
-            elseif (is_array($this->collection)) {
-                $this->_elements = array_slice($this->collection, $this->currentOffset(), $this->perPage);
-            }
+        if (isset($this->_elements)) {
+            return;
         }
-        
-        return $this;
+    
+        if (method_exists($this->collection, 'slice')) {
+            $this->_elements = $this->collection->slice($this->currentOffset(), $this->perPage);
+        }
+        elseif ($this->collection instanceof \Traversable) {
+            /* @TODO -- TRAVERSE to offset */
+            $this->collection = iterator_to_array($this->collection);
+            $this->_elements = array_slice($this->collection, $this->currentOffset(), $this->perPage);
+        }
+        elseif (is_array($this->collection)) {
+            $this->_elements = array_slice($this->collection, $this->currentOffset(), $this->perPage);
+        }
     }
 
-    /**
-     * @return int
-     */
-    public function currentOffset()
+    public function currentOffset(): int
     {
         $page = min($this->currentPage(), $this->pageCount());
         if ($page > 0) {
@@ -111,18 +94,12 @@ class Paginator implements Countable, IteratorAggregate, Paginable
         return 0;
     }
     
-    /**
-     * @return int
-     */
-    public function currentPage()
+    public function currentPage(): int
     {
         return $this->currentPage;
     }
     
-    /**
-     * @return int
-     */
-    public function nextPage()
+    public function nextPage(): ?int
     {
         if ($this->currentPage + 1 > $this->pageCount()) {
             return null;
@@ -131,10 +108,7 @@ class Paginator implements Countable, IteratorAggregate, Paginable
         return $this->currentPage + 1;
     }
     
-    /**
-     * @return int
-     */
-    public function prevPage()
+    public function prevPage(): ?int
     {
         if ($this->currentPage <= 1) {
             return null;
@@ -143,53 +117,29 @@ class Paginator implements Countable, IteratorAggregate, Paginable
         return $this->currentPage - 1;
     }
     
-    /**
-     * @param  int $currentPage
-     * @return $this
-     */
-    public function setCurrentPage($currentPage)
+    public function setCurrentPage(int $currentPage): static
     {
-        $this->currentPage = (int)$currentPage ?: 1;
-        $this->_elements = null;
+        $this->currentPage = $currentPage;
+        unset($this->_elements);
         return $this;
     }
     
-    /**
-     * @return int
-     */
-    public function getPerPage()
+    public function getPerPage(): int
     {
         return $this->perPage;
     }
     
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         $this->initialize();
-
-        if (is_array($this->_elements)) {
-            return $this->_elements;
-        }
-
-        if ($this->_elements instanceof \IteratorAggregate) {
-            return iterator_to_array($this->_elements->getIterator());
-        }
-
-        if ($this->_elements instanceof \ArrayIterator) {
-            return $this->_elements->getArrayCopy();
-        }
-
-        return $this->_elements->toArray();
+        return $this->_elements instanceof \Iterator
+            ? iterator_to_array($this->_elements)
+            : $this->_elements;
     }
     
-    /**
-     * @return int
-     */
-    public function total()
+    public function total(): int
     {
-        if (null === $this->_totalCount) {
+        if (!isset($this->_totalCount)) {
             if (!is_array($this->collection)
                 && !$this->collection instanceof \Countable) {
                 $this->collection = iterator_to_array($this->collection);
@@ -201,28 +151,19 @@ class Paginator implements Countable, IteratorAggregate, Paginable
         return $this->_totalCount;
     }
     
-    /**
-     * @return int
-     */
-    public function start()
+    public function start(): int
     {
         return $this->currentOffset() + 1;
     }
     
-    /**
-     * @return int
-     */
-    public function end()
+    public function end(): int
     {
         return ($this->currentPage-1) * $this->perPage + $this->count();
     }
     
-    /**
-     * @return int
-     */
-    public function pageCount()
+    public function pageCount(): int
     {
-        if (null === $this->_pageCount) {
+        if (!isset($this->_pageCount)) {
             $this->_pageCount = ceil($this->total() / $this->perPage);
         }
         
@@ -232,10 +173,8 @@ class Paginator implements Countable, IteratorAggregate, Paginable
     /**
      * Returns the number of elements on current page.
      * Defined by Countable interface.
-     *
-     * @return integer The number of elements on current page.
      */
-    public function count()
+    public function count(): int
     {
         $this->initialize();
         return count($this->_elements);
@@ -243,10 +182,8 @@ class Paginator implements Countable, IteratorAggregate, Paginable
 
     /**
      * Checks whether the current page is empty.
-     *
-     * @return boolean TRUE if the collection is empty, FALSE otherwise.
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         $this->initialize();
         return !$this->_elements;
@@ -255,10 +192,8 @@ class Paginator implements Countable, IteratorAggregate, Paginable
     /**
      * Gets an iterator for iterating over the elements in the collection.
      * Defined by IteratorAggregate interface.
-     *
-     * @return ArrayIterator|\Iterator
      */
-    public function getIterator()
+    public function getIterator(): \Iterator
     {
         $this->initialize();
         if ($this->_elements instanceof \Iterator) {

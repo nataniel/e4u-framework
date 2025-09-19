@@ -3,9 +3,9 @@ namespace E4u\Tools\Console;
 
 class Progress
 {
-    static $start_time;
+    static ?int $start_time;
 
-    public static function show($done, $total, $size = 30)
+    public static function show($done, $total, $size = 30): void
     {
         // if we go over our bound, just ignore it
         if (($done > $total) || ($total == 0)) return;
@@ -43,12 +43,12 @@ class Progress
         }
     }
 
-    public static function start()
+    public static function start(): void
     {
         self::$start_time = time();
     }
 
-    public static function seconds($x)
+    public static function seconds($x): string
     {
         if ($x < 300) {
             return $x . ' sec.';

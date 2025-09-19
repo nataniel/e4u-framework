@@ -13,14 +13,16 @@ class Redirect extends \Exception
 {
     protected $code = Response::STATUS_REDIRECT;
 
-    private $url;
+    private string $url;
 
-    public function setUrl($url) {
+    public function setUrl(string $url): static
+    {
         $this->url = $url;
         return $this;
     }
 
-    public function getUrl() {
+    public function getUrl(): string 
+    {
         return $this->url;
     }
 }

@@ -1,14 +1,13 @@
 <?php
 namespace E4uTest\Form;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use E4u\Form;
 
+#[CoversClass(Form\Element::class)]
 class ElementTest extends TestCase
 {
-    /**
-     * @covers \E4u\Form\Element::__construct
-     */
     public function testConstructor()
     {
         $field = new Form\Element\EmailAddress('login', [
@@ -21,6 +20,6 @@ class ElementTest extends TestCase
         $this->assertEquals('Adres e-mail', $field->getLabel());
         $this->assertTrue($field->isRequired());
         $this->assertEquals('np. kasia123@jakasdomena.pl', $field->getHint());
-        $this->assertEquals('autofocus', $field->getAutofocus('autofocus'));
+        $this->assertEquals('autofocus', $field->isAutofocus());
     }
 }

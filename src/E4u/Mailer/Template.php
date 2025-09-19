@@ -7,36 +7,35 @@ use Laminas\Mime;
 
 class Template
 {
-    const FORMAT_TXT = 1;
-    const FORMAT_HTML = 2;
-    const CHARSET = 'utf-8';
+    const int
+        FORMAT_TXT = 1,
+        FORMAT_HTML = 2;
+    
+    const string CHARSET = 'utf-8';
 
-    protected $from_name;
-    protected $from_email;
-    protected $to_name;
-    protected $to_email;
-    protected $subject = '';
-    protected $content = '';
-    protected $format = self::FORMAT_TXT;
+    protected string $from_name;
+    protected string $from_email;
+    protected string $to_name;
+    protected string $to_email;
+    protected string $subject = '';
+    protected string $content = '';
+    protected int $format = self::FORMAT_TXT;
 
     /**
      * @var Mail\Header\HeaderInterface[]
      */
-    protected $headers = [];
+    protected array $headers = [];
 
     /**
      * @var Mime\Part[]
      */
-    protected $attachments = [];
+    protected array $attachments = [];
 
-    protected $vars = [];
+    protected array $vars = [];
 
-    /**
-     * @var Mail\Transport\TransportInterface
-     */
-    protected $mailer;
+    protected Mail\Transport\TransportInterface $mailer;
 
-    public function __construct($vars = [])
+    public function __construct(array $vars = [])
     {
         $this->addToHeaders('Date', gmdate('r'));
         $this->addToHeaders(new Mail\Header\MessageId());
@@ -44,68 +43,41 @@ class Template
         $this->init();
     }
 
-    /**
-     * @return $this
-     */
-    public function init()
+    public function init(): void
     {
-        return $this;
     }
 
-    /**
-     * @param  string $from_name
-     * @return Template
-     */
-    public function setFromName($from_name)
+    public function setFromName(string $from_name): static
     {
         $this->from_name = $from_name;
         return $this;
     }
 
-    /**
-     * @param  string $from_email
-     * @return Template
-     */
-    public function setFromEmail($from_email)
+    public function setFromEmail(string $from_email): static
     {
         $this->from_email = $from_email;
         return $this;
     }
 
-    /**
-     * @param  string $to_name
-     * @return Template
-     */
-    public function setToName($to_name)
+    public function setToName(string $to_name): static
     {
         $this->to_name = $to_name;
         return $this;
     }
 
-    /**
-     * @param  string $to_email
-     * @return Template
-     */
-    public function setToEmail($to_email)
+    public function setToEmail(string $to_email): static
     {
         $this->to_email = $to_email;
         return $this;
     }
 
-    /**
-     * @param  string $subject
-     * @return Template
-     */
-    public function setSubject($subject)
+    public function setSubject(string $subject): static
     {
         $this->subject = $subject;
         return $this;
     }
 
-    /**
-     * @return Mime\Part
-     */
-    public function getBody()
+    public function getBody(): Mime\Part
     {
         $body = \E4u\Common\Template::merge($this->content, $this->vars);
         $text = new Mime\Part(trim($body));
@@ -114,48 +86,32 @@ class Template
         return $text;
     }
 
-    /**
-     * @param  string $content
-     * @return Template
-     */
-    public function setContent($content)
+    public function setContent(string $content): static
     {
         $this->content = $content;
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getFormat()
+    public function getFormat(): int
     {
         return $this->format;
     }
 
-    /**
-     * @param  int $format
-     * @return Template
-     */
-    public function setFormat($format)
+    public function setFormat(int $format): static
     {
         $this->format = $format;
         return $this;
     }
 
     /**
-     * @return array
+     * @return Mime\Part[]
      */
-    public function getAttachments()
+    public function getAttachments(): array
     {
         return $this->attachments;
     }
 
-    /**
-     * @param  string|Mail\Address\AddressInterface $email
-     * @param  string $name
-     * @return $this
-     */
-    public function setFrom($email, $name = null)
+    public function setFrom(string|Mail\Address\AddressInterface $email, ?string $name = null): static
     {
         if ($email instanceof Mail\Address\AddressInterface) {
             return $this
@@ -168,12 +124,7 @@ class Template
             ->setFromName($name);
     }
 
-    /**
-     * @param  string|Mail\Address\AddressInterface $email
-     * @param  string $name
-     * @return $this
-     */
-    public function setTo($email, $name = null)
+    public function setTo(string|Mail\Address\AddressInterface $email, ?string $name = null): static
     {
         if ($email instanceof Mail\Address\AddressInterface) {
             return $this
@@ -186,12 +137,7 @@ class Template
             ->setToName($name);
     }
 
-    /**
-     * @param  string|Mail\Header\HeaderInterface $name
-     * @param  ?string $value
-     * @return $this
-     */
-    public function addToHeaders($name, $value = null)
+    public function addToHeaders(string|Mail\Header\HeaderInterface $name, Entity|string|null $value = null): static
     {
         if ($name instanceof Mail\Header\HeaderInterface) {
             $this->headers[] = $name;
@@ -206,12 +152,7 @@ class Template
         return $this;
     }
 
-    /**
-     * @param  string $filename
-     * @param  string|null $mimeType
-     * @return $this
-     */
-    public function addToAttachments($filename, $mimeType = null)
+    public function addToAttachments(string $filename, ?string $mimeType = null): static
     {
         if (!is_string($mimeType)) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -229,32 +170,22 @@ class Template
         return $this;
     }
 
-    /**
-     * @return Mail\Transport\TransportInterface
-     */
-    public function getMailer()
+    public function getMailer(): Mail\Transport\TransportInterface
     {
-        if (null === $this->mailer) {
+        if (!isset($this->mailer)) {
             $this->mailer = \E4u\Loader::getMailer();
         }
 
         return $this->mailer;
     }
 
-    /**
-     * @param Mail\Transport\TransportInterface $mailer
-     * @return $this
-     */
-    public function setMailer(Mail\Transport\TransportInterface $mailer)
+    public function setMailer(Mail\Transport\TransportInterface $mailer): static
     {
         $this->mailer = $mailer;
         return $this;
     }
 
-    /**
-     * @return Mail\Headers
-     */
-    public function getHeaders()
+    public function getHeaders(): Mail\Headers
     {
         $headers = new Mail\Headers();
         $contentType = sprintf('Content-Type: %s; charset=%s', $this->getContentType(), self::CHARSET);
@@ -266,7 +197,7 @@ class Template
         return $headers;
     }
 
-    private function getContentType()
+    private function getContentType(): string
     {
         return $this->format == self::FORMAT_HTML ?
             Mime\Mime::TYPE_HTML :
@@ -276,7 +207,7 @@ class Template
     /**
      * @return Mime\Part[]
      */
-    private function getMimeParts()
+    private function getMimeParts(): array
     {
         $parts = [ $this->getBody() ];
         foreach ($this->attachments as $attachment) {
@@ -286,18 +217,12 @@ class Template
         return $parts;
     }
 
-    /**
-     * @return string
-     */
-    private function getSubject()
+    private function getSubject(): string
     {
         return \E4u\Common\Template::merge($this->subject, $this->vars);
     }
 
-    /**
-     * @return Mail\Message
-     */
-    public function prepareMessage()
+    public function prepareMessage(): Mail\Message
     {
         $message = new Mail\Message();
 
@@ -316,15 +241,11 @@ class Template
         return $message;
     }
 
-    /**
-     * @return $this
-     */
-    public function send()
+    public function send(): void
     {
         $mailer = $this->getMailer();
         $message = $this->prepareMessage();
 
         $mailer->send($message);
-        return $this;
     }
 }

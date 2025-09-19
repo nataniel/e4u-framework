@@ -1,13 +1,15 @@
 <?php
 namespace E4u\Form\Recaptcha;
 
+use GuzzleHttp\Utils;
+
 class Response
 {
-    private $data;
+    private array $data;
 
     public function __construct(string $response)
     {
-        $this->data = \GuzzleHttp\json_decode($response, true);
+        $this->data = Utils::jsonDecode($response, true);
     }
 
     public function isSuccess(): bool

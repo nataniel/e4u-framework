@@ -5,13 +5,14 @@ use Laminas\Stdlib\ResponseInterface;
 
 interface Response extends ResponseInterface
 {
-    const STATUS_OK = 200;
-    const STATUS_REDIRECT = 302;
-    const STATUS_FORBIDDEN = 403;
-    const STATUS_NOT_FOUND = 404;
-    const STATUS_INVALID = 500;
+    const int
+        STATUS_OK = 200,
+        STATUS_REDIRECT = 302,
+        STATUS_FORBIDDEN = 403,
+        STATUS_NOT_FOUND = 404,
+        STATUS_INVALID = 500;
 
-    public function send();
-    public function setStatus($status);
-    public function getStatus();
+    public function send(): void;
+    public function setStatus(int $status): void;
+    public function getStatus(): int;
 }

@@ -3,9 +3,9 @@ namespace E4u\Request;
 
 class Factory
 {
-    public static function create()
+    public static function create(): Cli|Xhr|Http
     {
-        if (PHP_SAPI == 'cli') {
+        if (PHP_SAPI === 'cli') {
             return new Cli();
         }
         

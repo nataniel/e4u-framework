@@ -3,32 +3,20 @@ namespace E4u\Form\Element;
 
 class Select extends Options
 {
-    protected $optGroups = [];
+    protected array $optGroups = [];
 
-    /**
-     * @param  array $optGroups
-     * @return $this
-     */
-    public function setOptGroups($optGroups)
+    public function setOptGroups(array $optGroups): static
     {
         $this->optGroups = $optGroups;
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptGroups()
+    public function getOptGroups(): array
     {
         return $this->optGroups;
     }
 
-    /**
-     * @param  string $name
-     * @param  array $group
-     * @return $this
-     */
-    public function addOptGroup($name, $group)
+    public function addOptGroup(string $name, array $group): static
     {
         $this->optGroups[ $name ] = $group;
         return $this;

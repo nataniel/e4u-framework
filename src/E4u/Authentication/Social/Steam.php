@@ -15,22 +15,13 @@ class Steam implements Helper
 {
     use Url;
 
-    /**
-     * @var Config
-     */
-    private $config;
+    private Config $config;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private Request $request;
 
-    /**
-     * @var \LightOpenID
-     */
-    protected $client;
+    protected \LightOpenID $client;
 
-    private $me;
+    private object $me;
 
     public function __construct(Config $config, Request $request)
     {
@@ -38,37 +29,26 @@ class Steam implements Helper
         $this->request = $request;
     }
 
-    /**
-     * @param  Config $config
-     * @return $this
-     */
-    protected function setConfig(Config $config)
+    protected function setConfig(Config $config): void
     {
         if (!$config->get('api_key')) {
             throw new ConfigException('Steam config must have "api_key" key set.');
         }
 
         $this->config = $config;
-        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLoginUrl()
+    public function getLoginUrl(): string
     {
         return $this->getClient()->authUrl();
     }
 
-    /**
-     * @return bool
-     */
-    public function loginFromRedirect()
+    public function loginFromRedirect(): bool
     {
         if ($this->getClient()->mode) {
             if ($this->getClient()->validate()) {
 
-                $url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?'
+                $url = 'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?'
                     . http_build_query([
                         'key' => $this->config->get('api_key'),
                         'steamids' => $this->getClient()->identity,
@@ -84,76 +64,54 @@ class Steam implements Helper
         return false;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->me->steamid;
     }
 
-    /**
-     * @return string
-     */
-    public function getFirstName()
+    public function getFirstName(): ?string
     {
         return strtok($this->me->realname, ' ') ?: $this->me->personaname;
     }
 
-    /**
-     * @return string
-     */
-    public function getLastName()
+    public function getLastName(): string
     {
         strtok($this->me->realname, ' ');
         return (string)strtok('');
     }
 
-    /**
-     * @return string
-     */
-    public function getPicture()
+    public function getPicture(): ?string
     {
         return $this->me->avatarfull;
     }
 
-    /**
-     * @return string
-     */
-    public function getEmail()
+    public function getEmail(): null
     {
         return null;
     }
 
     /**
      * Implements Helper\Url
-     * @return Request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
 
-    /**
-     * @return \LightOpenID
-     */
-    public function getClient()
+    public function getClient(): \LightOpenID
     {
-        if (null == $this->client) {
+        if (!isset($this->client)) {
 
             $callback = $this->getRequest()->getCurrentPath();
             $this->client = new \LightOpenID($this->urlTo($callback, true));
-            $this->client->identity = 'http://steamcommunity.com/openid';
+            $this->client->identity = 'https://steamcommunity.com/openid';
 
         }
 
         return $this->client;
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         // "loccountrycode": "PL",
         return strtolower($this->me->loccountrycode);

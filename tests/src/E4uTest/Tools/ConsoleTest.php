@@ -1,30 +1,25 @@
 <?php
 namespace E4uTest\Tools;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use E4u\Tools\Console;
 use Laminas\Config\Config;
 
+#[CoversClass(Console::class)]
 class ConsoleTest extends TestCase
 {
-    /**
-     * @var Console
-     */
-    protected $console;
+    protected Console $console;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
-        
         $this->console = new Console(new Config([]));
     }
 
-    /**
-     * @covers \E4u\Tools\Console::getCurrentCommand
-     */
     public function testGetCurrentCommand()
     {
         $_SERVER['argv'] = [ 'tools\console', 'xxx' ];
@@ -35,7 +30,7 @@ class ConsoleTest extends TestCase
     }
     
     /**
-     * @covers \E4u\Tools\Console::run
+     * @covers Console::run
      */
     public function testRun()
     {
@@ -45,12 +40,9 @@ class ConsoleTest extends TestCase
             $this->console->run();
             $output = ob_get_contents();
         ob_end_clean();
-        $this->assertContains(\E4u\Version::VERSION, $output);
+        $this->assertStringContainsString(\E4u\Version::VERSION, $output);
     }
 
-    /**
-     * @covers \E4u\Tools\Console::addCommand
-     */
     public function testAddCommand()
     {
         $this->console->addCommand(Console\Help::class, 'test_1');
@@ -61,21 +53,15 @@ class ConsoleTest extends TestCase
         $this->assertInstanceOf(Console\Help::class, $commands['test_2']);
     }
 
-    /**
-     * @covers \E4u\Tools\Console::showHelp
-     */
     public function testShowHelp()
     {
         ob_start();
             $this->console->showHelp('version');
             $output = ob_get_contents();
         ob_end_clean();
-        $this->assertContains('current version', $output);
+        $this->assertStringContainsString('current version', $output);
     }
 
-    /**
-     * @covers \E4u\Tools\Console::getCommands
-     */
     public function testGetCommands()
     {
         $commands = $this->console->getCommands();

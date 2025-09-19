@@ -3,24 +3,16 @@ namespace E4u\Form\Element;
 
 class CheckBoxGroup extends Options
 {
-    protected $default = [];
+    protected mixed $default = [];
 
-    /**
-     * @param  string $message
-     * @return $this
-     */
-    public function setRequired($message = null)
+    public function setRequired(null|bool|string $message = null): static
     {
         parent::setRequired($message);
         unset($this->attributes['required']);
         return $this;
     }
 
-    /**
-     * @param  mixed $value
-     * @return $this
-     */
-    public function setValue($value)
+    public function setValue(mixed $value): static
     {
         if (empty($value)) {
             $value = [];

@@ -9,11 +9,11 @@ class Directory extends File implements \IteratorAggregate, \Countable
     /**
      * @var File[]
      */
-    protected $entries;
+    protected array $entries;
 
-    public function __construct($filename, $publicPath = 'public/')
+    public function __construct(string $filename, string $publicPath = 'public/')
     {
-        if ($filename == '.') {
+        if ($filename === '.') {
             $filename = '';
         }
 
@@ -25,19 +25,16 @@ class Directory extends File implements \IteratorAggregate, \Countable
         }
     }
 
-    /**
-     * @return Directory|null
-     */
-    public function getParent()
+    public function getParent(): ?Directory
     {
         return $this->filename != '/'
             ? new Directory($this->getDirname(), $this->publicPath)
             : null;
     }
 
-    protected function initialize()
+    protected function initialize(): void
     {
-        if (null === $this->entries) {
+        if (!isset($this->entries)) {
 
             $files = scandir($this->getFullPath());
             $this->entries = [];
@@ -48,14 +45,12 @@ class Directory extends File implements \IteratorAggregate, \Countable
                 }
             }
         }
-
-        return $this;
     }
 
     /**
      * @return File[]
      */
-    public function getFiles()
+    public function getFiles(): array
     {
         $this->initialize();
         $files = [];
@@ -71,7 +66,7 @@ class Directory extends File implements \IteratorAggregate, \Countable
     /**
      * @return File\Directory[]
      */
-    public function getDirectories()
+    public function getDirectories(): array
     {
         $this->initialize();
         $directories = [];
@@ -84,19 +79,13 @@ class Directory extends File implements \IteratorAggregate, \Countable
         return $directories;
     }
 
-    /**
-     * @return \ArrayIterator
-     */
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         $this->initialize();
         return new \ArrayIterator($this->entries);
     }
 
-    /**
-     * @return int
-     */
-    public function count()
+    public function count(): int
     {
         $this->initialize();
         return count($this->entries);

@@ -4,63 +4,35 @@ namespace E4u\Tools\Console;
 use E4u\Application\Helper\Url;
 use E4u\Request\Request;
 use E4u\Tools\Console;
-use Laminas\Console\Getopt;
 
 abstract class Base implements Command
 {
     use Url;
 
-    const HELP = '';
+    const string HELP = '';
 
-    /**
-     * @var array
-     */
-    protected $arguments;
+    protected array $arguments;
 
-    /**
-     * @var Getopt
-     */
-    protected $options;
+    protected Getopt $options;
 
-    /**
-     * @var Console
-     */
-    protected $console;
+    protected Console $console;
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    protected Request $request;
 
-    /**
-     * @var string
-     */
-    protected $_locale;
+    protected string $_locale;
 
-    /**
-     * @return string
-     */
-    protected function getScript()
+    protected function getScript(): string
     {
         return $_SERVER['argv'][0];
     }
 
-    /**
-     * @param  string $key
-     * @param  mixed $default
-     * @return mixed|null
-     */
-    protected function getOption($key, $default = null)
+    protected function getOption(string $key, mixed $default = null): mixed
     {
         $value = $this->options->getOption($key);
         return !empty($value) ? $value : $default;
     }
 
-    /**
-     * @param  string $key
-     * @return string|null
-     */
-    protected function getArgument($key)
+    protected function getArgument(string $key): ?string
     {
         if (isset($this->arguments[$key])) {
             return $this->arguments[$key];
@@ -69,43 +41,31 @@ abstract class Base implements Command
         return null;
     }
 
-    /**
-     * @param  array $arguments
-     * @param  Getopt $options
-     * @return $this
-     */
-    public function configure($arguments, $options)
+    public function configure(array $arguments, Getopt $options): static
     {
         $this->arguments = $arguments;
         $this->options = $options;
         return $this;
     }
 
-    /**
-     * @return Console
-     */
-    public function getConsole()
+    public function getConsole(): Console
     {
         return $this->console;
     }
 
-    /**
-     * @param  Console $console
-     * @return Base    Current instance
-     */
-    public function setConsole(Console $console)
+    public function setConsole(Console $console): static
     {
         $this->console = $console;
         return $this;
     }
 
-    public function showHelp()
+    public function showHelp(): void
     {
         echo "Usage:\n";
         $this->getConsole()->showHelp($this);
     }
 
-    public function help()
+    public function help(): array|string
     {
         return static::HELP;
     }
@@ -113,12 +73,10 @@ abstract class Base implements Command
     /**
      * Get the router object. If no object available,
      * then create and configure one.
-     *
-     * @return Request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
-        if (!$this->request instanceof Request) {
+        if (!isset($this->request)) {
             $this->request = \E4u\Request\Factory::create();
 
             $config = $this->getConsole()->getConfig();
@@ -130,23 +88,13 @@ abstract class Base implements Command
         return $this->request;
     }
 
-    /**
-     * @param  mixed $message
-     * @param  string $locale
-     * @return string
-     */
-    public function translate($message, $locale = null)
+    public function translate(mixed $message, ?string $locale = null): string
     {
         $message = (string)$message;
         return \E4u\Loader::getTranslator()->translate($message, 'default', $locale ?: $this->getCurrentLocale());
     }
 
-    /**
-     * @param mixed $message
-     * @param array $parameters
-     * @return string
-     */
-    public function t($message, $parameters = null)
+    public function t(mixed $message, mixed $parameters = null): string
     {
         $txt = $this->translate($message);
         if (!empty($parameters)) {
@@ -162,22 +110,16 @@ abstract class Base implements Command
         return $txt;
     }
 
-    /**
-     * @return string
-     */
-    public function getCurrentLocale()
+    public function getCurrentLocale(): string
     {
-        if (null === $this->_locale) {
+        if (!isset($this->_locale)) {
             $this->_locale = $this->detectCurrentLocale();
         }
 
         return $this->_locale;
     }
 
-    /**
-     * @return string
-     */
-    protected function detectCurrentLocale()
+    protected function detectCurrentLocale(): string
     {
         return \E4u\Loader::getConfig()->get('default_locale')
             ?: strtok(\E4u\Loader::getTranslator()->getLocale(), '_');

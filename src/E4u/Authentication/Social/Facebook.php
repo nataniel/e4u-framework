@@ -5,6 +5,8 @@ use E4u\Application\Helper\Url;
 use E4u\Authentication\Exception\AuthenticationException;
 use E4u\Exception\ConfigException;
 use E4u\Request\Request;
+use Facebook\Exception\SDKException;
+use Facebook\GraphNode\GraphUser;
 use Laminas\Config\Config;
 
 /**
@@ -16,25 +18,13 @@ class Facebook implements Helper
 {
     use Url;
 
-    /**
-     * @var Config
-     */
-    private $config;
+    private Config $config;
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private Request $request;
 
-    /**
-     * @var \Facebook\Facebook
-     */
-    private $client;
+    private \Facebook\Facebook $client;
 
-    /**
-     * @var \Facebook\GraphNodes\GraphUser
-     */
-    private $me;
+    private GraphUser $me;
 
     public function __construct(Config $config, Request $request)
     {
@@ -42,36 +32,25 @@ class Facebook implements Helper
         $this->request = $request;
     }
 
-    /**
-     * @param  Config $config
-     * @return $this
-     */
-    protected function setConfig(Config $config)
+    protected function setConfig(Config $config): void
     {
         if (!$config->get('app_id') || !$config->get('app_secret')) {
             throw new ConfigException('Facebook config must have "app_id" and "app_secret" keys set.');
         }
 
         $this->config = $config;
-        return $this;
     }
 
-    /**
-     * @return \Facebook\Facebook
-     */
-    private function getClient()
+    private function getClient(): \Facebook\Facebook
     {
-        if (null === $this->client) {
+        if (!isset($this->client)) {
             $this->client = new \Facebook\Facebook($this->config->toArray());
         }
 
         return $this->client;
     }
 
-    /**
-     * @return string
-     */
-    public function getLoginUrl()
+    public function getLoginUrl(): string
     {
         $permissions = [ 'email' ];
         $helper = $this->getClient()->getRedirectLoginHelper();
@@ -80,16 +59,12 @@ class Facebook implements Helper
         return $helper->getLoginUrl($this->urlTo($callback, true), $permissions);
     }
 
-    /**
-     * @return bool
-     */
-    public function loginFromRedirect()
+    public function loginFromRedirect(): bool
     {
         $helper = $this->getClient()->getRedirectLoginHelper();
         try {
 
             $accessToken = $helper->getAccessToken();
-
             if (empty($accessToken)) {
                 return false;
             }
@@ -102,41 +77,27 @@ class Facebook implements Helper
             $this->me = $response->getGraphUser();
             return true;
 
-        } catch (\Facebook\Exceptions\FacebookSDKException $e) {
-
+        } catch (SDKException $e) {
             throw new AuthenticationException($e->getMessage(), null, $e);
-
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->me->getId();
     }
 
-    /**
-     * @return string
-     */
-    public function getFirstName()
+    public function getFirstName(): ?string
     {
         return $this->me->getFirstName();
     }
 
-    /**
-     * @return string
-     */
-    public function getLastName()
+    public function getLastName(): ?string
     {
         return $this->me->getLastName();
     }
 
-    /**
-     * @return string
-     */
-    public function getPicture()
+    public function getPicture(): string
     {
         $picture = $this->me->getPicture();
         return !empty($picture)
@@ -144,18 +105,12 @@ class Facebook implements Helper
             : '';
     }
 
-    /**
-     * @return string
-     */
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->me->getEmail();
     }
 
-    /**
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): string
     {
         // ["locale"] => string(5) "pl_PL"
         return strtok($this->me->getField('locale'), '_');
@@ -163,9 +118,8 @@ class Facebook implements Helper
 
     /**
      * Implements Helper\Url
-     * @return Request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }

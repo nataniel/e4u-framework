@@ -11,7 +11,7 @@ class Test implements Mail\Transport\TransportInterface
      * @param  Mail\Message $message
      * @return void
      */
-    public function send(Mail\Message $message)
+    public function send(Mail\Message $message): void
     {
         echo('<pre>'.htmlentities($message->toString()).'</pre>');
     }

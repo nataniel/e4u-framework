@@ -9,7 +9,7 @@ class Submit extends Element
      * @param  mixed $value
      * @return $this
      */
-    public function setValue($value)
+    public function setValue(mixed $value): static
     {
         parent::setValue((bool)$value);
         return $this;

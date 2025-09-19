@@ -9,63 +9,43 @@ use Laminas\Http\PhpEnvironment\Request as HttpRequest,
 
 class Http extends HttpRequest implements RequestDescription
 {
-    /** @var RouteStackInterface */
-    protected $router;
+    protected RouteStackInterface $router;
 
-    /** @var RouteMatch */
-    protected $currentRoute;
+    protected RouteMatch $currentRoute;
 
-    protected function detectBaseUrl()
+    protected function detectBaseUrl(): string
     {
         $baseUrl = parent::detectBaseUrl();
         return preg_replace('/index.php$/', '', $baseUrl);
     }
 
-    /**
-     * @param  RouteStackInterface $router
-     * @return $this|Request
-     */
-    public function setRouter(RouteStackInterface $router)
+    public function setRouter(RouteStackInterface $router): static
     {
         $this->router = $router;
         return $this;
     }
 
-    /**
-     * @return RouteStackInterface
-     */
-    public function getRouter()
+    public function getRouter(): RouteStackInterface
     {
-        if (!$this->router instanceof RouteStackInterface)
-        {
+        if (!isset($this->router)) {
             $this->router = new HttpRouter();
         }
 
         return $this->router;
     }
 
-    /**
-     * @param  RouteMatch $route
-     * @return $this|Request
-     */
-    public function setCurrentRoute(RouteMatch $route)
+    public function setCurrentRoute(RouteMatch $route): static
     {
         $this->currentRoute = $route;
         return $this;
     }
 
-    /**
-     * @return RouteMatch
-     */
-    public function getCurrentRoute()
+    public function getCurrentRoute(): RouteMatch
     {
         return $this->currentRoute;
     }
 
-    /**
-     * @return string
-     */
-    public function getCurrentPath()
+    public function getCurrentPath(): string
     {
         $route = $this->getQuery('route');
         if (is_null($route)) {
@@ -76,10 +56,7 @@ class Http extends HttpRequest implements RequestDescription
         return $route;
     }
 
-    /**
-     * @return string
-     */
-    public function getFullUrl()
+    public function getFullUrl(): string
     {
         $uri = $this->getUri();
         $port = $uri->getPort();
@@ -89,19 +66,12 @@ class Http extends HttpRequest implements RequestDescription
             . $this->getBaseUrl();
     }
 
-    /**
-     * @return string|null
-     */
-    public function getQueryString()
+    public function getQueryString(): ?string
     {
         return $this->getUri()->getQuery();
     }
 
-    /**
-     * @param  array $merge
-     * @return string
-     */
-    public function mergeQuery($merge = [])
+    public function mergeQuery(array $merge = []): string
     {
         $query = $this->getUri()->getQueryAsArray();
         $query = array_merge($query, $merge);
@@ -113,10 +83,7 @@ class Http extends HttpRequest implements RequestDescription
         return in_array($port, [ 80, 443 ]);
     }
 
-    /**
-     * @return bool
-     */
-    public function isSSL()
+    public function isSSL(): bool
     {
         return !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off';
     }

@@ -5,12 +5,12 @@ use E4u\Tools\Console\Base;
 
 class RunAll extends Base
 {
-    public function help()
+    public function help(): string
     {
         return 'Run all tests';
     }
 
-    public function execute()
+    public function execute(): void
     {
         $command = "phpunit --configuration tests/phpunit.xml";
         system($command);

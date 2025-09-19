@@ -3,53 +3,24 @@ namespace E4u\Authentication;
 
 interface Identity
 {
-    /**
-     * @return int
-     */
-    public function id();
+    public function id(): int;
 
-    /**
-     * @return string
-     */
-    public function getLogin();
+    public function getLogin(): ?string;
 
-    /**
-     * @return string|null
-     */
-    public function getLocale();
+    public function getLocale(): ?string;
 
-    /**
-     * @return string
-     */
-    public function getCookie();
+    public function getCookie(): ?string;
 
     /**
      * Should return TRUE if the current identity has a privilige
      * to take a specified action. In most cases $privilige will be
      * an integer, like E4u\Application\Controller::ACCESS_ADMIN
      * to be checked against privileges appointed to the user (or group).
-     * 
-     * @param  int
-     * @return bool
      */
-    public function hasPrivilege($privilege);
+    public function hasPrivilege(int $privilege): bool;
     
-    /**
-     * @param  string $user
-     * @param  string $password
-     * @return Identity
-     */
-    public static function login($user, $password);
+    public static function login(string $login, string $password): static;
     
-    /**
-     * @param  int $id
-     * @return Identity
-     */
-    public static function findByID($id);
-    
-    /**
-     * @param  string $cookie
-     * @return Identity
-     */
-    public static function findByCookie($cookie);
+    public static function findByID(int $id): ?static;
+    public static function findByCookie(string $cookie): ?static;
 }

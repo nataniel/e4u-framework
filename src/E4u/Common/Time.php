@@ -3,7 +3,7 @@ namespace E4u\Common;
 
 class Time
 {
-    public static function getMicrotime()
+    public static function getMicrotime(): float
     {
         list($usec, $sec) = explode(" ", microtime());
         return ((float)$usec + (float)$sec);

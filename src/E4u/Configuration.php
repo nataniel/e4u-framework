@@ -5,12 +5,11 @@ use Laminas\Config\Config;
 
 abstract class Configuration
 {
-    /** @var Config */
-    private static $_config;
+    private static Config $_config;
 
     public static function isSSLRequired(): bool
     {
-        return (bool)self::getConfigValue('ssl_required', false) ?: false;
+        return (bool)self::getConfigValue('ssl_required', false);
     }
 
     public static function baseUrl(): string
@@ -25,11 +24,7 @@ abstract class Configuration
         return rtrim($url, '/');
     }
 
-    /**
-     * @return mixed
-     * @throws \E4u\Exception\ConfigException
-     */
-    protected static function getConfigValue(string $key, bool $exceptionIfEmpty = true)
+    protected static function getConfigValue(string $key, bool $exceptionIfEmpty = true): mixed
     {
         $value = self::getConfig()->get($key);
         if (empty($value) && $exceptionIfEmpty) {

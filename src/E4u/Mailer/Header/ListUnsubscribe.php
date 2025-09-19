@@ -18,31 +18,24 @@ class ListUnsubscribe extends AsciiHeader
             throw new LogicException('Invalid header line for List-Unsubscribe string');
         }
 
-        $header = new static($value);
-        return $header;
+        return new static($value);
     }
 
-    public function getFieldName()
+    public function getFieldName(): ?string
     {
         return 'List-Unsubscribe';
     }
 
-    /**
-     * Set the unsubscribe url
-     *
-     * @param  string $url
-     * @return ListUnsubscribe
-     */
-    public function setFieldValue($url)
+    public function setFieldValue(string $fieldValue): static
     {
-        if (! HeaderValue::isValid($url)
-            || preg_match("/[\r\n]/", $url)
-            || !filter_var($url, FILTER_VALIDATE_URL)
+        if (! HeaderValue::isValid($fieldValue)
+            || preg_match("/[\r\n]/", $fieldValue)
+            || !filter_var($fieldValue, FILTER_VALIDATE_URL)
         ) {
             throw new LogicException('Invalid Url detected');
         }
 
-        parent::setFieldValue(sprintf('<%s>', $url));
+        parent::setFieldValue(sprintf('<%s>', $fieldValue));
         return $this;
     }
 }

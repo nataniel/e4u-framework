@@ -5,29 +5,27 @@ use E4u\Common\File\Csv;
 
 class CsvWithoutHeader extends Csv
 {
-    /**
-     * @return int
-     */
-    public function countColumns()
+    public function countColumns(): int
     {
-        return empty($this->getData()) ? 0 : count($this->data[0]);
+        return !empty($this->getData())
+            ? count($this->data[0])
+            : 0;
     }
 
-    protected function initialize()
+    protected function initialize(): void
     {
-        if (!is_null($this->header)) {
-            return false;
+        if (isset($this->header)) {
+            return;
         }
+        
         $this->header = [];
-
         $file = fopen($this->getFullPath(), 'r');
-
+        
         $this->data = [];
-        while ($row = $this->readLineToArray($file)) {
+        while ($row = $this->readLineIntoArray($file)) {
             $this->data[] = $row;
         }
 
         fclose($file);
-        return true;
     }
 }
