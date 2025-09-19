@@ -76,10 +76,6 @@ class BaseTest extends TestCase
         $this->assertEquals('else', $this->form->getValue('foo'));
     }
 
-    /**
-     * @covers Form\Base::setMethod
-     * @covers Form\Base::getMethod
-     */
     public function testMethod()
     {
         // default method

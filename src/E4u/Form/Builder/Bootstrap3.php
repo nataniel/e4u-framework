@@ -169,7 +169,7 @@ class Bootstrap3 implements BuilderInterface
         ], join(' ', $elements));
     }
 
-    protected function helpBlock(?string $name, ?string $content): string
+    protected function helpBlock(?string $name, ?string $content = null): string
     {
         $content = $name;
         if (empty($content)) {

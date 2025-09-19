@@ -13,6 +13,6 @@ interface Response extends ResponseInterface
         STATUS_INVALID = 500;
 
     public function send(): void;
-    public function setStatus(int $status): void;
+    public function setStatus(int $status): static;
     public function getStatus(): int;
 }

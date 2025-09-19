@@ -10,7 +10,7 @@ class VarDump
         $content = ob_get_clean();
         
         $html = str_replace("=>\n", "=>\t", $content);
-        $pattern = '/\n([^\n]*)\{(.*)\}/Us';
+        $pattern = '/\n([^\n]*)\{(.*)}/Us';
         while (preg_match($pattern, $html))
         {
             $id = rand(10000, 99999);

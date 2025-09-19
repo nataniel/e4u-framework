@@ -29,9 +29,6 @@ class ConsoleTest extends TestCase
         $this->assertInstanceOf('E4u\Tools\Console\Version', $this->console->getCurrentCommand(true));
     }
     
-    /**
-     * @covers Console::run
-     */
     public function testRun()
     {
         $_SERVER['argv'] = [ 'tools\console', 'version' ];

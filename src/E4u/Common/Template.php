@@ -86,7 +86,7 @@ class Template
                 Variable::getType($vars)));
         }
         
-        return preg_replace_callback('/\[\[((?<name>.*)(\((?<options>.*)\))?)\]\]/U', function ($matches) use ($vars) {
+        return preg_replace_callback('/\[\[((?<name>.*)(\((?<options>.*)\))?)]]/U', function ($matches) use ($vars) {
 
             if (empty($matches['name'])) {
                 return '';

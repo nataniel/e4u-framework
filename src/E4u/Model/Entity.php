@@ -71,11 +71,8 @@ class Entity extends Base
 
     /**
      * Defined by ArrayAccess.
-     *
-     * @param string $offset
-     * @return boolean
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         $method = self::propertyGetMethod($offset);
         if (method_exists($this, $method)) {
@@ -840,11 +837,7 @@ class Entity extends Base
         return self::getRepository()->find($id);
     }
 
-    /**
-     * @param  array $attributes
-     * @return static
-     */
-    public static function create($attributes)
+    public static function create(array $attributes): static
     {
         $instance = new static($attributes);
         $instance->save();

@@ -16,9 +16,10 @@ abstract class Base extends LaminasResponse implements Response
 
     public abstract function send(): void;
     
-    public function setStatus(int $status): void
+    public function setStatus(int $status): static
     {
         $this->status = $status;
+        return $this;
     }
     
     public function getStatus(): int

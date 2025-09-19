@@ -188,7 +188,7 @@ class Loader
     /**
      * @return \Doctrine\DBAL\Migrations\Configuration\Configuration
      */
-    public static function configureMigrations(Config $config = null)
+    public static function configureMigrations(?Config $config = null)
     {
         if (is_null($config)) {
             $config = self::getConfig();

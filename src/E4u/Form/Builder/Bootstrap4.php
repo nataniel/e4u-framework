@@ -557,7 +557,7 @@ class Bootstrap4 extends Bootstrap3
         return Html::tag('label', $attributes, $this->t($this->form->getElement($name)->getLabel()));
     }
 
-    protected function helpBlock(?string $name, ?string $content): string
+    protected function helpBlock(?string $name, ?string $content = null): string
     {
         if (empty($content)) {
             return '';

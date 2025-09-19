@@ -233,7 +233,7 @@ class StringTools
         $txt = str_replace('&nbsp;', '-', $txt);
 
         // replace non letter or digits by -
-        $txt = preg_replace('~[^\\pL\d\.]+~u', '-', $txt);
+        $txt = preg_replace('~[^\pL\d.]+~u', '-', $txt);
 
         // trim
         $txt = trim($txt, '-.');
@@ -269,11 +269,11 @@ class StringTools
     public static function shortVersion(string $txt, int $maxWords = 20): string
     {
         $content = strip_tags($txt);
-        $content = preg_replace('/\[\[.*\]\]/U', '', $content);
+        $content = preg_replace('/\[\[.*]]/U', '', $content);
         $content = str_replace('&nbsp;', ' ', $content);
         $content = str_replace("\r\n", ' ', $content);
         $content = str_replace("\n", ' ', $content);
-        $content = preg_replace('/\[\[.*\]\]/U', '', $content);
+        $content = preg_replace('/\[\[.*]]/U', '', $content);
         $content = preg_replace('/ +/', ' ', $content);
 
         $short = strtok($content, ' ').' ';
