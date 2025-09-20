@@ -9,6 +9,15 @@
       "email": "artur@jedlinski.pl"
     }
   ],
+  "config": {
+    "platform": {
+      "php": "8.4"
+    },
+    "allow-plugins": {
+      "composer/package-versions-deprecated": true,
+      "php-http/discovery": true
+    }
+  },
   "require-dev": {
     "phpunit/phpunit": "^11.5"
   },
@@ -43,15 +52,6 @@
     "psr-4": {
       "E4u\\": "src/E4u/",
       "E4uTest\\": "tests/src/E4uTest/"
-    }
-  },
-  "config": {
-    "platform": {
-      "php": "8.4"
-    },
-    "allow-plugins": {
-      "composer/package-versions-deprecated": true,
-      "php-http/discovery": true
     }
   }
 }
