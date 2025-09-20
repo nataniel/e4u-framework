@@ -22,7 +22,7 @@ class Test extends Cli
     
     /**
      * Mock $_POST parameters
-     * @return ParametersInterface
+     * @return ParametersInterface|mixed
      */
     public function getPost($name = null, $default = null)
     {
@@ -39,7 +39,7 @@ class Test extends Cli
     
     /**
      * Mock $_GET parameters
-     * @return ParametersInterface
+     * @return ParametersInterface|mixed
      */
     public function getQuery($name = null, $default = null) 
     {
