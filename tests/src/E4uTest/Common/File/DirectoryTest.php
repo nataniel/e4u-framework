@@ -39,8 +39,9 @@ class DirectoryTest extends TestCase
         return $dir;
     }
 
-    public function testIterable(Directory $dir)
+    public function testIterable()
     {
+        $dir = new Directory('/files/directory', 'tests/');
         foreach ($dir as $file) {
             $this->assertInstanceOf(File::class, $file);
         }
